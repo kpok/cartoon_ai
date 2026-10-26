@@ -54,7 +54,7 @@ test('English link, translated speech and switching preserve playback preference
   await expect(page.locator('#music')).toHaveAttribute('aria-pressed','false');
   await expect(page.locator('#volume')).toHaveValue('25');
   expect(await page.evaluate(()=>window.languageTest.cancels)).toBeGreaterThan(0);
-  expect(page.url()).toContain('lang=pl');expect(page.url()).toContain('demo=1#scene');
+  expect(page.url()).toContain('lang=pl');expect(new URL(page.url()).searchParams.get('demo')).toBe('1');expect(new URL(page.url()).hash).toBe('#scene');
   await page.goBack();await expect(page.locator('html')).toHaveAttribute('lang','en');
   await expect(page.getByRole('button',{name:'Play',exact:true})).toBeVisible();
   await page.reload();await expect(page.locator('html')).toHaveAttribute('lang','en');
@@ -79,13 +79,13 @@ test('unsupported language parameter falls back to Polish',async({page})=>{
   await expect(page.getByRole('button',{name:'Odtwórz bajkę',exact:true})).toBeVisible();
 });
 
-test('3D garden renders, seeks backwards, switches language and episodes',async({page})=>{
+test('3D garden renders, seeks backwards, switches language and episodes',async({page},testInfo)=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/?story=garden&lang=pl');
  await expect(page.locator('#garden-film')).toHaveAttribute('data-ready','true',{timeout:20000});
  const slider=page.locator('#seek');await expect(slider).toHaveAttribute('max','90');
  const start=await page.locator('#garden-film').screenshot();
  for(const t of ['10','18','26','40','52','62','74','82','89','0']){await slider.fill(t);await expect(slider).toHaveValue(t);}
- await slider.fill('74');const grown=await page.locator('#garden-film').screenshot();expect(start.equals(grown)).toBe(false);
+ await slider.fill('74');const grown=await page.locator('#garden-film').screenshot();await testInfo.attach('garden-grown',{body:grown,contentType:'image/png'});expect(start.equals(grown)).toBe(false);
  await page.locator('#language').selectOption('en');await expect(slider).toHaveValue('74');await expect(page.locator('h1')).toContainText('Little Seed');
  await slider.fill('90');await expect(page.locator('#ended')).toBeVisible();await page.locator('#again').click();await expect(slider).not.toHaveValue('90');
  await page.locator('button[data-story="meadow"]').click();await expect(slider).toHaveAttribute('max','65');await expect(page.locator('#film')).toBeVisible();
@@ -94,4 +94,15 @@ test('3D garden renders, seeks backwards, switches language and episodes',async(
 test('missing WebGL offers a working first story',async({page})=>{
  await page.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){return type==='webgl2'?null:original.call(this,type,...args);};});
  await page.goto('/?story=garden');await expect(page.locator('#back-to-meadow')).toBeVisible();await expect(page.locator('#play')).toBeDisabled();await page.locator('#back-to-meadow').click();await expect(page.locator('#play')).toBeEnabled();await expect(page.locator('#film')).toBeVisible();
+});
+
+test('context loss pauses garden and leaves the first story usable',async({page})=>{
+ await page.goto('/?story=garden');await expect(page.locator('#garden-film')).toHaveAttribute('data-ready','true',{timeout:20000});
+ await page.locator('#start').click();
+ await page.locator('#garden-film').evaluate(canvas=>canvas.dispatchEvent(new Event('webglcontextlost',{cancelable:true})));
+ await expect(page.locator('#garden-film')).toHaveAttribute('data-ready','false');await expect(page.locator('#play')).toBeDisabled();await page.locator('#back-to-meadow').click();await expect(page.locator('#play')).toBeEnabled();
+});
+test('finishing an async 3D load never switches the selected story',async({page})=>{
+ await page.route('**/src/garden-view.js',async route=>{await new Promise(resolve=>setTimeout(resolve,400));await route.continue();});
+ await page.goto('/?story=garden');await page.locator('button[data-story="meadow"]').click();await expect(page.locator('#garden-film')).toHaveAttribute('data-ready','true',{timeout:20000});await expect(page.locator('#player')).toHaveAttribute('data-story','meadow');await expect(page.locator('#seek')).toHaveValue('0');await expect(page.locator('#film')).toBeVisible();
 });
