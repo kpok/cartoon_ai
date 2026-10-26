@@ -1,8 +1,8 @@
-# Kotek i motyl
+# Kotek i motyl — music and dialogue
 
-A complete, silent, two-minute browser cartoon for very young children. An orange kitten wakes in a basket, meets a butterfly, walks through the garden, offers a helping paw, and returns home to sleep. There are no dialogue, captions inside the film, sound, advertisements, analytics, accounts, external assets or runtime API calls.
+A complete two-minute browser cartoon with gentle original music and short Polish dialogue. An orange kitten wakes in a basket, meets a butterfly, walks through the garden, offers a helping paw, and returns home to sleep. There are no advertisements, analytics, accounts, external assets or application API calls. Music is synthesized with Web Audio; dialogue uses the device/browser speech synthesis service. Some installed voices are remote services and can require internet.
 
-The original artwork is drawn with Canvas 2D from JavaScript. This is a simple procedural cartoon, not generated video or a photorealistic animation. The Polish player interface is intended for an accompanying adult.
+The original artwork is drawn with Canvas 2D from JavaScript. This is a simple procedural cartoon, not generated video or a photorealistic animation. The Polish player interface is intended for an accompanying adult. The original wordless experience is still available by turning off music, dialogue and captions.
 
 ## Watch locally
 
@@ -18,7 +18,7 @@ Open http://localhost:3000 and press **Obejrzyj bajkę**. Runtime dependencies d
 
 Play/pause, restart, seek anywhere on the timeline, replay, and fullscreen when supported. Space toggles playback and left/right arrows seek five seconds when focus is outside a control. Native slider keyboard controls remain intact. Hiding the tab pauses the film; returning never starts it automatically. Playback ends at 120 seconds and does not loop automatically.
 
-Fullscreen support depends on browser/device policy. A fixed 1280×720 drawing surface keeps rendering bounded on high-density phones. It scales to fit the player; there is no audio autoplay or media download.
+Fullscreen support depends on browser/device policy. A fixed 1280×720 drawing surface keeps rendering bounded on high-density phones. It scales to fit the player; audio starts only after a user gesture, and there is no media download.
 
 ## Build and tests
 
@@ -60,3 +60,11 @@ The deploy job depends on the test job and publishes its `dist/` Pages artifact,
 Before activation the workflow runs checks and skips publication. To pause future deployments, set `ENABLE_GITHUB_PAGES` to `false`; this does not remove an already published site. The final playback URL appears in the deploy job's environment link and **Settings → Pages**.
 
 GitHub Free supports Pages for public repositories. This repository is private; Pages requires a suitable paid plan such as GitHub Pro. A public Pages site exposes the deployed HTML, JavaScript and artwork even if its source repository is private. Only `dist/` is published: tests, project reports, workflow files and development server are excluded. The workflow does not change repository visibility or purchase a plan.
+
+## Music, dialogue and captions
+
+Music and dialogue start enabled, but no sound starts before pressing Play. Toggle either independently; music volume is adjustable. Captions can also be toggled independently and remain useful when no Polish voice is available. The player displays a status message if speech or music is unavailable. Polish local voices are preferred; otherwise an available Polish voice is used. Voice quality and availability depend on the device. There are no recorded voice assets or guaranteed professional character voices.
+
+Pause, seek, restart, hiding/leaving the page and the natural end cancel active speech and scheduled notes. Resuming within a dialogue window restarts that short line if at least two seconds remain. Seeking skips earlier lines, never queues missed dialogue, and does not auto-play a paused film. Speech is cancelled at the end of its cue window so it cannot drift into another scene. Music is reduced during dialogue windows.
+
+The original pentatonic melody is synthesized from sine tones; no copyrighted music recordings or paid APIs are used. Automated audio tests use injected adapters and browser speech mocks; they validate scheduling and lifecycle, not human-perceived voice quality or loudness on physical Android hardware.

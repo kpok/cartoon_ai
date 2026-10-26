@@ -50,3 +50,5 @@ jobs:
           fi
           git push --force-with-lease="refs/heads/main:$expected_head" origin main:main
           echo 'All reachable main commit identities use GitHub noreply addresses; file tree and commit count preserved.'
+
+# Recheck commit privacy when delivering the music and dialogue update.

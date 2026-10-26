@@ -1,6 +1,6 @@
 import {sampleStory} from './story.js';
 const TAU=Math.PI*2;
-export function render(ctx,time){
+export function render(ctx,time,{talking=false,speaker=null}={}){
  const s=sampleStory(time),t=s.t;
  ctx.clearRect(0,0,1280,720);
  const ellipse=(x,y,rx,ry,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,TAU);ctx.fill();};
@@ -40,6 +40,7 @@ export function render(ctx,time){
  const blink=Math.sin(t*1.1)> .992||s.sleep>.65;
  if(blink){curve([-24,-13,-19,-8,-12,-8,-7,-13],ink,3);curve([18,-13,23,-8,30,-8,35,-13],ink,3);}else{ellipse(-16,-12,5,7*(1-s.sleep*.7),ink);ellipse(28,-12,5,7*(1-s.sleep*.7),ink);ellipse(-14,-14,1.6,2,'#fff7df');ellipse(30,-14,1.6,2,'#fff7df');}
  ellipse(-33,4,10,5,'#e6a28a');ellipse(43,4,10,5,'#e6a28a');poly([[0,1],[12,1],[6,7]],'#b4776b');curve([6,7,1,16,-3,14,-6,12],ink,2);curve([6,7,11,16,15,14,18,11],ink,2);
+ if(talking&&speaker==='Kotek')ellipse(6,14,5,3+Math.abs(Math.sin(t*14))*4,ink);
  line([[-31,9],[-56,4]],ink,1.6);line([[-31,15],[-57,17]],ink,1.6);line([[39,9],[62,4]],ink,1.6);line([[39,15],[64,18]],ink,1.6);ctx.restore();ctx.restore();
  if(s.butterfly>0){ctx.save();ctx.globalAlpha=s.butterfly;ctx.translate(s.bx,s.by);const flutter=.55+Math.abs(Math.sin(t*(s.chapter===3?2:6)))*.45;ctx.scale(flutter,1);ellipse(-15,-8,20,25,'#d8aa88');ellipse(15,-8,20,25,'#d8aa88');ellipse(-12,15,14,16,'#ecd0a1');ellipse(12,15,14,16,'#ecd0a1');ellipse(-17,-10,9,12,'#f0d6b8');ellipse(17,-10,9,12,'#f0d6b8');ellipse(0,1,3,19,'#887159');line([[-1,-15],[-7,-25]],'#887159',1.5);line([[1,-15],[7,-25]],'#887159',1.5);ctx.restore();}
  if(s.heart>0){ctx.save();ctx.globalAlpha=s.heart;heart(855,340-Math.sin(t*.6)*7,.8);ctx.restore();}
