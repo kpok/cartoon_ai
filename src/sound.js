@@ -1,7 +1,9 @@
 import { cueAt, noteAt, BEAT_SECONDS } from './dialogue.js';
+import { normalizeLocale, translate } from './i18n.js';
 
 export class FilmSound {
-  constructor({ AudioContextClass, synth, UtteranceClass, onStatus = () => {} } = {}) {
+  constructor({ AudioContextClass, synth, UtteranceClass, onStatus = () => {}, locale = 'pl' } = {}) {
+    this.locale = normalizeLocale(locale);
     this.AudioContextClass = AudioContextClass;
     this.synth = synth;
     this.UtteranceClass = UtteranceClass;
@@ -25,22 +27,22 @@ export class FilmSound {
 
   voice() {
     const voices = this.synth?.getVoices?.() || [];
-    const polish = voices.filter(voice => /^pl(?:[-_]|$)/i.test(voice.lang));
-    return polish.find(voice => voice.localService) || polish[0] || null;
+    const matching = voices.filter(voice => String(voice.lang).toLowerCase().replace('_', '-').split('-')[0] === this.locale);
+    return matching.find(voice => voice.localService) || matching[0] || null;
   }
 
   reportStatus() {
     const messages = [];
     if (this.musicEnabled && (!this.AudioContextClass || this.musicFailed)) {
-      messages.push('Muzyka jest niedostępna w tej przeglądarce.');
+      messages.push(translate(this.locale, 'musicUnavailable'));
     }
     if (this.dialogueEnabled) {
       if (!this.UtteranceClass || !this.voice()) {
-        messages.push('Brak polskiego głosu. Dialogi są dostępne w napisach.');
+        messages.push(translate(this.locale, 'voiceMissing'));
       } else if (this.speechFailed) {
-        messages.push('Nie udało się odtworzyć głosu. Dialogi są dostępne w napisach.');
+        messages.push(translate(this.locale, 'speechFailed'));
       } else if (!this.voice().localService) {
-        messages.push('Polski głos może wymagać połączenia z internetem.');
+        messages.push(translate(this.locale, 'remoteVoice'));
       }
     }
     this.onStatus(messages.join(' '));
@@ -83,6 +85,13 @@ export class FilmSound {
     this.speechFailed = false;
     this.unlock();
     this.update(time, true);
+    this.reportStatus();
+  }
+
+  setLocale(locale) {
+    this.stop();
+    this.locale = normalizeLocale(locale);
+    this.speechFailed = false;
     this.reportStatus();
   }
 
@@ -152,10 +161,10 @@ export class FilmSound {
     this.cancelSpeech();
     this.spokenCue = cue.id;
     const utterance = new this.UtteranceClass(cue.text);
-    utterance.lang = 'pl-PL';
+    utterance.lang = voice.lang;
     utterance.voice = voice;
     utterance.rate = 0.9;
-    utterance.pitch = cue.speaker === 'Motyl' ? 1.35 : 1.05;
+    utterance.pitch = cue.speakerId === 'butterfly' ? 1.35 : 1.05;
     utterance.volume = 0.7;
     utterance.onend = () => {
       if (this.utterance === utterance) this.speaking = false;
@@ -179,7 +188,7 @@ export class FilmSound {
     const start = context.currentTime + Math.max(0, beat * BEAT_SECONDS - time);
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    const duck = this.dialogueEnabled && cueAt(beat * BEAT_SECONDS) ? 0.3 : 1;
+    const duck = this.dialogueEnabled && cueAt(beat * BEAT_SECONDS, this.locale) ? 0.3 : 1;
     oscillator.type = 'sine';
     oscillator.frequency.value = frequency;
     gain.gain.setValueAtTime(0, start);
@@ -205,7 +214,7 @@ export class FilmSound {
       return;
     }
     if (!this.playing) return;
-    const cue = cueAt(time);
+    const cue = cueAt(time, this.locale);
     if ((cue?.id || null) !== this.lastCue) {
       this.cancelSpeech();
       this.lastCue = cue?.id || null;

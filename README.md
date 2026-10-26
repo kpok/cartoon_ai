@@ -68,3 +68,14 @@ Music and dialogue start enabled, but no sound starts before pressing Play. Togg
 Pause, seek, restart, hiding/leaving the page and the natural end cancel active speech and scheduled notes. Resuming within a dialogue window restarts that short line if at least two seconds remain. Seeking skips earlier lines, never queues missed dialogue, and does not auto-play a paused film. Speech is cancelled at the end of its cue window so it cannot drift into another scene. Music is reduced during dialogue windows.
 
 The original pentatonic melody is synthesized from sine tones; no copyrighted music recordings or paid APIs are used. Automated audio tests use injected adapters and browser speech mocks; they validate scheduling and lifecycle, not human-perceived voice quality or loudness on physical Android hardware.
+
+## Polish and English on the same Pages site
+
+Use the language selector in the header, or share a direct version link:
+
+- Polish: https://kpok.github.io/cartoon_ai/?lang=pl
+- English: https://kpok.github.io/cartoon_ai/?lang=en
+
+Both versions use the same animation and music, with seven separate translated dialogue lines, character labels, captions, interface and accessibility labels. Each version selects a voice matching its language, preferring a local voice. An unavailable English voice never falls back to reading English in Polish; a translated caption-only notice is shown instead. Voice quality still depends on the device.
+
+Changing language pauses the story at the current position, cancels speech and music, and preserves audio volume, toggles and caption preferences. Press Play to continue in the selected language. The URL updates for sharing, and browser Back/Forward restores the corresponding language. Reload uses the URL; no language preference is saved to local storage. Missing/unsupported `lang` defaults to Polish.

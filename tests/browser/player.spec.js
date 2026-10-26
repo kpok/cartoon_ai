@@ -27,3 +27,54 @@ test('audio controls, Polish captions and missing-voice fallback',async({page})=
   expect(await page.evaluate(()=>window.audioTest.cancels)).toBeGreaterThan(0);
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
+
+test('English link, translated speech and switching preserve playback preferences',async({page})=>{
+  await page.addInitScript(()=>{
+    const spoken=[];let cancels=0;
+    const voices=[{lang:'pl-PL',localService:true},{lang:'en-GB',localService:true}];
+    Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>voices,speak:u=>spoken.push({text:u.text,lang:u.lang}),cancel:()=>cancels++,addEventListener(){}}});
+    Object.defineProperty(window,'SpeechSynthesisUtterance',{value:class{constructor(text){this.text=text;}}});
+    window.languageTest={spoken,get cancels(){return cancels;}};
+  });
+  await page.goto('/?lang=en&demo=1#scene');
+  await expect(page.locator('html')).toHaveAttribute('lang','en');
+  await expect(page.getByRole('heading',{level:1})).toHaveText('Kitten and Butterfly.');
+  await expect(page.getByRole('button',{name:'Play the story',exact:true})).toBeVisible();
+  await page.getByRole('button',{name:'♫ Music',exact:true}).click();
+  await page.getByRole('slider',{name:'Music volume',exact:true}).fill('25');
+  await page.getByRole('slider',{name:'Story position',exact:true}).fill('24');
+  await expect(page.locator('#subtitle')).toContainText('Kitten: Hello, little butterfly!');
+  await page.getByRole('button',{name:'Play',exact:true}).click();
+  await expect.poll(()=>page.evaluate(()=>window.languageTest.spoken[0]?.lang)).toBe('en-GB');
+  await page.locator('#language').selectOption('pl');
+  await expect(page.locator('html')).toHaveAttribute('lang','pl');
+  await expect(page.getByRole('button',{name:'Odtwórz',exact:true})).toBeVisible();
+  await expect(page.locator('#subtitle')).toContainText('Kotek: Cześć, motylku!');
+  const position=Number(await page.locator('#seek').inputValue());expect(position).toBeGreaterThanOrEqual(24);expect(position).toBeLessThan(27);
+  await expect(page.locator('#music')).toHaveAttribute('aria-pressed','false');
+  await expect(page.locator('#volume')).toHaveValue('25');
+  expect(await page.evaluate(()=>window.languageTest.cancels)).toBeGreaterThan(0);
+  expect(page.url()).toContain('lang=pl');expect(page.url()).toContain('demo=1#scene');
+  await page.goBack();await expect(page.locator('html')).toHaveAttribute('lang','en');
+  await expect(page.getByRole('button',{name:'Play',exact:true})).toBeVisible();
+  await page.reload();await expect(page.locator('html')).toHaveAttribute('lang','en');
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+});
+
+test('English voice fallback and translated end screen work',async({page})=>{
+  await page.addInitScript(()=>Object.defineProperty(window,'speechSynthesis',{value:{getVoices:()=>[{lang:'pl-PL',localService:true}],cancel(){},addEventListener(){}}}));
+  await page.goto('/?lang=en');
+  await expect(page.locator('#sound-status')).toContainText('No English voice');
+  await page.getByRole('slider',{name:'Story position',exact:true}).fill('120');
+  await expect(page.getByRole('button',{name:'Watch again',exact:true})).toBeVisible();
+  await expect(page.locator('#ended')).toContainText('Good night, little kitten.');
+  await page.getByRole('button',{name:'Watch again',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Pause',exact:true})).toBeVisible();
+});
+
+test('unsupported language parameter falls back to Polish',async({page})=>{
+  await page.goto('/?lang=unknown');
+  await expect(page.locator('html')).toHaveAttribute('lang','pl');
+  await expect(page.locator('#language')).toHaveValue('pl');
+  await expect(page.getByRole('button',{name:'Odtwórz bajkę',exact:true})).toBeVisible();
+});

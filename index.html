@@ -1,18 +1,45 @@
 <!doctype html>
 <html lang="pl">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5eddf"><meta name="description" content="Dwuminutowa bajka o kotku i motylu z muzyką i polskimi dialogami. Animacja tworzona z kodu, bez reklam."><title>Kotek i motyl — mała bajka</title><link rel="stylesheet" href="./src/style.css"></head>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5eddf"><meta name="description" content="Dwuminutowa bajka o kotku i motylu z muzyką i polskimi dialogami.">
+<title>Kotek i motyl — mała bajka</title><link rel="stylesheet" href="./src/style.css">
+</head>
 <body>
-<header><a class="brand" href="./" aria-label="Kotek i motyl — strona główna"><span aria-hidden="true">✿</span> małe historie</a><span class="badge">MUZYKA I DIALOGI · 2 MIN</span></header>
-<main><div class="intro"><p class="eyebrow">MAŁA PRZYGODA, WIELKA PRZYJAŹŃ</p><h1>Kotek i motyl<span>.</span></h1><p>Dwa małe serduszka. Jeden spokojny dzień w ogrodzie.</p></div>
-<section id="player" aria-label="Odtwarzacz bajki Kotek i motyl">
-<div class="picture"><canvas id="film" width="1280" height="720" role="img" aria-label="Animacja: kotek poznaje motyla w ogrodzie, pomaga mu i wraca do koszyka."></canvas><button id="start" class="start" aria-label="Odtwórz bajkę"><span aria-hidden="true">▶</span><span>Obejrzyj bajkę</span><small>2 minuty spokoju</small></button><div id="subtitle" class="subtitle" aria-live="off" hidden></div><div id="ended" hidden><span aria-hidden="true">♡</span><p>Dobranoc, kotku.</p><button id="again">Obejrzyj jeszcze raz</button></div></div>
-<div class="controls"><button id="play" aria-label="Odtwórz" title="Odtwórz / pauza">▶</button><button id="restart" aria-label="Od początku" title="Od początku">↺</button><output id="time" aria-label="Czas odtwarzania">0:00 / 2:00</output><input id="seek" type="range" min="0" max="120" step="0.1" value="0" aria-label="Pozycja w bajce"><button id="fullscreen" aria-label="Pełny ekran" title="Pełny ekran">⛶</button></div>
-<div class="sound-controls" aria-label="Ustawienia dźwięku">
-<button id="music" type="button" aria-pressed="true">♫ Muzyka</button>
-<button id="dialogue" type="button" aria-pressed="true">◌ Dialogi</button>
-<label class="volume">Głośność muzyki <input id="volume" aria-label="Głośność muzyki" type="range" min="0" max="100" value="40"></label>
-<label class="captions"><input id="captions" type="checkbox" checked> Napisy</label>
-</div><p id="sound-status" role="status" class="sound-status" hidden></p></section>
-<p class="footnote"><span aria-hidden="true">☁</span> Łagodna melodia, kilka słów i mała przyjaźń. Dźwięk możesz wyłączyć.</p>
-</main><footer>Narysowane kodem, opowiedziane ruchem. <span>Miłego oglądania ♡</span></footer><script type="module" src="./src/app.js"></script>
+<header>
+  <a id="home" class="brand" href="./" data-i18n-aria="home"><span aria-hidden="true">✿</span> <span data-i18n="brand">małe historie</span></a>
+  <div class="header-options"><span class="badge" data-i18n="badge">MUZYKA I DIALOGI · 2 MIN</span>
+  <label class="language-label"><span class="sr-only" data-i18n="language">Język bajki / Story language</span>
+  <select id="language"><option value="pl" lang="pl">Polski</option><option value="en" lang="en">English</option></select></label></div>
+</header>
+<main>
+<div class="intro"><p class="eyebrow" data-i18n="eyebrow">MAŁA PRZYGODA, WIELKA PRZYJAŹŃ</p>
+<h1><span class="story-title" data-i18n="heading">Kotek i motyl</span><span>.</span></h1>
+<p data-i18n="intro">Dwa małe serduszka. Jeden spokojny dzień w ogrodzie.</p></div>
+<section id="player" data-i18n-aria="player">
+  <div class="picture">
+    <canvas id="film" width="1280" height="720" role="img" data-i18n-aria="canvas"></canvas>
+    <button id="start" class="start" data-i18n-aria="start"><span aria-hidden="true">▶</span><span data-i18n="watch">Obejrzyj bajkę</span><small data-i18n="quietMinutes">2 minuty spokoju</small></button>
+    <div id="subtitle" class="subtitle" aria-live="off" hidden></div>
+    <div id="ended" hidden><span aria-hidden="true">♡</span><p data-i18n="goodnight">Dobranoc, kotku.</p><button id="again" data-i18n="again">Obejrzyj jeszcze raz</button></div>
+  </div>
+  <div class="controls">
+    <button id="play" data-i18n-aria="play" data-i18n-title="togglePlay">▶</button>
+    <button id="restart" data-i18n-aria="restart" data-i18n-title="restart">↺</button>
+    <output id="time" data-i18n-aria="time">0:00 / 2:00</output>
+    <input id="seek" type="range" min="0" max="120" step="0.1" value="0" data-i18n-aria="seek">
+    <button id="fullscreen" data-i18n-aria="fullscreen" data-i18n-title="fullscreen">⛶</button>
+  </div>
+  <div class="sound-controls" data-i18n-aria="soundSettings">
+    <button id="music" type="button" aria-pressed="true">♫ <span data-i18n="music">Muzyka</span></button>
+    <button id="dialogue" type="button" aria-pressed="true">◌ <span data-i18n="dialogue">Dialogi</span></button>
+    <label class="volume"><span data-i18n="volume">Głośność muzyki</span><input id="volume" data-i18n-aria="volume" type="range" min="0" max="100" value="40"></label>
+    <label class="captions"><input id="captions" type="checkbox" checked><span data-i18n="captions">Napisy</span></label>
+  </div>
+  <p id="sound-status" role="status" class="sound-status" hidden></p>
+</section>
+<p class="footnote"><span aria-hidden="true">☁</span> <span data-i18n="footnote">Łagodna melodia, kilka słów i mała przyjaźń. Dźwięk możesz wyłączyć.</span></p>
+</main>
+<footer><span data-i18n="footer">Narysowane kodem, opowiedziane ruchem.</span><span data-i18n="enjoy">Miłego oglądania ♡</span></footer>
+<script type="module" src="./src/app.js"></script>
 </body></html>
