@@ -1,81 +1,56 @@
-# Kotek i motyl — music and dialogue
+# Małe historie — two browser cartoons
 
-A complete two-minute browser cartoon with gentle original music and short Polish dialogue. An orange kitten wakes in a basket, meets a butterfly, walks through the garden, offers a helping paw, and returns home to sleep. There are no advertisements, analytics, accounts, external assets or application API calls. Music is synthesized with Web Audio; dialogue uses the device/browser speech synthesis service. Some installed voices are remote services and can require internet.
+A small Polish/English story library with two independently selectable episodes on one GitHub Pages site:
 
-The original artwork is drawn with Canvas 2D from JavaScript. This is a simple procedural cartoon, not generated video or a photorealistic animation. The Polish player interface is intended for an accompanying adult. The original wordless experience is still available by turning off music, dialogue and captions.
+- **Kitten and Butterfly / Kotek i motyl** — 65 seconds, Canvas 2D. The original artwork is retained, with the long walks compressed to about 4–5 seconds each.
+- **Kitten and the Little Seed / Kotek i małe nasionko** — 90 seconds, real-time 3D with Three.js. The kitten plants a seed, gives it a little water, moves its pot into light and waits through days and nights before a sprout, leaves and a flower appear.
 
-## Watch locally
+The garden is an original procedural clay-style diorama: 3D kitten, terracotta pot, watering can, plant, butterfly, lights, shadows and changing camera shots. It does not use generated video, downloaded character models or paid AI services. The garden teaches a simplified preschool lesson: water, light and time help plants grow; the leaves use light. Growth represents many days, not an immediate result of watering.
 
-Requires Node.js 22 or newer. From the project directory:
+## Watch
 
-```sh
-npm run dev
-```
+[Open the story library](https://kpok.github.io/cartoon_ai/).
 
-Open http://localhost:3000 and press **Obejrzyj bajkę**. Runtime dependencies do not need to be installed. To watch from a phone on the same trusted Wi-Fi, open `http://<computer-LAN-IP>:3000` while the server is running; firewall rules may need to allow this port. The development server binds to all network interfaces; use it on trusted networks only.
+Direct links use `?story=meadow&lang=pl`, `?story=garden&lang=pl`, or `?story=garden&lang=en`. Choose a story and language on the page. Switching stories resets playback; switching language pauses at the same time. Nothing starts automatically.
 
-## Controls
+Requires a modern browser; the 3D episode requires WebGL2. If 3D is unavailable or its context is lost, the player displays a message and a button back to the first story. It does not substitute a blank or 2D garden. Rendering resolution is capped at 1.5× device pixel ratio and shadows at 1024 pixels.
 
-Play/pause, restart, seek anywhere on the timeline, replay, and fullscreen when supported. Space toggles playback and left/right arrows seek five seconds when focus is outside a control. Native slider keyboard controls remain intact. Hiding the tab pauses the film; returning never starts it automatically. Playback ends at 120 seconds and does not loop automatically.
+## Local development
 
-Fullscreen support depends on browser/device policy. A fixed 1280×720 drawing surface keeps rendering bounded on high-density phones. It scales to fit the player; audio starts only after a user gesture, and there is no media download.
-
-## Build and tests
+Node.js 22 or newer:
 
 ```sh
 npm ci
+npm run dev
+```
+
+Open http://localhost:3000. The predev/build scripts copy the installed Three.js modules and license into `vendor/`; the deployed app loads them from its own origin, with no CDN or runtime API call. The development server binds to all interfaces, for use on trusted networks. ES modules need an HTTP server; opening index.html directly is unsupported.
+
+```sh
 npm test
 npm run build
 npx playwright install --with-deps chromium
 npm run test:e2e
 ```
 
-`dist/` contains the standalone static website. Host it with any HTTP static server. ES modules require HTTP serving; double-clicking `index.html` as a file is not supported. To serve the build locally: `SERVE_DIR=dist npm run dev` (set the environment variable using your shell's syntax).
+`dist/` is a standalone static website. To serve it locally, use `SERVE_DIR=dist npm run dev` (adapt environment-variable syntax for your shell). Browser tests run desktop and mobile Chromium with software WebGL enabled for CI, including real 3D renders, backward seeking, episode/language changes, replay and unavailable-WebGL fallback.
 
-GitHub Actions runs unit tests, static build, and Playwright tests in desktop Chromium and an Android-sized Chromium viewport. It uploads the `kitten-film` build artifact. GitHub Pages deployment is included but disabled until the one-time setup below. The GitHub repository URL is source code, not a playback link.
+## Playback and sound
 
-## Story timeline
+Play/pause, restart, arbitrary seek, replay and fullscreen are available. Space toggles playback and arrows seek five seconds outside controls. Hiding the page pauses it. Each episode stops at its own duration and never loops automatically.
 
-| Seconds | Scene |
-| --- | --- |
-| 0–18 | Kitten wakes in its basket |
-| 18–38 | A butterfly appears |
-| 38–58 | A gentle walk to a flower |
-| 58–78 | A helping paw and a little heart |
-| 78–100 | The friends enjoy the garden |
-| 100–120 | The kitten returns home and sleeps |
+Music is an original gentle melody synthesized through Web Audio. Short PL/EN dialogue uses the browser's speech synthesis voices; these are not prerecorded AI actors. If a matching voice is unavailable, translated captions remain available. Some system voices may use an online service. Music, dialogue, volume and captions can be changed independently. Audio starts only after a user gesture and stops on pause, seek, story/language change or completion.
 
-`src/story.js` samples the complete scene at an absolute timestamp. `src/draw.js` renders it without persistent animation state. `src/app.js` owns the monotonic playback clock and controls. This separation allows deterministic backwards seeking and future export by rendering sequential frames. MP4 export is not implemented.
+No analytics, advertisements, accounts or application API keys are used.
 
-## GitHub Pages: one-time activation
+## Implementation
 
-The owner needs to configure the repository once:
+`src/episodes.js` defines episode metadata, dialogue and the accelerated mapping to the original 120-second artwork timeline. That legacy artwork timeline remains in `src/story.js`; the actual first player lasts 65 seconds. `src/garden-state.js` samples the complete garden at an absolute timestamp; `src/garden-view.js` constructs and poses the 3D scene. Backward seeking therefore does not retain future plant growth. `src/app.js` coordinates the selected episode, clock, UI and asynchronous 3D loading. `src/sound.js` accepts the episode duration and dialogue provider.
 
-1. Open **Settings → Pages → Build and deployment → Source → GitHub Actions**.
-2. Open **Settings → Secrets and variables → Actions → Variables**, create a repository variable named `ENABLE_GITHUB_PAGES` with the exact value `true`. No secret or personal access token is needed.
-3. Open **Actions → Film checks and Pages → Run workflow**, select `main`, and run it. Later pushes to `main` deploy automatically after all tests pass.
+Garden beats: 0–7 discover seed; 7–15 plant; 15–23 water; 23–30 light; 30–36 patience; 36–48 days/nights; 48–57 sprout; 57–67 leaves; 67–77 more days and flower; 77–85 recap; 85–90 goodbye. Walking is brief and camera/action changes punctuate the episode. MP4 export is not implemented.
 
-The deploy job depends on the test job and publishes its `dist/` Pages artifact, without rebuilding or checking out a different revision. Pull requests only run checks; they never publish. Deployment permissions (`pages: write` and `id-token: write`) belong only to the deploy job. Deployments are serialized. Keep the `github-pages` environment restricted to `main` if adding environment branch rules.
+## Deployment
 
-Before activation the workflow runs checks and skips publication. To pause future deployments, set `ENABLE_GITHUB_PAGES` to `false`; this does not remove an already published site. The final playback URL appears in the deploy job's environment link and **Settings → Pages**.
+GitHub Actions checks tests and build, then deploys that same `dist/` artifact to GitHub Pages after success on main. Set Pages source to **GitHub Actions** and repository variable `ENABLE_GITHUB_PAGES=true` for deployment. Pull requests only run checks. The deploy job has scoped Pages/OIDC permissions and serialized deployments; no personal access token is needed. Setting the variable to false pauses future publication.
 
-GitHub Free supports Pages for public repositories. This repository is private; Pages requires a suitable paid plan such as GitHub Pro. A public Pages site exposes the deployed HTML, JavaScript and artwork even if its source repository is private. Only `dist/` is published: tests, project reports, workflow files and development server are excluded. The workflow does not change repository visibility or purchase a plan.
-
-## Music, dialogue and captions
-
-Music and dialogue start enabled, but no sound starts before pressing Play. Toggle either independently; music volume is adjustable. Captions can also be toggled independently and remain useful when no Polish voice is available. The player displays a status message if speech or music is unavailable. Polish local voices are preferred; otherwise an available Polish voice is used. Voice quality and availability depend on the device. There are no recorded voice assets or guaranteed professional character voices.
-
-Pause, seek, restart, hiding/leaving the page and the natural end cancel active speech and scheduled notes. Resuming within a dialogue window restarts that short line if at least two seconds remain. Seeking skips earlier lines, never queues missed dialogue, and does not auto-play a paused film. Speech is cancelled at the end of its cue window so it cannot drift into another scene. Music is reduced during dialogue windows.
-
-The original pentatonic melody is synthesized from sine tones; no copyrighted music recordings or paid APIs are used. Automated audio tests use injected adapters and browser speech mocks; they validate scheduling and lifecycle, not human-perceived voice quality or loudness on physical Android hardware.
-
-## Polish and English on the same Pages site
-
-Use the language selector in the header, or share a direct version link:
-
-- Polish: https://kpok.github.io/cartoon_ai/?lang=pl
-- English: https://kpok.github.io/cartoon_ai/?lang=en
-
-Both versions use the same animation and music, with seven separate translated dialogue lines, character labels, captions, interface and accessibility labels. Each version selects a voice matching its language, preferring a local voice. An unavailable English voice never falls back to reading English in Polish; a translated caption-only notice is shown instead. Voice quality still depends on the device.
-
-Changing language pauses the story at the current position, cancels speech and music, and preserves audio volume, toggles and caption preferences. Press Play to continue in the selected language. The URL updates for sharing, and browser Back/Forward restores the corresponding language. Reload uses the URL; no language preference is saved to local storage. Missing/unsupported `lang` defaults to Polish.
+Only the static build is published; project reports, tests and development scripts are excluded. Source and deployed assets are publicly readable. Three.js's MIT license is included with the vendored modules.

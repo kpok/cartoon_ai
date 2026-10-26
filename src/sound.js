@@ -2,7 +2,9 @@ import { cueAt, noteAt, BEAT_SECONDS } from './dialogue.js';
 import { normalizeLocale, translate } from './i18n.js';
 
 export class FilmSound {
-  constructor({ AudioContextClass, synth, UtteranceClass, onStatus = () => {}, locale = 'pl' } = {}) {
+  constructor({ AudioContextClass, synth, UtteranceClass, onStatus = () => {}, locale = 'pl', duration = 120, cueProvider = cueAt } = {}) {
+    this.duration = duration;
+    this.cueProvider = cueProvider;
     this.locale = normalizeLocale(locale);
     this.AudioContextClass = AudioContextClass;
     this.synth = synth;
@@ -86,6 +88,13 @@ export class FilmSound {
     this.unlock();
     this.update(time, true);
     this.reportStatus();
+  }
+
+  setEpisode(duration, cueProvider) {
+    this.stop();
+    this.duration = duration;
+    this.cueProvider = cueProvider;
+    this.time = 0;
   }
 
   setLocale(locale) {
@@ -188,7 +197,7 @@ export class FilmSound {
     const start = context.currentTime + Math.max(0, beat * BEAT_SECONDS - time);
     const oscillator = context.createOscillator();
     const gain = context.createGain();
-    const duck = this.dialogueEnabled && cueAt(beat * BEAT_SECONDS, this.locale) ? 0.3 : 1;
+    const duck = this.dialogueEnabled && this.cueProvider(beat * BEAT_SECONDS, this.locale) ? 0.3 : 1;
     oscillator.type = 'sine';
     oscillator.frequency.value = frequency;
     gain.gain.setValueAtTime(0, start);
@@ -209,12 +218,12 @@ export class FilmSound {
 
   update(time, playing) {
     this.time = time;
-    if (!playing || time >= 120) {
+    if (!playing || time >= this.duration) {
       if (this.playing) this.stop();
       return;
     }
     if (!this.playing) return;
-    const cue = cueAt(time, this.locale);
+    const cue = this.cueProvider(time, this.locale);
     if ((cue?.id || null) !== this.lastCue) {
       this.cancelSpeech();
       this.lastCue = cue?.id || null;
@@ -224,7 +233,7 @@ export class FilmSound {
     if (cue && time < cue.end - 2) this.speak(cue);
     if (this.musicEnabled && this.context?.state === 'running') {
       const current = Math.floor(time / BEAT_SECONDS);
-      const last = Math.min(Math.floor((time + 0.2) / BEAT_SECONDS), 149);
+      const last = Math.min(Math.floor((time + 0.2) / BEAT_SECONDS), Math.ceil(this.duration / BEAT_SECONDS) - 1);
       this.lastBeat = Math.max(this.lastBeat, current - 1);
       for (let beat = this.lastBeat + 1; beat <= last; beat += 1) {
         if (beat * BEAT_SECONDS >= time - 0.04) this.scheduleNote(beat, time);

@@ -1,1 +1,19 @@
-{"name":"kitten-and-butterfly","version":"1.0.0","private":true,"type":"module","scripts":{"dev":"node scripts/serve.mjs","build":"node scripts/build.mjs","test":"node --test tests/*.test.mjs","test:e2e":"playwright test"},"devDependencies":{"@playwright/test":"1.56.1"}}
+{
+  "name": "kitten-and-butterfly",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "playwright test",
+    "predev": "node scripts/vendor.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  }
+}

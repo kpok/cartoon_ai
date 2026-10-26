@@ -20,9 +20,9 @@ export function sampleStory(seconds){
   return {t,chapter,x,walk,sleep,help,bx,by,butterfly,heart,facing:1-2*smooth((t-78)/2),sunset:smooth((t-92)/28)};
 }
 export class PlaybackClock{
-  constructor(){this.time=0;this.playing=false;this.last=null;}
-  play(now){if(this.time>=DURATION)this.time=0;this.playing=true;this.last=now;}
+  constructor(duration=DURATION){this.duration=duration;this.time=0;this.playing=false;this.last=null;}
+  play(now){if(this.time>=this.duration)this.time=0;this.playing=true;this.last=now;}
   pause(){this.playing=false;this.last=null;}
-  seek(time){this.time=clamp(Number.isFinite(time)?time:0,0,DURATION);this.last=null;if(this.time===DURATION)this.pause();}
-  tick(now){if(this.playing){if(this.last!==null)this.time=clamp(this.time+Math.max(0,now-this.last)/1000,0,DURATION);this.last=now;if(this.time>=DURATION)this.pause();}return this.time;}
+  seek(time){this.time=clamp(Number.isFinite(time)?time:0,0,this.duration);this.last=null;if(this.time===this.duration)this.pause();}
+  tick(now){if(this.playing){if(this.last!==null)this.time=clamp(this.time+Math.max(0,now-this.last)/1000,0,this.duration);this.last=now;if(this.time>=this.duration)this.pause();}return this.time;}
 }

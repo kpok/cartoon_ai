@@ -8,20 +8,27 @@
 <body>
 <header>
   <a id="home" class="brand" href="./" data-i18n-aria="home"><span aria-hidden="true">✿</span> <span data-i18n="brand">małe historie</span></a>
-  <div class="header-options"><span class="badge" data-i18n="badge">MUZYKA I DIALOGI · 2 MIN</span>
+  <div class="header-options"><span class="badge" id="story-badge">MUZYKA I DIALOGI · 2 MIN</span>
   <label class="language-label"><span class="sr-only" data-i18n="language">Język bajki / Story language</span>
   <select id="language"><option value="pl" lang="pl">Polski</option><option value="en" lang="en">English</option></select></label></div>
 </header>
 <main>
 <div class="intro"><p class="eyebrow" data-i18n="eyebrow">MAŁA PRZYGODA, WIELKA PRZYJAŹŃ</p>
-<h1><span class="story-title" data-i18n="heading">Kotek i motyl</span><span>.</span></h1>
-<p data-i18n="intro">Dwa małe serduszka. Jeden spokojny dzień w ogrodzie.</p></div>
-<section id="player" data-i18n-aria="player">
+<h1><span class="story-title" id="story-title">Kotek i motyl</span><span>.</span></h1>
+<p id="story-intro">Dwa małe serduszka. Jeden spokojny dzień w ogrodzie.</p></div>
+<nav class="story-library" data-i18n-aria="chooseStory">
+  <button type="button" data-story="meadow" aria-pressed="true"><span class="card-art meadow-art" aria-hidden="true">🐱<i>🦋</i></span><span class="card-copy"><strong class="card-title">Kotek i motyl</strong><span class="card-detail"></span><small class="card-tag"></small></span></button>
+  <button type="button" data-story="garden" aria-pressed="false"><span class="card-art garden-art" aria-hidden="true">🌱<i>☀</i></span><span class="card-copy"><strong class="card-title">Kotek i małe nasionko</strong><span class="card-detail"></span><small class="card-tag"></small></span></button>
+</nav>
+<section id="player">
   <div class="picture">
+    <div id="scene-note" class="scene-note" hidden></div>
+    <canvas id="garden-film" width="1280" height="720" role="img" hidden></canvas>
+    <div id="render-status" class="render-status" hidden><span aria-hidden="true">🌱</span><p id="render-message"></p><button id="back-to-meadow" data-i18n="backToFirst" hidden>Wróć do pierwszej bajki</button></div>
     <canvas id="film" width="1280" height="720" role="img" data-i18n-aria="canvas"></canvas>
-    <button id="start" class="start" data-i18n-aria="start"><span aria-hidden="true">▶</span><span data-i18n="watch">Obejrzyj bajkę</span><small data-i18n="quietMinutes">2 minuty spokoju</small></button>
+    <button id="start" class="start" data-i18n-aria="start"><span aria-hidden="true">▶</span><span data-i18n="watch">Obejrzyj bajkę</span><small id="start-duration">2 minuty spokoju</small></button>
     <div id="subtitle" class="subtitle" aria-live="off" hidden></div>
-    <div id="ended" hidden><span aria-hidden="true">♡</span><p data-i18n="goodnight">Dobranoc, kotku.</p><button id="again" data-i18n="again">Obejrzyj jeszcze raz</button></div>
+    <div id="ended" hidden><span aria-hidden="true">♡</span><p id="ending-line">Dobranoc, kotku.</p><button id="again" data-i18n="again">Obejrzyj jeszcze raz</button></div>
   </div>
   <div class="controls">
     <button id="play" data-i18n-aria="play" data-i18n-title="togglePlay">▶</button>
