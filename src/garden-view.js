@@ -230,8 +230,11 @@ export function createGardenView(canvas, { onContextLost = () => {} } = {}) {
 
   function render(time,{talking=false,speaker=null}={}) {
     if(disposed)return;
-    const s=sampleGarden(time),t=s.t;
     const width=Math.max(1,canvas.clientWidth||1280),height=Math.max(1,canvas.clientHeight||720);
+    const portrait=width<height;
+    const s=sampleGarden(time),t=s.t;
+    // A compact portrait stage keeps the cat, pot and butterfly in one shot.
+    if(portrait){s.catX=-1.5+.75*smooth(t/4);s.potX=.15+.7*smooth((t-23)/5);}
     if(width!==lastWidth||height!==lastHeight) {
       renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();lastWidth=width;lastHeight=height;
     }
@@ -244,7 +247,7 @@ export function createGardenView(canvas, { onContextLost = () => {} } = {}) {
     pot.position.set(s.potX,0,0);
     hole.scale.setScalar(Math.max(.001,1-s.soilCover));hole.visible=t>=6&&t<15;
     soilMaterial.color.set('#7c5b40').lerp(new THREE.Color('#584632'),Math.max(s.water*.7,t>=16?.35:0));
-    const follow=1.2*smooth((t-23)/5);
+    const follow=(portrait?.7:1.2)*smooth((t-23)/5);
     cat.position.x=s.catX+follow;
     const walking=t<4?Math.sin(t*10)*.05*(1-smooth((t-3)/1)):t>=23&&t<28?Math.sin(t*10)*.025:0;
     cat.position.y=walking;
@@ -297,13 +300,22 @@ export function createGardenView(canvas, { onContextLost = () => {} } = {}) {
     }
     blossom.position.y=plantHeight;blossom.visible=s.flower>.001;blossom.scale.setScalar(Math.max(.001,s.flower));
     blossom.rotation.z=Math.sin(t*.6)*.04;
-    butterfly.position.set(s.potX+1.05+Math.sin(t*.85)*.28,1.8+Math.sin(t*1.4)*.2+s.flower*.8,.2+Math.cos(t*.5)*.24);
+    butterfly.position.set(s.potX+(portrait?.8:1.05)+Math.sin(t*.85)*(portrait?.16:.28),1.8+Math.sin(t*1.4)*.2+s.flower*.8,.2+Math.cos(t*.5)*.24);
     butterfly.rotation.y=-.12;
     const flap=.18+Math.sin(t*9)*.55;wingLeft.rotation.y=flap;wingRight.rotation.y=-flap;
     const index=s.phase,previous=Math.max(0,index-1),ease=smooth(s.phaseProgress*4);
     camera.position.fromArray(cameraPositions[previous]).lerp(new THREE.Vector3(...cameraPositions[index]),ease);
     camera.position.x+=Math.sin(t*.22)*.09;
     const target=new THREE.Vector3(...cameraTargets[previous]).lerp(new THREE.Vector3(...cameraTargets[index]),ease);
+    if(portrait){
+      // Frame actual action bounds rather than cropping the landscape camera.
+      const left=cat.position.x-.75;
+      const right=Math.max(pot.position.x+.65,butterfly.position.x+.4);
+      const center=(left+right)/2;
+      const distance=(right-left+1.05)/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.aspect);
+      target.set(center,1.65,0);
+      camera.position.set(center+.55+Math.sin(t*.22)*.06,1.65+distance*.2,distance);
+    }
     camera.lookAt(target);
     renderer.render(scene,camera);
   }

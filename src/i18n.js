@@ -1,6 +1,7 @@
 export const normalizeLocale = value => value === 'en' ? 'en' : 'pl';
 export const messages = {
   pl: {
+    format:'Format obrazu',landscape:'Poziomo · 16:9',portrait:'Pionowo · 9:16',
     chooseStory:'Wybierz bajkę',loading3d:'Przygotowujemy ogród 3D…',noWebgl:'Nie można uruchomić 3D na tym urządzeniu. Pierwsza bajka nadal jest dostępna.',backToFirst:'Wróć do pierwszej bajki',title: 'Kotek i motyl — mała bajka', description: 'Dwuminutowa bajka o kotku i motylu z muzyką i polskimi dialogami. Animacja tworzona z kodu, bez reklam.',
     brand: 'małe historie', home: 'Kotek i motyl — strona główna', badge: 'MUZYKA I DIALOGI · 2 MIN',
     eyebrow: 'MAŁA PRZYGODA, WIELKA PRZYJAŹŃ', heading: 'Kotek i motyl', intro: 'Dwa małe serduszka. Jeden spokojny dzień w ogrodzie.',
@@ -14,6 +15,7 @@ export const messages = {
     speechFailed: 'Nie udało się odtworzyć głosu. Dialogi są dostępne w napisach.', remoteVoice: 'Polski głos może wymagać połączenia z internetem.',
   },
   en: {
+    format:'Picture format',landscape:'Landscape · 16:9',portrait:'Portrait · 9:16',
     chooseStory:'Choose a story',loading3d:'Preparing the 3D garden…',noWebgl:'3D is unavailable on this device. You can still watch the first story.',backToFirst:'Back to the first story',title: 'Kitten and Butterfly — a little story', description: 'A two-minute kitten story with gentle music and English dialogue. Animated with code, without ads.',
     brand: 'little stories', home: 'Kitten and Butterfly — home', badge: 'MUSIC & DIALOGUE · 2 MIN',
     eyebrow: 'A LITTLE ADVENTURE, A BIG FRIENDSHIP', heading: 'Kitten and Butterfly', intro: 'Two little hearts. One peaceful day in the garden.',

@@ -7,6 +7,7 @@ import {sampleGarden} from './garden-state.js';
 
 const $=id=>document.getElementById(id);
 let url=new URL(location.href),locale=normalizeLocale(url.searchParams.get('lang')),episode=getEpisode(url.searchParams.get('story'));
+let format=url.searchParams.get('format')==='portrait'?'portrait':'landscape';
 let clock=new PlaybackClock(episode.duration),started=false,frame=null;
 const ctx=$('film').getContext('2d');
 let gardenView=null,gardenPromise=null,gardenError=false;
@@ -23,7 +24,7 @@ function sync(){
   if(episode.id==='garden'){
     if(gardenView&&!gardenError)gardenView.render(clock.time,{talking:sound.speaking&&clock.playing,speaker:cue?.speakerId});
     $('scene-note').textContent=gardenNote(sampleGarden(clock.time),locale);
-  }else render(ctx,meadowVisualTime(clock.time),{talking:sound.speaking&&clock.playing,speaker:cue?.speakerId});
+  }else render(ctx,meadowVisualTime(clock.time),{talking:sound.speaking&&clock.playing,speaker:cue?.speakerId,portrait:format==='portrait'});
   const text=cue?`${cue.speaker}: ${cue.text}`:'';
   if($('subtitle').textContent!==text)$('subtitle').textContent=text;
   $('subtitle').hidden=!$('captions').checked||!cue;
@@ -55,7 +56,9 @@ function applyTranslations(){
   $('player').setAttribute('aria-label',info.title);
   for(const id of ['film','garden-film'])$(id).setAttribute('aria-label',info.canvas);
   $('home').setAttribute('aria-label',info.title);
-  $('home').href=`?lang=${locale}&story=${episode.id}`;
+  $('home').href=`?lang=${locale}&story=${episode.id}&format=${format}`;
+  $('format').value=format;$('player').dataset.format=format;
+  $('film').width=format==='portrait'?720:1280;$('film').height=format==='portrait'?1280:720;
   $('language').value=locale;$('seek').max=episode.duration;
   document.querySelectorAll('button[data-story]').forEach(button=>{
     const item=episodes[button.dataset.story];
@@ -86,7 +89,7 @@ function animate(now){frame=null;clock.tick(now);sync();if(clock.playing)frame=r
 function play(){if(!ready())return;started=true;clock.play(performance.now());sound.start(clock.time);sync();if(frame===null)frame=requestAnimationFrame(animate);}
 function pause(){clock.tick(performance.now());clock.pause();sound.stop();if(frame!==null)cancelAnimationFrame(frame);frame=null;sync();}
 function seek(time){if(!ready())return;started=true;clock.seek(time);sound.seek(clock.time);sync();}
-function writeUrl(){const next=new URL(location.href);next.searchParams.set('lang',locale);next.searchParams.set('story',episode.id);history.pushState(null,'',next);}
+function writeUrl(){const next=new URL(location.href);next.searchParams.set('lang',locale);next.searchParams.set('story',episode.id);next.searchParams.set('format',format);history.pushState(null,'',next);}
 function chooseStory(value,updateUrl=true){
   pause();episode=getEpisode(value);clock=new PlaybackClock(episode.duration);started=false;
   sound.setEpisode(episode.duration,(time,lang)=>episodeCueAt(time,lang,episode.id));
@@ -95,11 +98,15 @@ function chooseStory(value,updateUrl=true){
   if(episode.id==='garden')prepareGarden();
 }
 function changeLocale(value,updateUrl=true){pause();locale=normalizeLocale(value);sound.setLocale(locale);applyTranslations();if(updateUrl)writeUrl();sync();}
+function changeFormat(value,updateUrl=true){pause();format=value==='portrait'?'portrait':'landscape';applyTranslations();if(updateUrl)writeUrl();sync();}
+$('format').onchange=event=>changeFormat(event.target.value);
 $('language').onchange=event=>changeLocale(event.target.value);
 document.querySelectorAll('button[data-story]').forEach(button=>button.onclick=()=>chooseStory(button.dataset.story));
 $('back-to-meadow').onclick=()=>chooseStory('meadow');
 window.addEventListener('popstate',()=>{
   const next=new URL(location.href);const nextLocale=normalizeLocale(next.searchParams.get('lang')),nextStory=normalizeStory(next.searchParams.get('story'));
+  const nextFormat=next.searchParams.get('format')==='portrait'?'portrait':'landscape';
+  if(nextFormat!==format)changeFormat(nextFormat,false);
   if(nextLocale!==locale)changeLocale(nextLocale,false);
   if(nextStory!==episode.id)chooseStory(nextStory,false);
 });

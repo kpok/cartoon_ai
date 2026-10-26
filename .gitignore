@@ -5,3 +5,6 @@ test-results/
 .openai/
 
 vendor/
+
+exports/
+.cartoon-export-*/

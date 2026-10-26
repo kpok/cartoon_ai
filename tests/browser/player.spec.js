@@ -106,3 +106,26 @@ test('finishing an async 3D load never switches the selected story',async({page}
  await page.route('**/src/garden-view.js',async route=>{await new Promise(resolve=>setTimeout(resolve,400));await route.continue();});
  await page.goto('/?story=garden');await page.locator('button[data-story="meadow"]').click();await expect(page.locator('#garden-film')).toHaveAttribute('data-ready','true',{timeout:20000});await expect(page.locator('#player')).toHaveAttribute('data-story','meadow');await expect(page.locator('#seek')).toHaveValue('0');await expect(page.locator('#film')).toBeVisible();
 });
+
+test('portrait format keeps time, language and navigation for both cartoons',async({page},testInfo)=>{
+ for(const story of ['meadow','garden']){
+  await page.goto(`/?story=${story}&lang=en&format=portrait`);
+  if(story==='garden')await expect(page.locator('#garden-film')).toHaveAttribute('data-ready','true',{timeout:20000});
+  await expect(page.locator('#player')).toHaveAttribute('data-format','portrait');
+  const picture=await page.locator('.picture').boundingBox();expect(picture.width/picture.height).toBeCloseTo(9/16,2);
+  for(const t of story==='garden'?['0','18','52','74','0']:['0','12','29','58','0'])await page.locator('#seek').fill(t);
+  await page.locator('#seek').fill('12');await page.locator('#format').selectOption('landscape');await expect(page.locator('#seek')).toHaveValue('12');await expect(page.locator('#format')).toHaveValue('landscape');
+  await page.goBack();await expect(page.locator('#format')).toHaveValue('portrait');await expect(page.locator('#seek')).toHaveValue('12');
+  await page.locator('#language').selectOption('pl');await expect(page.locator('#format')).toHaveValue('portrait');
+  await page.screenshot({path:testInfo.outputPath(`${story}-portrait.png`),fullPage:true});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+ }
+});
+test('export surface renders exact frames without player UI',async({page},testInfo)=>{
+ for(const story of ['meadow','garden'])for(const lang of ['pl','en']){
+  await page.setViewportSize({width:360,height:640});await page.goto(`/export.html?story=${story}&lang=${lang}&width=360&height=640`);await page.waitForFunction(()=>window.exportReady);
+  for(const t of story==='garden'?[0,18,52,74]:[0,12,29,58]){
+   await page.evaluate(t=>window.renderFrame(t),t);await page.locator('#frame').screenshot({path:testInfo.outputPath(`${story}-${lang}-${t}.png`)});
+  }
+  await page.evaluate(()=>window.renderFrame(0));const a=await page.locator('#frame').screenshot();await page.evaluate(()=>window.renderFrame(35));await page.evaluate(()=>window.renderFrame(0));const b=await page.locator('#frame').screenshot();expect(a.equals(b)).toBe(true);expect(await page.locator('button').count()).toBe(0);
+ }
+});

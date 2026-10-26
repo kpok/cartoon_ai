@@ -21,6 +21,8 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg espeak-ng
+      - run: npm run test:export
       - uses: actions/upload-artifact@v4
         if: always()
         with:

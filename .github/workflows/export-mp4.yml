@@ -1,0 +1,66 @@
+name: Export cartoon MP4
+on:
+  workflow_dispatch:
+    inputs:
+      story:
+        description: Story
+        type: choice
+        options: [garden, meadow]
+        default: garden
+      language:
+        description: Dialogue and captions
+        type: choice
+        options: [en, pl]
+        default: en
+      format:
+        description: Picture format
+        type: choice
+        options: [portrait, landscape]
+        default: portrait
+      quality:
+        description: Portrait1080p or landscape1920p; draft uses360/640
+        type: choice
+        options: [full, draft]
+        default: full
+      dialogue:
+        description: Offline synthetic voices or music only
+        type: choice
+        options: [tts, none]
+        default: tts
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg espeak-ng
+      - run: npx playwright install --with-deps chromium
+      - name: Render selected episode with audio
+        env:
+          STORY: ${{ inputs.story }}
+          LANGUAGE: ${{ inputs.language }}
+          FORMAT: ${{ inputs.format }}
+          QUALITY: ${{ inputs.quality }}
+          DIALOGUE: ${{ inputs.dialogue }}
+        run: |
+          if [ "$FORMAT" = portrait ]; then
+            WIDTH=1080
+            if [ "$QUALITY" = draft ]; then WIDTH=360; fi
+          else
+            WIDTH=1920
+            if [ "$QUALITY" = draft ]; then WIDTH=640; fi
+          fi
+          npm run export:mp4 -- --story "$STORY" --lang "$LANGUAGE" --format "$FORMAT" --width "$WIDTH" --dialogue "$DIALOGUE"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cartoon-${{ inputs.story }}-${{ inputs.language }}-${{ inputs.format }}
+          path: exports/
+          if-no-files-found: error
+          retention-days: 14
