@@ -1,0 +1,6 @@
+# Review routing only; enforce code-owner review with branch rules if collaboration is enabled.
+/.github/ @kpok
+/scripts/ @kpok
+/package.json @kpok
+/package-lock.json @kpok
+/SECURITY.md @kpok
