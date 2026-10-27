@@ -27,14 +27,14 @@ export function ownerContext(overrides={}){
  return {github:{repository:'kpok/cartoon_ai',repository_id:'1433681495',repository_owner_id:'10676481',actor_id:'10676481',actor:'kpok',triggering_actor:'kpok',ref:'refs/heads/main',event_name:'push',...overrides},needs:{test:{result:'success'}},vars:{ENABLE_GITHUB_PAGES:'true'}};
 }
 export function checkPolicy(workflows,pins){
- assert.deepEqual(Object.keys(workflows).sort(),['ci.yml','export-mp4.yml'],'New or administrative workflows need a security policy review');
+ assert.deepEqual(Object.keys(workflows).sort(),['ci.yml','export-mp4.yml','repo-diagnostics.yml'],'New or administrative workflows need a security policy review');
  const jobs=[];
  for(const [file,workflow] of Object.entries(workflows)){
   assert.deepEqual(workflow.permissions,{},`${file}: default token must have no permissions`);
   assert.equal(workflow.concurrency,undefined,'Authorization must happen before concurrency allocation');
   assert.deepEqual(Object.keys(workflow.on).sort(),file==='ci.yml'?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
   if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main']});
-  assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','test']:['export']);
+  assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','test']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
    const label=`${file}/${name}`;jobs.push({file,name,job});
    assert.equal(job['runs-on'],'ubuntu-latest',`${label}: hosted runner required`);

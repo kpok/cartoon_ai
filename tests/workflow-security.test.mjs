@@ -4,9 +4,12 @@ import {readFile} from 'node:fs/promises';
 import {readWorkflows,checkPolicy,evaluateGate,ownerContext} from '../scripts/check-workflows.mjs';
 const workflows=await readWorkflows();
 const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',import.meta.url),'utf8'));
-test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),3);});
+test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),5);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
+  w=>{w['repo-diagnostics.yml'].on.push={branches:['main']};},
+  w=>{w['repo-diagnostics.yml'].jobs.diagnostics.if="github.ref == 'refs/heads/main'";},
+  w=>{w['repo-diagnostics.yml'].jobs['actions-smoke'].permissions.contents='write';},
   w=>{w['ci.yml'].on.pull_request={};},
   w=>{w['ci.yml'].jobs.test.if="github.ref == 'refs/heads/main'";},
   w=>{w['ci.yml'].jobs.deploy.if=w['ci.yml'].jobs.test.if;},

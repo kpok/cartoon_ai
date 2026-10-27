@@ -88,3 +88,16 @@ Dokumentacja GitHuba:
 - https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository
 - https://docs.github.com/en/actions/reference/security/secure-use
 - https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs
+
+
+## Ręczna diagnostyka konfiguracji
+
+Otwórz Actions → Repository configuration diagnostics → Run workflow, wybierz `main` i uruchom jako `kpok`.
+
+- `diagnostics` sprawdza start runnera bez zewnętrznych akcji i próbuje odczytać wybrane ustawienia przez API. Raport znajdziesz w Summary.
+- `actions-smoke` sprawdza przypięte checkout/setup-node/upload-artifact, politykę workflowów i testy bezpieczeństwa. Tworzy niewielki artefakt `configuration-probe` z retencją 1 dzień.
+- `UNKNOWN` przy HTTP 403/404 oznacza brak możliwości weryfikacji przez wbudowany token. Nie oznacza poprawnego ani błędnego ustawienia. Wartości oznaczone jako odczytane należy porównać z instrukcją powyżej.
+
+Zielony wynik potwierdza wykonanie powyższych prób, ale nie potwierdza kompletnego zabezpieczenia repo ani blokowania nowych workflowów w zewnętrznych PR. Ustawienia administracyjne nadal wymagają sprawdzenia w Settings lub lokalnym skryptem audytu. Workflow nie zmienia konfiguracji, nie wdraża Pages i nie eksportuje filmu. Działa ręcznie, tylko dla właściciela na `main`; nie wymaga nowych sekretów ani rozszerzenia listy dozwolonych akcji.
+
+Jeżeli Actions są całkowicie wyłączone, workflow nie wystartuje — włącz je ręcznie w Settings → Actions → General. Jeśli `diagnostics` działa, a `actions-smoke` jest blokowany przed pierwszym krokiem, sprawdź listę dozwolonych akcji i ich SHA.
