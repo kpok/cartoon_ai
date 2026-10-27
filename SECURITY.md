@@ -13,7 +13,9 @@ This is a public repository. The policy is **owner-only execution in kpok/cartoo
 - Fixed job-level concurrency prevents overlapping exports/builds; it is evaluated after job authorization, and rejected requests cannot cancel authorized jobs. Runners are GitHub-hosted, with bounded timeouts.
 - `npm run check:workflows` parses actual YAML, checks permission ceilings/pins/triggers and evaluates the exact authorization expressions against hostile and valid contexts. `npm test` also tests policy mutations. These checks help prevent accidental regressions; they do not constrain an owner who deliberately changes the checks and workflow together.
 
-Opening a public PR no longer runs CI here. To test an outside contribution, inspect its changes first, then deliberately bring the reviewed code onto trusted main as the owner. Owner execution of malicious code remains dangerous even with read-only tokens; do not merge unreviewed workflow, dependency or script changes.
+Opening a public PR no longer starts our existing CI workflow. A PR can propose a new or changed workflow, so complete the repository-wide approval setting below before claiming that all outside PR workflow execution requires approval. To test an outside contribution, inspect its changes first, then deliberately bring the reviewed code onto trusted main as the owner. Owner execution of malicious code remains dangerous even with read-only tokens; do not merge unreviewed workflow, dependency or script changes.
+
+For a Polish step-by-step guide with a ready-to-paste action allowlist, see [ADMIN_SECURITY_PL.md](ADMIN_SECURITY_PL.md).
 
 ## Repository administration: separate from YAML
 
@@ -23,7 +25,7 @@ In **Settings → Actions → General**:
 
 1. Keep Actions enabled. Restrict allowed actions to the reviewed action/SHA pairs in `.github/action-pins.json`; enable the full-length SHA requirement. Include the nested upload-artifact pin (already in that manifest).
 2. Set default workflow token permissions to **Read repository contents and packages**. Disable **Allow GitHub Actions to create and approve pull requests**.
-3. Require approval for workflows from **all outside collaborators/contributors** as defense against future reintroduction of PR triggers. This is supplementary; current workflows do not execute PR events at all.
+3. Require approval for workflows from **all outside collaborators/contributors**. This repository-level setting is essential for the broader goal: an outside PR can add a new workflow or change a workflow definition, including its guard. Removing triggers from our existing files alone does not prevent that. Until the setting is applied and verified, global fork-PR runner approval remains incomplete; only the existing committed jobs are hardened.
 
 In **Settings → Environments → github-pages**, allow only the exact **branch main**, not tags or broad patterns. Preserve any existing reviewer, wait-timer or custom protection rules. Required human reviewers are optional here because the owner's existing automatic Pages deployment is intended to continue.
 

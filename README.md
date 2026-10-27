@@ -111,4 +111,4 @@ Open **Actions → Export cartoon MP4 → Run workflow**. Select story, language
 
 ## Workflow security
 
-CI/Pages and manual MP4 export are restricted to owner-initiated runs on main in the canonical repository. See [SECURITY.md](SECURITY.md) for implemented guards, action pins, administration steps and limitations. Run `npm run check:workflows` after editing workflows.
+CI/Pages and manual MP4 export are restricted to owner-initiated runs on main in the canonical repository. See [SECURITY.md](SECURITY.md) for implemented guards, action pins and limitations, and [ADMIN_SECURITY_PL.md](ADMIN_SECURITY_PL.md) for the required manual repository settings. Run `npm run check:workflows` after editing workflows.
