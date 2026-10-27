@@ -6,7 +6,7 @@ const query=new URLSearchParams(location.search);
 const story=query.get('story')||'meadow',locale=query.get('lang')||'pl';
 const episode=episodes[story];
 const width=Number(query.get('width')),height=Number(query.get('height'));
-if(!episode||!['pl','en'].includes(locale)||!Number.isInteger(width)||!Number.isInteger(height)||width<180||width>3840||height<180||height>3840)throw new Error('Invalid render settings');
+if(!Object.hasOwn(episodes,story)||!['pl','en'].includes(locale)||!Number.isInteger(width)||!Number.isInteger(height)||width<180||width>3840||height<180||height>3840)throw new Error('Invalid render settings');
 const portrait=width<height,canvas=document.querySelector('#frame');
 canvas.width=width;canvas.height=height;
 const ctx=canvas.getContext('2d');
@@ -24,6 +24,7 @@ function label(text,y,{size,maxWidth,fill='#fffdf3ed',color='#354d43'}={}){
  ctx.fillStyle=color;ctx.textAlign='center';ctx.textBaseline='top';lines.forEach((l,i)=>ctx.fillText(l,width*.46,y+i*lineHeight));
 }
 window.renderFrame=seconds=>{
+ if(!Number.isFinite(seconds))throw new Error('Frame timestamp must be finite');
  const t=Math.max(0,Math.min(episode.duration,seconds)),cue=episodeCueAt(t,locale,story);
  const options={talking:query.get('dialogue')!=='none'&&Boolean(cue),speaker:cue?.speakerId,portrait};
  ctx.clearRect(0,0,width,height);

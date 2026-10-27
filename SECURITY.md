@@ -59,3 +59,14 @@ References:
 - https://docs.github.com/en/actions/how-tos/manage-workflow-runs/approve-runs-from-forks
 - https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository
 - https://docs.github.com/en/actions/how-tos/manage-workflow-runs/re-run-workflows-and-jobs
+
+
+## Application and artifact hardening
+
+The local preview binds only to `127.0.0.1` and both preview/export servers expose only the public HTML, source assets and locked vendor files. Repository metadata, scripts, dependency files and escaping symlinks are denied; only GET/HEAD are supported. These are local development servers, not a production server for untrusted filesystem writers.
+
+Both HTML entry points carry a Content Security Policy restricting scripts to the same origin and denying page connections, frames, objects and form submissions. Inline styles remain allowed for rendering. GitHub Pages receives this policy through HTML meta: it does not provide `frame-ancestors` enforcement or custom HTTP security headers. The no-external-page-request browser test does not establish that the operating system's speech service is offline.
+
+Build verification checks the exact public file inventory, absence of symlinks, local module/link dependencies, CSP and vendored Three.js bytes against the locked package. Default browser tests build and serve `dist`, the same directory uploaded for Pages. A trusted project file change still requires review; this is not a malicious-code scanner.
+
+MP4 exports validate actual FFprobe codec/stream/frame/timing/audio properties and publish MP4/SRT/JSON without replacing existing files. MP4 is linked last as the completion marker. Publication uses hard links on the destination filesystem; unsupported filesystems fail without replacing an output. The three-file bundle is not one filesystem transaction: another reader may briefly observe sidecars before MP4, and a process crash may leave partial sidecars requiring explicit cleanup.

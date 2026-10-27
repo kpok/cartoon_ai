@@ -90,7 +90,7 @@ jobs:
         run: |
           npm ci --ignore-scripts
           npm run check:workflows
-          node --test tests/workflow-security.test.mjs tests/github-settings.test.mjs
+          node --test tests/workflow-security.test.mjs tests/github-settings.test.mjs tests/hardening.test.mjs
       - name: Test versions and create harmless artifact
         run: |
           node --version

@@ -1,9 +1,10 @@
 import {parseArgs} from 'node:util';
 import {fileURLToPath,pathToFileURL} from 'node:url';
-import {resolve,dirname,join,extname,sep} from 'node:path';
-import {readFile,writeFile,mkdir,mkdtemp,rm,rename,access} from 'node:fs/promises';
+import {resolve,dirname,join} from 'node:path';
+import {readFile,writeFile,mkdir,mkdtemp,rm,access} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
-import {createServer} from 'node:http';
+import {createStaticServer} from './static-server.mjs';
+import {validateMovie,publishBundle} from './export-validation.mjs';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {chromium} from '@playwright/test';
@@ -13,7 +14,7 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 export function settings(args){
  const {values:v}=parseArgs({args,options:{story:{type:'string',default:'garden'},lang:{type:'string',default:'en'},format:{type:'string',default:'portrait'},width:{type:'string'},fps:{type:'string',default:'30'},dialogue:{type:'string',default:'tts'},'voice-dir':{type:'string'},out:{type:'string'},from:{type:'string',default:'0'},duration:{type:'string'},'no-captions':{type:'boolean',default:false},help:{type:'boolean',default:false}}});
  if(v.help)return {help:true};
- if(!episodes[v.story])throw new Error('story must be meadow or garden');
+ if(!Object.hasOwn(episodes,v.story))throw new Error('story must be meadow or garden');
  if(!['pl','en'].includes(v.lang))throw new Error('lang must be pl or en');
  if(!['portrait','landscape'].includes(v.format))throw new Error('format must be portrait or landscape');
  if(!['tts','recordings','none'].includes(v.dialogue))throw new Error('dialogue must be tts, recordings or none');
@@ -29,10 +30,10 @@ export async function exportFilm(config){
  const ffmpeg=process.env.FFMPEG_PATH||'ffmpeg',ffprobe=process.env.FFPROBE_PATH||'ffprobe',tts=process.env.ESPEAK_PATH||'espeak-ng';
  await run(ffmpeg,['-version']);await run(ffprobe,['-version']);if(config.dialogue==='tts')await run(tts,['--version']);
  await mkdir(dirname(config.out),{recursive:true});
- try{await access(config.out);throw new Error(`Output already exists: ${config.out}. Choose another --out or remove it explicitly.`);}catch(e){if(e.code!=='ENOENT')throw e;}
+ for(const extension of ['mp4','srt','json']){const destination=config.out.replace(/\.mp4$/i,`.${extension}`);try{await access(destination);throw new Error(`Output already exists: ${destination}. Choose another --out or remove it explicitly.`);}catch(e){if(e.code!=='ENOENT')throw e;}}
  await import('./vendor.mjs');
  const temporary=await mkdtemp(join(tmpdir(),'cartoon-export-'));
- // Final encode stays beside the destination for an atomic rename on the same filesystem.
+ // Stage beside the destination for exclusive hard-link publication on the same filesystem.
  const staging=await mkdtemp(join(dirname(config.out),'.cartoon-export-'));
  let server,browser,encoder;let encoderDone;let interrupted=false;
  const interrupt=()=>{interrupted=true;};process.on('SIGINT',interrupt);process.on('SIGTERM',interrupt);
@@ -40,7 +41,7 @@ export async function exportFilm(config){
   console.log(`Preparing ${config.dialogue} dialogue and original music…`);
   const audio=await prepareAudio({...config,temporary,ffmpeg,tts});
   if(interrupted)throw new Error('Export interrupted');
-  server=createServer(async(req,res)=>{try{const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);const path=resolve(root,'.'+pathname);if(!path.startsWith(root+sep)||!['.html','.js','.css'].includes(extname(path)))return res.writeHead(404).end();const body=await readFile(path);res.writeHead(200,{'Content-Type':extname(path)==='.js'?'text/javascript':extname(path)==='.css'?'text/css':'text/html','X-Content-Type-Options':'nosniff'}).end(body);}catch{res.writeHead(404).end();}});
+  server=createStaticServer(root);
   await new Promise((ok,fail)=>{server.once('error',fail);server.listen(0,'127.0.0.1',ok);});
   browser=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
   const page=await browser.newPage({viewport:{width:config.width,height:config.height},deviceScaleFactor:1});
@@ -71,12 +72,11 @@ export async function exportFilm(config){
   const movie=join(staging,'film.mp4');
   await run(ffmpeg,['-v','error','-i',video,'-i',audio.path,'-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','192k','-t',String(config.duration),'-movflags','+faststart','-y',movie]);
   const probe=JSON.parse((await run(ffprobe,['-v','error','-show_streams','-show_format','-of','json',movie])).toString());
-  const picture=probe.streams.find(s=>s.codec_type==='video'),sound=probe.streams.find(s=>s.codec_type==='audio');
-  if(!picture||picture.width!==config.width||picture.height!==config.height||picture.codec_name!=='h264'||picture.pix_fmt!=='yuv420p'||!sound||sound.codec_name!=='aac'||Math.abs(Number(probe.format.duration)-config.duration)>.1||Number(picture.nb_frames)!==frames)throw new Error('Encoded MP4 validation failed');
+  validateMovie(probe,config);
   const metadata={...config,frames,voiceCount:audio.voiceCount,voiceBackend:config.dialogue==='tts'?'eSpeak NG (basic synthetic voices)':config.dialogue,streams:probe.streams.map(({codec_type,codec_name,width,height,avg_frame_rate,sample_rate,channels,nb_frames})=>({codec_type,codec_name,width,height,avg_frame_rate,sample_rate,channels,nb_frames})),duration:Number(probe.format.duration)};
   await writeFile(join(staging,'film.srt'),srt(config.story,config.lang,config.from,config.duration));
   await writeFile(join(staging,'film.json'),JSON.stringify(metadata,null,2)+'\n');
-  await rename(join(staging,'film.srt'),config.out.replace(/\.mp4$/i,'')+'.srt');await rename(join(staging,'film.json'),config.out.replace(/\.mp4$/i,'')+'.json');await rename(movie,config.out);
+  await publishBundle(staging,config.out);
   console.log(`Exported: ${config.out} (${config.duration}s, ${config.width}×${config.height}, ${config.fps}fps, music + ${config.dialogue} dialogue)`);
   return metadata;
  }finally{
