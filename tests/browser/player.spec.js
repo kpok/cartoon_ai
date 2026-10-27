@@ -1,7 +1,21 @@
 import {test,expect} from '@playwright/test';
 test('silent film can play, pause, seek to end and replay',async({page})=>{const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');await expect(page.getByRole('button',{name:'Odtwórz bajkę'})).toBeVisible();await page.getByRole('button',{name:'Odtwórz bajkę'}).click();await expect(page.getByRole('button',{name:'Pauza',exact:true})).toBeVisible();await page.waitForTimeout(1200);await page.getByRole('button',{name:'Pauza',exact:true}).click();const slider=page.getByRole('slider',{name:'Pozycja w bajce'});const paused=await slider.inputValue();expect(Number(paused)).toBeGreaterThan(0);await page.waitForTimeout(300);expect(await slider.inputValue()).toBe(paused);await slider.fill('65');await expect(page.getByRole('button',{name:'Obejrzyj jeszcze raz'})).toBeVisible();await page.getByRole('button',{name:'Obejrzyj jeszcze raz'}).click();await expect(page.getByRole('button',{name:'Pauza',exact:true})).toBeVisible();expect(Number(await slider.inputValue())).toBeLessThan(2);expect(errors).toEqual([]);});
 test('all story scenes render, backwards seeking and restart work without overflow',async({page})=>{await page.goto('/');const slider=page.getByRole('slider',{name:'Pozycja w bajce'});for(const t of ['5','12','21','29','42','58','0']){await slider.fill(t);await expect(slider).toHaveValue(t);await expect(page.locator('#ended')).toBeHidden();}await slider.fill('42');await page.getByRole('button',{name:'Od początku'}).click();await expect(slider).toHaveValue('0');expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await expect(page.locator('#film')).toBeVisible();expect(await page.locator('audio,video,iframe').count()).toBe(0);});
-test('clock reaches natural end without waiting two minutes',async({page})=>{await page.clock.install();await page.goto('/');await page.getByRole('button',{name:'Odtwórz bajkę'}).click();await page.clock.fastForward(64000);await page.clock.runFor(2200);await expect(page.getByRole('slider',{name:'Pozycja w bajce'})).toHaveValue('65');await expect(page.getByRole('button',{name:'Obejrzyj jeszcze raz'})).toBeVisible();});
+test('clock reaches natural end with controlled animation timestamps',async({page})=>{
+  await page.clock.install({time:new Date('2026-01-01T08:00:00Z')});
+  await page.goto('/');
+  // Stop wall-clock auto-advancement before starting the animation.
+  await page.clock.pauseAt(new Date('2026-01-01T10:00:00Z'));
+  await page.getByRole('button',{name:'Odtwórz bajkę'}).click();
+  await page.clock.runFor(100);
+  const slider=page.getByRole('slider',{name:'Pozycja w bajce'});
+  expect(Number(await slider.inputValue())).toBeGreaterThan(0);
+  await page.clock.fastForward(64000);
+  await page.clock.runFor(1100);
+  await expect(slider).toHaveValue('65');
+  await expect(page.getByRole('button',{name:'Obejrzyj jeszcze raz'})).toBeVisible();
+  await expect(page.locator('#play')).toHaveAttribute('aria-label','Odtwórz ponownie');
+});
 
 test('audio controls, Polish captions and missing-voice fallback',async({page})=>{
   await page.addInitScript(()=>{
