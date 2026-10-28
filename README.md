@@ -24,7 +24,7 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. The predev/build scripts copy the installed Three.js modules and license into `vendor/`; the deployed app loads them from its own origin, with no CDN or runtime API call. The development server binds to all interfaces, for use on trusted networks. ES modules need an HTTP server; opening index.html directly is unsupported.
+Open http://localhost:3000. The predev/pretest/build scripts copy the installed Three.js modules and license into `vendor/`; the deployed app loads them from its own origin, with no CDN or runtime API call. The development server binds to all interfaces, for use on trusted networks. ES modules need an HTTP server; opening index.html directly is unsupported.
 
 ```sh
 npm test
@@ -51,7 +51,7 @@ Garden beats: 0–7 discover seed; 7–15 plant; 15–23 water; 23–30 light; 3
 
 ## Deployment
 
-GitHub Actions checks tests and build, then deploys that same `dist/` artifact to GitHub Pages after success on main. Set Pages source to **GitHub Actions** and repository variable `ENABLE_GITHUB_PAGES=true` for deployment. Public pull requests do not start workflows; only owner-initiated runs on main are allowed. The deploy job has scoped Pages/OIDC permissions and serialized deployments; no personal access token is needed. Setting the variable to false pauses future publication.
+GitHub Actions checks workflow security, model validation, unit tests and build, then deploys that same `dist/` artifact to GitHub Pages after those fast checks succeed on main. By explicit owner choice, full browser/MP4 regression runs in parallel with deployment; check its separate result. Set Pages source to **GitHub Actions** and repository variable `ENABLE_GITHUB_PAGES=true` for deployment. Public pull requests do not start workflows; only owner-initiated runs on main are allowed. The deploy job has scoped Pages/OIDC permissions and serialized deployments; no personal access token is needed. Setting the variable to false pauses future publication.
 
 Only the static build is published; project reports, tests and development scripts are excluded. Source and deployed assets are publicly readable. Three.js's MIT license is included with the vendored modules.
 
@@ -107,7 +107,7 @@ These files are automatically scheduled, normalized and mixed with ducked music.
 
 ### GitHub Actions export
 
-Open **Actions → Export cartoon MP4 → Run workflow**. Select story, language, portrait/landscape, full/draft resolution and TTS/music-only. After completion, download the `cartoon-…` artifact ZIP containing MP4, SRT and metadata (retained14days). The manual workflow installs all tools; no local setup is needed. It does not publish to YouTube or Facebook and does not run on every push. Existing Pages deployment still runs after successful CI; CI additionally checks a small voiced MP4 from each renderer.
+Open **Actions → Export cartoon MP4 → Run workflow**. Select story, language, portrait/landscape, full/draft resolution and TTS/music-only. After completion, download the `cartoon-…` artifact ZIP containing MP4, SRT and metadata (retained14days). The manual workflow installs all tools; no local setup is needed. It does not publish to YouTube or Facebook and does not run on every push. Pages deployment runs after fast checks; a separate parallel regression job additionally checks a small voiced MP4 from each renderer.
 
 ## Workflow security
 
@@ -119,3 +119,7 @@ CI/Pages and manual MP4 export are restricted to owner-initiated runs on main in
 See [Roadmapa — filmy tworzone kodem](docs/ROADMAP_PL.md) for the accepted Sprint 1 plan: a procedural Blender/Python robot experiment in this repository, mobile GLB preview and a silent third film on the existing Pages site. The generator does not call AI APIs at runtime. This is a plan, not an implemented third episode.
 
 Automatic CI/Pages skips pushes changing only Markdown (`**/*.md`) or files under `docs/`. Mixed code/documentation changes still run CI; manual workflows remain available.
+
+## Procedural robot — Stage A
+
+The third card opens [the robot studio](https://kpok.github.io/cartoon_ai/robot.html): orbit/zoom/reset a static procedural head and shoulders, with PNG fallback. No dance or robot MP4 yet. Selected files in `published/robot/` survive all later builds; Blender never runs on a website visit or normal push. Use **Actions → Generate robot model (Stage A)** for a bounded manual render and download its seven-day artifact. Promotion of selected validated outputs remains a separate reviewed commit. Generator commands, mobile budgets and separate code/output licenses: [experiment README](experiments/dancing-robot/README.md).
