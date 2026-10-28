@@ -33,7 +33,7 @@ export function checkPolicy(workflows,pins){
   assert.deepEqual(workflow.permissions,{},`${file}: default token must have no permissions`);
   assert.equal(workflow.concurrency,undefined,'Authorization must happen before concurrency allocation');
   assert.deepEqual(Object.keys(workflow.on).sort(),file==='ci.yml'?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
-  if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main']});
+  if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main'],'paths-ignore':['**/*.md','docs/**']});
   assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','test']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
    const label=`${file}/${name}`;jobs.push({file,name,job});

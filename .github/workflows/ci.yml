@@ -2,6 +2,9 @@ name: Film checks and Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
   workflow_dispatch:
 permissions: {}
 jobs:

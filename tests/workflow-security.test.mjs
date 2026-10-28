@@ -7,6 +7,7 @@ const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',impor
 test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),5);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
+  w=>{w['ci.yml'].on.push['paths-ignore'].push('src/**');},
   w=>{w['repo-diagnostics.yml'].on.push={branches:['main']};},
   w=>{w['repo-diagnostics.yml'].jobs.diagnostics.if="github.ref == 'refs/heads/main'";},
   w=>{w['repo-diagnostics.yml'].jobs['actions-smoke'].permissions.contents='write';},
