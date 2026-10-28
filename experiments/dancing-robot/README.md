@@ -1,7 +1,7 @@
-# Neon Tinker — etap A
+# Neon Tinker — szkic krótkonogiej sylwetki
 
 Proceduralna interpretacja referencji robota: metal, duże oczy, uśmiech i kolorowa
-błyszcząca powłoka. To statyczna głowa z ramionami, bez tańca i MP4.
+błyszcząca powłoka. Ta gałąź dodaje statyczną humanoidalną sylwetkę z krótkimi nogami, bez tańca i MP4.
 Nie używa AI podczas wykonania ani żadnych zewnętrznych modeli lub tekstur.
 
 ## Wykonanie
@@ -39,3 +39,29 @@ są dozwolone z wymaganym uznaniem autorstwa i wskazaniem zmian.
 Film i model nie otrzymują GPL automatycznie dlatego, że utworzono je Blenderem.
 Nie dołączamy samego obrazka referencyjnego ani nie zapewniamy wyłączności wobec
 podobnych projektów. Przed dodaniem cudzych zasobów trzeba odrębnie sprawdzić ich prawa.
+
+
+
+## Szkic humanoidalnej sylwetki — osobna gałąź
+
+Wersja robocza dodaje małą miednicę i krótkie, masywne nóżki z kolanami, kostkami
+i zaokrąglonymi stopami. Zatwierdzona duża głowa, ramiona, twarz i kolorowa powłoka
+pozostają takie same. Długość nóg jest zbliżona do obecnych krótkich rąk — bez proporcji
+dorosłego człowieka. Każda część ma własną nazwę do późniejszego przygotowania ruchu.
+To nadal statyczny model: nie dodano jeszcze szkieletu ani tańca.
+
+Domyślnie generator tworzy `--body humanoid`; `--body bust` odtwarza dotychczasową
+geometrię głowy i ramion. Raport zapisuje wybrany wariant. Kamera uwzględnia nowe stopy.
+Wyniki zapisuj do osobnego folderu, np. `--output robot-humanoid-output`.
+Ta gałąź nie modyfikuje `published/robot`, głównej strony ani workflowów publikacji.
+Bez zatwierdzenia właściciela nie scalać z main ani nie wdrażać na Pages.
+
+### Render roboczy (bez publikacji Pages)
+
+![Krótkonogi robot — szkic sylwetki](previews/humanoid.png)
+
+Kontrola geometrii w Blenderze:
+
+```sh
+blender --background --factory-startup --disable-autoexec --python-exit-code 1 --python experiments/dancing-robot/check_humanoid.py
+```

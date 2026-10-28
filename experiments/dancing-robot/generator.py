@@ -83,7 +83,8 @@ def look_at(obj, target):
     obj.rotation_euler = (Vector(target) - obj.location).to_track_quat('-Z', 'Y').to_euler()
 
 
-def build():
+def build(body='humanoid'):
+    MODEL.clear()
     global steel, dark
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete(use_global=False)
@@ -162,6 +163,22 @@ def build():
         orb('Candy pearl',(x,y,z),(r,r,r),[pink,cyan,violet][i%3],16,8)
     for pos, mat in [((-.97,-.35,1.78),cyan),((1.18,-.3,1.84),pink),((.9,.1,3.7),violet)]:
         orb('Suspended candy droplet',pos,(.065,.065,.09),mat,16,8)
+    if body == 'humanoid':
+        # Keep the approved oversized head and short arms. Legs use the same chunky scale.
+        orb('Compact waist core', (0, .05, .27), (.39, .3, .22), dark)
+        orb('Small pelvis shell', (0, .04, .06), (.58, .36, .22), steel)
+        torus('Waist chrome belt', (0, .04, .23), .34, .045, edge, (0, 0, 0))
+        for side, label in [(-1, 'Left'), (1, 'Right')]:
+            x = side * .33
+            orb(f'{label} hip joint', (x, .04, -.10), (.18, .18, .18), dark)
+            orb(f'{label} short thigh', (x, .04, -.24), (.20, .22, .23), steel)
+            orb(f'{label} knee joint', (x, -.01, -.43), (.15, .18, .15), dark)
+            orb(f'{label} knee cap', (x, -.175, -.43), (.13, .045, .12), edge)
+            orb(f'{label} short shin', (x, .04, -.59), (.18, .20, .20), steel)
+            orb(f'{label} ankle joint', (x, .02, -.75), (.13, .14, .12), dark)
+            orb(f'{label} rounded foot', (x, -.12, -.85), (.25, .37, .14), edge)
+            orb(f'{label} sole', (x, -.12, -.93), (.255, .37, .055), dark)
+            orb(f'{label} shin candy inset', (x, -.155, -.59), (.075, .035, .105), cyan if side == -1 else pink, 16, 8)
     return MODEL
 
 
@@ -169,12 +186,13 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--output',default='robot-output')
     parser.add_argument('--seed',type=int,default=27)
+    parser.add_argument('--body', choices=['bust', 'humanoid'], default='humanoid')
     parser.add_argument('--samples',type=int,default=32,choices=range(1,129))
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else sys.argv[1:])
     random.seed(args.seed)
     output = Path(args.output).resolve()
     output.mkdir(parents=True,exist_ok=True)
-    models = build()
+    models = build(args.body)
     scene=bpy.context.scene
     scene.render.engine='CYCLES'
     scene.cycles.device='CPU'
@@ -195,8 +213,8 @@ def main():
         data=bpy.data.lights.new(name,'AREA');data.energy=power;data.color=color;data.shape='DISK';data.size=size
         obj=bpy.data.objects.new(name,data);scene.collection.objects.link(obj);obj.location=pos;look_at(obj,(0,0,2))
     bpy.ops.object.camera_add(location=(4,-10,4.5))
-    camera=bpy.context.object;camera.name='Portrait camera';camera.data.type='ORTHO';camera.data.ortho_scale=4.85
-    look_at(camera,(0,0,2.1));scene.camera=camera
+    camera=bpy.context.object;camera.name='Portrait camera';camera.data.type='ORTHO';camera.data.ortho_scale=5.65 if args.body == 'humanoid' else 4.85
+    look_at(camera,(0,0,1.55 if args.body == 'humanoid' else 2.1));scene.camera=camera
     bpy.ops.object.select_all(action='DESELECT')
     for obj in models: obj.select_set(True)
     bpy.ops.export_scene.gltf(filepath=str(output/'robot.glb'),export_format='GLB',use_selection=True,export_cameras=False,export_lights=False,export_extras=False,export_animations=False)
@@ -211,10 +229,11 @@ def main():
     except (OSError,subprocess.CalledProcessError):
         commit=os.getenv('GITHUB_SHA','unknown')
     triangles=sum(sum(len(p.vertices)-2 for p in obj.data.polygons) for obj in models)
-    report={'schema':1,'generator':'Neon Tinker Stage A','seed':args.seed,'blender':bpy.app.version_string,'source_commit':commit,'generator_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'generation_seconds':round(generation_seconds,3),'render_seconds':round(time.monotonic()-render_start,3),'total_seconds':round(time.monotonic()-START,3),'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'samples':args.samples,'resolution':[768,768],'triangles_before_export':triangles,'objects':len(models),'audio':False,'stage':'A','license':'CC-BY-4.0','attribution':'Neon Tinker by kpok'}
+    report={'schema':1,'generator':'Neon Tinker Stage A','seed':args.seed,'blender':bpy.app.version_string,'source_commit':commit,'generator_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'generation_seconds':round(generation_seconds,3),'render_seconds':round(time.monotonic()-render_start,3),'total_seconds':round(time.monotonic()-START,3),'peak_rss_kib':resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,'samples':args.samples,'resolution':[768,768],'triangles_before_export':triangles,'objects':len(models),'audio':False,'stage':'A','body':args.body,'license':'CC-BY-4.0','attribution':'Neon Tinker by kpok'}
     (output/'report.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report))
 
 
 if __name__=='__main__':
     main()
+
