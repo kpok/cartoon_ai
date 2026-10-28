@@ -66,7 +66,7 @@ Nie gwarantujemy idealnego odwzorowania obrazu ani filmowego realizmu na każdym
 3. Do dokładnego dopasowania rytmu właściciel wskazuje konkretne nagranie lub czasy akcentów
    „digi digi … Hey”. Nie pobieramy ani nie publikujemy nieuzgodnionej muzyki.
 4. Sprawdzić liczbę klatek, czas, kodek, wymiary oraz brak ścieżki audio; ocenić ruch wizualnie.
-5. Dodać trzecią kartę z filmem i modelem, zweryfikować obie dotychczasowe bajki i nawigację.
+5. Uzupełnić istniejącą od etapu A trzecią kartę robota o film, zweryfikować obie dotychczasowe bajki i nawigację.
 
 Na początek powłoka jest częścią modelu. Realistyczna symulacja chlupotania i odrywania
 kropli pozostaje poza zakresem pierwszego eksperymentu.
@@ -131,3 +131,90 @@ Automatyczny workflow CI/Pages pomija push, jeżeli wszystkie zmiany dotyczą pl
 lub katalogu `docs/`. Zmiana dokumentacji razem z kodem albo workflowem uruchamia CI.
 Ręczne uruchomienia CI, eksportu i diagnostyki pozostają dostępne. Dokumentacji nie używamy
 jako miejsca przechowywania wykonywalnego kodu aplikacji. Mechanizm: `paths-ignore` dla push.
+
+## Warunki po przeglądzie Rady Ekspertów — doprecyzowanie Sprintu 1
+
+Ustalenia z przeglądu planu omówionego 2026-10-28. To warunki do realizacji,
+nie potwierdzenie wykonania testów generatora ani formalna opinia prawna.
+
+### Co właściciel zobaczy i kiedy
+
+- Etap A: trzecia karta robota na tym samym Pages, PNG oraz obracany i przybliżany
+  GLB głowy i ramion. Bez MP4; interfejs jasno informuje, że film jeszcze nie powstał.
+- Po ocenie modelu na rzeczywistym Androidzie właściciel akceptuje wygląd albo wskazuje poprawki.
+- Etap B dopiero po akceptacji: pełna sylwetka, 5–10 sekund tańca i pionowy niemy MP4.
+  Istniejącą kartę uzupełniamy o odtwarzacz, zamiast tworzyć czwartą pozycję.
+- Obie obecne bajki pozostają dostępne. Ich animacja w przeglądarce nie wymaga
+  konwersji do MP4 ani zastępowania jej renderami Blendera.
+
+### Pomiary, mobilność i kontrola jakości
+
+Najpierw mierzymy pojedynczą klatkę: czas, zużycie pamięci, ustawienia renderera,
+rozdzielczość i liczbę próbek. Dopiero na tej podstawie szacujemy koszt całej animacji.
+Limit 60 minut zabezpiecza wykonanie, nie gwarantuje ukończenia filmu.
+
+Przed publikacją etapu A ustalamy i zapisujemy liczbowe budżety rozmiaru GLB,
+liczby trójkątów oraz rozdzielczości i pamięci tekstur. Wartości dobieramy po pomiarach,
+a przekroczenia wykrywa walidator. Test na telefonie obejmuje czas ładowania,
+płynność obracania, przybliżanie i zachowanie przy błędzie pobrania.
+Metal, oczy i powłokę oceniamy również w wyeksportowanym GLB w przeglądarce,
+ponieważ render Blendera nie gwarantuje identycznego wyglądu materiałów w Three.js.
+
+Dla robota powstaje osobny profil walidacji MP4: dokładnie jeden strumień obrazu,
+zero strumieni audio, uzgodnione wymiary, kodek, długość i liczba klatek.
+Nie osłabiamy istniejących walidacji dźwięku i eksportu poprzednich bajek.
+
+### Rozdzielenie generowania i publikacji oraz zabezpieczenia
+
+Generator otrzymuje tylko odczyt repo i możliwość zapisania swoich artefaktów;
+bez uprawnień Pages, zapisu kodu i dostępu do kont społecznościowych.
+Publikacja jest odrębnym krokiem, przyjmuje wybrane i zwalidowane wyniki z konkretnego
+commita oraz konfiguracji, sprawdza ścieżki, formaty i rozmiary. Nie publikuje całego
+katalogu roboczego. Uprawnienia wdrożeniowe są dostępne wyłącznie krokowi publikacji.
+
+Obsługę GLB i PNG dodajemy już w etapie A, a MP4 dopiero w etapie B.
+Politykę CSP, listy plików buildu i serwera rozszerzamy w minimalnym zakresie.
+Docelowo pobranie modelu i odtwarzanie filmu ma być dozwolone z tego samego originu
+(np. odpowiednie `connect-src 'self'` i `media-src 'self'`), po sprawdzeniu faktycznych
+potrzeb loadera. Nie wyłączamy CSP i nie otwieramy dowolnych zewnętrznych źródeł.
+Testy regresji obejmują obie istniejące bajki, nawigację oraz nowe zasoby.
+Nie chodzi o zagrożenie po odtworzeniu filmu, tylko o dopuszczenie nowego typu zasobów.
+
+### Licencje przed publikacją generatora i wyników
+
+Przy implementacji wybieramy i zapisujemy konkretny wariant GPL zgodny z użyciem API
+Blendera, dołączamy tekst licencji i oznaczenia plików generatora. Sprawdzamy zgodność
+zależności i istniejącej licencji repo, bez automatycznej zmiany licencji całego projektu.
+Oddzielnie opisujemy zasady udostępniania modeli, tekstur, PNG, BLEND i filmów;
+nie zakładamy automatycznego objęcia wynikowego filmu lub modelu GPL.
+Każdy cudzy zasób wymaga sprawdzenia praw do publikacji filmu oraz redystrybucji
+pliku źródłowego. Sekrety i zasoby bez praw do redystrybucji pozostają poza publicznym repo.
+
+### Renderowanie po eksperymencie — opcje i punkt decyzji
+
+Sprint 1 jest ograniczonym rozwojem, testem i demonstracją generatora.
+Nie traktujemy bezpłatnych publicznych runnerów jako gwarantowanej usługi codziennej
+produkcji komercyjnych filmów. Przed zwiększeniem skali sprawdzamy aktualny regulamin
+GitHuba, limity i ceny. Sam zakup własnego runnera nie jest uznany za automatyczne
+wyłączenie zasad Actions.
+
+Generator ma działać również poza Actions: ta sama komenda i parametry lokalnie
+lub w przypiętym środowisku/kontenerze. Kandydaci do późniejszej oceny:
+
+| Wariant | Co trzeba ocenić przed wyborem |
+| --- | --- |
+| Własny komputer | Dostępność CPU/GPU, czas pracy i wygoda uruchamiania |
+| Jednorazowe zadanie ECS/Fargate | Wykonalność renderu CPU, pamięć, czas i koszt uruchomienia |
+| AWS Batch | Kolejka, skalowanie, wymagania CPU/GPU i opłacalność |
+| Tymczasowe EC2 | Dobór maszyny, zakończenie pracy i sprzątanie dysków |
+| Własny runner GitHuba na AWS | Izolacja i ryzyko wykonania niezaufanego kodu z publicznego repo |
+
+Preferowany kierunek do oceny: osobne zadanie renderujące uruchamiane niezależnie
+od Actions, zapis wyników do S3 i zakończenie zadania. GitHub pozostaje miejscem
+rozwoju i testowania kodu. Decyzję podejmujemy po pomiarach; bez wdrażania AWS w Sprincie 1.
+Przed uruchomieniem chmury ustalamy limit czasu, maksymalną równoległość, budżet,
+retencję S3, sprzątanie zasobów i minimalne uprawnienia. Alert budżetowy sam nie
+stanowi twardego limitu kosztów. Nie zakładamy stałych kluczy AWS w repo.
+
+Aktualizacja ta dotyczy wyłącznie dokumentacji. Nie uruchamia generatora, nie zmienia
+CSP ani workflowów i nie publikuje jeszcze trzeciej karty.
