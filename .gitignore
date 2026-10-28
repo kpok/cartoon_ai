@@ -8,3 +8,7 @@ vendor/
 
 exports/
 .cartoon-export-*/
+
+robot-output/
+*.blend1
+__pycache__/

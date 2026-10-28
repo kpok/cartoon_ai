@@ -1,0 +1,42 @@
+name: Generate robot model (Stage A)
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  generate:
+    if: >-
+      github.repository == 'kpok/cartoon_ai' &&
+      github.repository_id == '1433681495' &&
+      github.repository_owner_id == '10676481' &&
+      github.actor_id == '10676481' &&
+      github.actor == 'kpok' &&
+      github.triggering_actor == 'kpok' &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'workflow_dispatch'
+    permissions:
+      contents: read
+    concurrency:
+      group: trusted-robot-generation
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Download verified Blender
+        run: |
+          curl --fail --location --retry 2 --max-time 300 https://download.blender.org/release/Blender4.2/blender-4.2.0-linux-x64.tar.xz -o blender.tar.xz
+          echo '4f4fd7646af01f6fee9d420408318381a6e52571268eb7cf9cd5033bd9e7a359  blender.tar.xz' | sha256sum --check --strict
+          tar -xf blender.tar.xz
+      - name: Generate model and single-frame preview
+        run: ./blender-4.2.0-linux-x64/blender --background --factory-startup --python-exit-code 1 --python experiments/dancing-robot/generator.py -- --output robot-output
+      - name: Validate model budget and self-contained assets
+        run: python3 scripts/validate-robot.py robot-output --require-blend
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: robot-stage-a
+          path: robot-output/
+          if-no-files-found: error
+          retention-days: 7

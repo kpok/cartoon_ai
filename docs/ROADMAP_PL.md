@@ -1,7 +1,7 @@
 # Roadmapa — filmy tworzone kodem
 
-Data uzgodnienia: 2026-10-28. Status: plan zaakceptowany, Sprint 1 jeszcze nie rozpoczęty.
-Ten dokument nie oznacza wdrożenia generatora, utworzenia modelu ani trzeciego filmu.
+Data uzgodnienia: 2026-10-28. Status: etap A zaimplementowany; publikacja i testy śledzone w `.agentic/tasks/robot-stage-a/verification.md`.
+Etap B (pełna sylwetka, taniec i MP4) nadal wymaga oceny i akceptacji etapu A.
 
 ## Cel i sposób pracy
 
@@ -218,3 +218,7 @@ stanowi twardego limitu kosztów. Nie zakładamy stałych kluczy AWS w repo.
 
 Aktualizacja ta dotyczy wyłącznie dokumentacji. Nie uruchamia generatora, nie zmienia
 CSP ani workflowów i nie publikuje jeszcze trzeciej karty.
+
+## Aktualizacja wykonawcza etapu A
+
+Wybrane GLB/PNG/manifest pozostają w `published/robot/`, aby kolejne buildy zachowały podgląd. Generator ma osobny ręczny workflow. Na wyraźne polecenie właściciela publikacja po szybkich kontrolach (model, zabezpieczenia, testy jednostkowe i build) działa równolegle z pełnym jobem Playwright/eksportu. Nie oznacza to oczekiwania na pełne regresje przed publikacją; ich wynik należy sprawdzić osobno. Generator i wyniki: zasady w `experiments/dancing-robot/README.md`.

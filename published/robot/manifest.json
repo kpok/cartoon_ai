@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "generator": "Neon Tinker Stage A",
+  "seed": 27,
+  "blender": "4.2.0",
+  "source_commit": "cc8879fc1a1adc030f3f47097b38b9503e6031b3",
+  "generator_sha256": "51b7938222183bda6b87c13c92fa9efcf6d8806bb8cc75816a0eb8cb0e203ae4",
+  "generation_seconds": 5.023,
+  "render_seconds": 28.242,
+  "total_seconds": 33.265,
+  "peak_rss_kib": 890980,
+  "samples": 32,
+  "resolution": [
+    768,
+    768
+  ],
+  "triangles_before_export": 46320,
+  "objects": 112,
+  "audio": false,
+  "stage": "A",
+  "license": "CC-BY-4.0",
+  "attribution": "Neon Tinker by kpok"
+}
