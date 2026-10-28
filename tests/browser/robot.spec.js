@@ -7,6 +7,13 @@ test('robot loads locally with orbit controls and preserves story navigation',as
  await page.goto('/');await page.locator('a[href="./robot.html"]').click();
  await expect(page.locator('#robot-canvas')).toHaveAttribute('data-ready','true',{timeout:30000});
  await expect(page.locator('#robot-canvas')).toBeVisible();
+ const manifest=await (await page.request.get('/published/robot/manifest.json')).json();
+ expect(manifest.body).toBe('humanoid');
+ const binary=await (await page.request.get('/published/robot/robot.glb')).body();
+ const jsonLength=binary.readUInt32LE(12),gltf=JSON.parse(binary.subarray(20,20+jsonLength).toString('utf8'));
+ const names=gltf.nodes.map(node=>node.name);
+ for(const side of ['Left','Right'])for(const part of ['short thigh','knee joint','short shin','rounded foot'])expect(names).toContain(`${side} ${part}`);
+
  const canvas=page.locator('#robot-canvas'),initial=await canvas.screenshot();
  await page.getByRole('button',{name:'Obróć w lewo'}).click();
  await expect.poll(async()=>!(await canvas.screenshot()).equals(initial),{timeout:10000}).toBe(true);

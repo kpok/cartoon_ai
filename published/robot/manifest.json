@@ -3,21 +3,32 @@
   "generator": "Neon Tinker Stage A",
   "seed": 27,
   "blender": "4.2.0",
-  "source_commit": "cc8879fc1a1adc030f3f47097b38b9503e6031b3",
-  "generator_sha256": "51b7938222183bda6b87c13c92fa9efcf6d8806bb8cc75816a0eb8cb0e203ae4",
-  "generation_seconds": 5.023,
-  "render_seconds": 28.242,
-  "total_seconds": 33.265,
-  "peak_rss_kib": 890980,
+  "source_commit": "5219388806f4c300cb85a134712f81e5b98c260c",
+  "generator_sha256": "997b5f10cd61ebfab5163f2c0c29fd284e1ba7f61e67c0fbcc0bf37d9eaaa72d",
+  "generation_seconds": 1.849,
+  "render_seconds": 7.835,
+  "total_seconds": 9.684,
+  "peak_rss_kib": 881072,
   "samples": 32,
   "resolution": [
     768,
     768
   ],
-  "triangles_before_export": 46320,
-  "objects": 112,
+  "triangles_before_export": 56784,
+  "objects": 133,
   "audio": false,
   "stage": "A",
+  "body": "humanoid",
   "license": "CC-BY-4.0",
-  "attribution": "Neon Tinker by kpok"
+  "attribution": "Neon Tinker by kpok",
+  "files": {
+    "robot.glb": {
+      "sha256": "d0ea628eda5eb2c4707eb5b3845e25641bc5a9de2f5df630b87f9e6c214b5d12",
+      "bytes": 1352524
+    },
+    "preview.png": {
+      "sha256": "5502dd554a343eeed2ad2ace52173cdef88ba00916d60513ab8daf1411249276",
+      "bytes": 798668
+    }
+  }
 }

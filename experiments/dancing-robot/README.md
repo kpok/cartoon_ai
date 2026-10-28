@@ -53,12 +53,12 @@ To nadal statyczny model: nie dodano jeszcze szkieletu ani tańca.
 Domyślnie generator tworzy `--body humanoid`; `--body bust` odtwarza dotychczasową
 geometrię głowy i ramion. Raport zapisuje wybrany wariant. Kamera uwzględnia nowe stopy.
 Wyniki zapisuj do osobnego folderu, np. `--output robot-humanoid-output`.
-Ta gałąź nie modyfikuje `published/robot`, głównej strony ani workflowów publikacji.
-Bez zatwierdzenia właściciela nie scalać z main ani nie wdrażać na Pages.
+Właściciel zatwierdził publikację statycznej pełnej sylwetki. Wybrane GLB i PNG trafiają
+do `published/robot`, a podgląd jest na `robot.html`. Taniec i MP4 nie są częścią tej aktualizacji.
 
 ### Render roboczy (bez publikacji Pages)
 
-![Krótkonogi robot — szkic sylwetki](previews/humanoid.png)
+![Krótkonogi robot — podgląd sylwetki](../../published/robot/preview.png)
 
 Kontrola geometrii w Blenderze:
 
