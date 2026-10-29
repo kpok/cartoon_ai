@@ -46,4 +46,4 @@ jobs:
             robot-video/robot-dance.mp4
             robot-video/robot-dance.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 1
