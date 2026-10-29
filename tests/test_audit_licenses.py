@@ -24,6 +24,9 @@ class LicenseGateTests(unittest.TestCase):
     def test_unknown_or_disallowed_dependency_fails(self):
         p=self.root/'package-lock.json';lock=json.loads(p.read_text());lock['packages']['node_modules/three']['license']='Unknown';p.write_text(json.dumps(lock))
         self.assertEqual(self.run_gate(),1)
+    def test_reference_image_cannot_inherit_output_license(self):
+        p=self.root/'.security/assets.json';assets=json.loads(p.read_text());assets['docs/images/robot-concept.jpg']['license']='CC-BY-4.0';p.write_text(json.dumps(assets))
+        self.assertEqual(self.run_gate(),1)
     def test_missing_notice_fails(self):
         (self.root/'dist/vendor/THREE-LICENSE.txt').unlink();self.assertEqual(self.run_gate(),1)
     def test_new_disguised_binary_fails(self):

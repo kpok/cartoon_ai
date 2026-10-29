@@ -2,6 +2,9 @@
 
 - Robot appearance: a visual reference generated with ChatGPT and supplied by the
   project owner; recreated as procedural geometry without imported image textures.
+  The supplied concept image is now documented at [robot-concept.jpg](images/robot-concept.jpg).
+  It is a reference illustration, separate from the rendered procedural model.
+  No additional reuse license is granted for this image; see the [licensing map](../LICENSING.md).
   This records the owner's account, not an independent ownership or exclusivity opinion.
 - Model and preview: generated in Blender, then articulated by project code.
   `.security/assets.json` records exact hashes and existing CC BY attribution.

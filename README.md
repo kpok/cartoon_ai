@@ -38,6 +38,18 @@ ChatGPT przekładał te uwagi na zmiany w repozytorium: przygotowywał kod, mode
 
 W miarę rozwoju projektu doszły planowanie, przeglądy z udziałem agentów, automatyczne testy oraz audyt repozytorium. Moja ocena dotyczyła przede wszystkim efektu wizualnego. Testy i przeglądy pomagają wykrywać błędy, ale nie są gwarancją poprawności ani zastępstwem dla oceny praw do używanych materiałów.
 
+## Od obrazu koncepcyjnego do modelu 3D
+
+Poniżej obraz koncepcyjny wygenerowany w ChatGPT, na którym wzorowaliśmy wygląd robota, oraz podgląd modelu utworzonego proceduralnie w Blenderze.
+
+| Obraz koncepcyjny — wygenerowany w ChatGPT | Model proceduralny — render z Blendera |
+| --- | --- |
+| ![Obraz koncepcyjny neonowego robota wygenerowany w ChatGPT](docs/images/robot-concept.jpg) | ![Podgląd proceduralnego modelu robota z krótkimi rękami i nogami](published/robot/preview.png) |
+
+Kolorystyka, duża głowa i charakter postaci były inspiracją do budowy geometrii i materiałów. Krótkie nogi, ruchy i mimika powstawały później w kolejnych iteracjach kodu. Obraz koncepcyjny jest ilustracją referencyjną; jego zasady udostępniania opisuje [mapa licencji](LICENSING.md).
+
+[Otwórz animowany model i obróć go w 3D](https://kpok.github.io/cartoon_ai/robot.html).
+
 ## Jak działa rozwiązanie
 
 1. **Opisuję pomysł i poprawki** w rozmowie z ChatGPT Work.
