@@ -22,8 +22,8 @@
   "attribution": "Neon Tinker by kpok",
   "files": {
     "robot.glb": {
-      "bytes": 2028012,
-      "sha256": "e92a2ab0ca7d16a7ee0ea1ab1b67ae8b42e51a94f13ce35dd28d6a8d56a1ff8d"
+      "bytes": 2028016,
+      "sha256": "78c5686ff932a98cf1dfb0794a91945ce2295417f5d093d9ece48bb08df884ef"
     },
     "preview.png": {
       "bytes": 798668,
@@ -39,6 +39,12 @@
     "fps": 24,
     "reference_timing": true,
     "music_synchronized": false,
+    "rhythm_alignment": {
+      "period": 0.43793487803947007,
+      "accent": 13.309488910485939,
+      "source": "measured reference audio onset grid",
+      "audio_bundled": false
+    },
     "cues": [
       [
         0,
@@ -47,68 +53,68 @@
       ],
       [
         5.8,
-        8.5,
+        8.45,
         "Gesty przy barkach"
       ],
       [
-        8.5,
-        11.3,
+        8.45,
+        9.6,
         "Powitanie"
       ],
       [
-        11.3,
+        9.6,
         17.4,
-        "Kołysanie i zmiana podparcia"
+        "Kołysanie i opuszczanie rąk"
       ],
       [
         17.4,
-        21.6,
+        21.7,
         "Niewidzialna gitara"
       ],
       [
-        21.6,
-        23.8,
+        21.7,
+        24.3,
         "Sprężysty przysiad"
       ],
       [
-        23.8,
-        28.2,
+        24.3,
+        28.3,
         "Otwarte dłonie i zbliżenie rąk"
       ],
       [
-        28.2,
+        28.3,
         32.2,
         "Pochylenie i otwarcie ramion"
       ],
       [
         32.2,
-        36.8,
-        "Dłoń na piersi"
+        36.9,
+        "Dłoń na piersi i obrót"
       ],
       [
-        36.8,
+        36.9,
         40,
         "Gesty przy twarzy i powrót"
       ]
     ],
     "bounds": {
       "min": [
-        -1.8455964743314348,
-        -0.9900000314526509,
-        -1.3775397283137676
+        -1.8456275748488988,
+        -0.9900000314478048,
+        -1.4442688877657122
       ],
       "max": [
-        1.8488697658409787,
-        4.282935313926825,
-        1.995595096212392
+        1.8475937307195722,
+        4.282902198085306,
+        2.277890845467356
       ]
     }
   },
   "provenance_note": "Stage A geometry/preview metrics retained. ReferenceDance is deterministically retargeted from the archived approved rig. Hand-timed adaptation of supplied recording; no recording, audio or MP4 is published. Arms are segmented in-place; recessed joints added without rescaling.",
   "retarget": {
     "script": "experiments/dancing-robot/retarget.mjs",
-    "sha256": "2493c9598d707a3651851833860ab2e136c0b5a1e4218d45c181f38a0934a73d",
-    "choreography_sha256": "aed04062ec2bb103603f37b3406b57604aa4aa602e3d7803975a753e33f8474e",
+    "sha256": "d35875c26d65b3e9fa0a26bb0aae3afda9f703f404d2698ec8784749fc7aec95",
+    "choreography_sha256": "e67be9a5be6b12b026735d78ad621dac8aa322f8ec56f5c5a012b2aa197621c3",
     "base_sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44"
   }
 }

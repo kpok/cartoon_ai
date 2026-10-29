@@ -1,0 +1,10 @@
+{
+  "video_sha256": "046f24a76b60edd225a4cdbbcfaef12a1153506321485b3035ccc83c6fa4ac63",
+  "model_sha256": "e92a2ab0ca7d16a7ee0ea1ab1b67ae8b42e51a94f13ce35dd28d6a8d56a1ff8d",
+  "sample_count": 80,
+  "step_seconds": 0.5,
+  "range_seconds": [
+    0,
+    39.5
+  ]
+}

@@ -37,9 +37,9 @@ try{
  new ResizeObserver(resize).observe(viewport);resize();
  canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();if(frame!==null)cancelAnimationFrame(frame);failed();});
  const loader=new GLTFLoader();
- loader.load(new URL('../published/robot/robot.glb?v=reference-v2',import.meta.url).href,async gltf=>{
+ loader.load(new URL('../published/robot/robot.glb?v=rhythm-v3',import.meta.url).href,async gltf=>{
   try{
-  const response=await fetch(new URL("../published/robot/manifest.json?v=reference-v2",import.meta.url));if(!response.ok)throw new Error("Missing manifest");const manifest=await response.json();cues=manifest.animation.cues;
+  const response=await fetch(new URL("../published/robot/manifest.json?v=rhythm-v3",import.meta.url));if(!response.ok)throw new Error("Missing manifest");const manifest=await response.json();cues=manifest.animation.cues;
   if(unavailable)return;
   if(gltf.animations.length!==1||gltf.animations[0].name!=='ReferenceDance'||Math.abs(gltf.animations[0].duration-40)>.01||manifest.animation.duration!==40||!Array.isArray(cues)){failed();return;}
   model=gltf.scene;mixer=new THREE.AnimationMixer(model);mixer.clipAction(gltf.animations[0]).play();mixer.setTime(0);clock=new DanceClock(gltf.animations[0].duration);

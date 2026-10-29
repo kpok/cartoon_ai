@@ -10,13 +10,13 @@ test('published dance articulates limbs and preserves independent scene orbit',a
  const mixer=new AnimationMixer(gltf.scene);mixer.clipAction(gltf.animations[0]).play();mixer.setTime(0);gltf.scene.updateMatrixWorld(true);
  const names=['HeadPivot','LeftArmPivot','RightArmPivot','LeftHipPivot','RightHipPivot'];
  const start=names.map(name=>gltf.scene.getObjectByName(name).quaternion.clone());mixer.setTime(.375);
- for(const i of [0,3,4])assert.ok(start[i].angleTo(gltf.scene.getObjectByName(names[i]).quaternion)>.01,names[i]+' must move during intro');
- mixer.setTime(9.7);assert.ok(start[1].angleTo(gltf.scene.getObjectByName('LeftArmPivot').quaternion)>.3,'wave arm must lift');
+ for(const i of [0,3,4]){let excursion=0;for(const time of [.125,.25,.375,.5,.625,.75,.875,1]){mixer.setTime(time);excursion=Math.max(excursion,start[i].angleTo(gltf.scene.getObjectByName(names[i]).quaternion));}assert.ok(excursion>.01,names[i]+' must move over the intro');}
+ mixer.setTime(8.9);assert.ok(start[1].angleTo(gltf.scene.getObjectByName('LeftArmPivot').quaternion)>.3,'wave arm must lift');
  mixer.setTime(34.1);assert.ok(start[2].angleTo(gltf.scene.getObjectByName('RightArmPivot').quaternion)>.3,'chest arm must cross');
  mixer.setTime(40);for(let i=0;i<names.length;i++)assert.ok(start[i].angleTo(gltf.scene.getObjectByName(names[i]).quaternion)<.001,'loop must close');
  // A head slide must translate sideways rather than merely rotate the face.
- mixer.setTime(.26);const head=gltf.scene.getObjectByName('HeadPivot'),leftSlide=head.position.x;
- mixer.setTime(.78);assert.ok(leftSlide-head.position.x>.35,'visible head translation');
+ mixer.setTime(1.047);const head=gltf.scene.getObjectByName('HeadPivot'),leftSlide=head.position.x;
+ mixer.setTime(1.485);assert.ok(leftSlide-head.position.x>.35,'visible head translation');
  assert.ok(Math.abs(head.rotation.y)<.08,'face stays mostly forward');
  assert.ok(gltf.scene.getObjectByName('LeftElbowPivot'));assert.ok(gltf.scene.getObjectByName('RightWristPivot'));
  gltf.scene.rotation.y=.7;mixer.setTime(2);assert.equal(gltf.scene.rotation.y,.7);

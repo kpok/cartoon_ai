@@ -1,0 +1,81 @@
+time_seconds,reference_observation,animation_phase,visual_finding,assessment
+0.0,"Ręka wysunięta, wejście w gesty",Boczne ruchy głowy,Robot od razu trzyma obie końcówki rąk przed sobą,qualitative manual comparison; not a pose-distance score
+0.5,"Ręka wysunięta, wejście w gesty",Boczne ruchy głowy,Robot od razu trzyma obie końcówki rąk przed sobą,qualitative manual comparison; not a pose-distance score
+1.0,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+1.5,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+2.0,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+2.5,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+3.0,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+3.5,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+4.0,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+4.5,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+5.0,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+5.5,Głowa i drobne gesty przy twarzy,Boczne ruchy głowy,"Head slide obecny, lecz dłonie i barki mają mniej różnic; faza rytmu niezgodna",qualitative manual comparison; not a pose-distance score
+6.0,Dłonie przy klatce i barkach,Gesty przy barkach,"Ogólna okolica podobna, brak szczegółów i zgodności akcentów",qualitative manual comparison; not a pose-distance score
+6.5,Dłonie przy klatce i barkach,Gesty przy barkach,"Ogólna okolica podobna, brak szczegółów i zgodności akcentów",qualitative manual comparison; not a pose-distance score
+7.0,Dłonie przy klatce i barkach,Gesty przy barkach,"Ogólna okolica podobna, brak szczegółów i zgodności akcentów",qualitative manual comparison; not a pose-distance score
+7.5,Dłonie przy klatce i barkach,Gesty przy barkach,"Ogólna okolica podobna, brak szczegółów i zgodności akcentów",qualitative manual comparison; not a pose-distance score
+8.0,Dłonie przy klatce i barkach,Gesty przy barkach,"Ogólna okolica podobna, brak szczegółów i zgodności akcentów",qualitative manual comparison; not a pose-distance score
+8.5,"Krótki gest ręki, przechylenie i zejście dłoni",Powitanie,Robot utrzymuje powitanie zbyt jednostajnie; granice gestu wymagają dokładniejszego pomiaru,qualitative manual comparison; not a pose-distance score
+9.0,"Krótki gest ręki, przechylenie i zejście dłoni",Powitanie,Robot utrzymuje powitanie zbyt jednostajnie; granice gestu wymagają dokładniejszego pomiaru,qualitative manual comparison; not a pose-distance score
+9.5,"Krótki gest ręki, przechylenie i zejście dłoni",Powitanie,Robot utrzymuje powitanie zbyt jednostajnie; granice gestu wymagają dokładniejszego pomiaru,qualitative manual comparison; not a pose-distance score
+10.0,"Krótki gest ręki, przechylenie i zejście dłoni",Powitanie,Robot utrzymuje powitanie zbyt jednostajnie; granice gestu wymagają dokładniejszego pomiaru,qualitative manual comparison; not a pose-distance score
+10.5,"Krótki gest ręki, przechylenie i zejście dłoni",Powitanie,Robot utrzymuje powitanie zbyt jednostajnie; granice gestu wymagają dokładniejszego pomiaru,qualitative manual comparison; not a pose-distance score
+11.0,"Krótki gest ręki, przechylenie i zejście dłoni",Powitanie,Robot utrzymuje powitanie zbyt jednostajnie; granice gestu wymagają dokładniejszego pomiaru,qualitative manual comparison; not a pose-distance score
+11.5,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+12.0,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+12.5,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+13.0,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+13.5,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+14.0,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+14.5,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+15.0,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+15.5,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+16.0,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+16.5,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+17.0,"Ręce niżej, barki i zmiana podparcia",Kołysanie i zmiana podparcia,Robot nadal utrzymuje prawie stałą pozycję rąk; brakuje opadania i asymetrii,qualitative manual comparison; not a pose-distance score
+17.5,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+18.0,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+18.5,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+19.0,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+19.5,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+20.0,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+20.5,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+21.0,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+21.5,Ruch podobny do gry na gitarze,Niewidzialna gitara,"Ogólna sekwencja podobna, rytm szarpania i praca tułowia do dopasowania",qualitative manual comparison; not a pose-distance score
+22.0,Wyraźne zejście i pochylenie,Sprężysty przysiad,Robot przysiada i pochyla się zbyt płytko; nie wystarcza sama zgodność etykiety fazy,qualitative manual comparison; not a pose-distance score
+22.5,Wyraźne zejście i pochylenie,Sprężysty przysiad,Robot przysiada i pochyla się zbyt płytko; nie wystarcza sama zgodność etykiety fazy,qualitative manual comparison; not a pose-distance score
+23.0,Wyraźne zejście i pochylenie,Sprężysty przysiad,Robot przysiada i pochyla się zbyt płytko; nie wystarcza sama zgodność etykiety fazy,qualitative manual comparison; not a pose-distance score
+23.5,Wyraźne zejście i pochylenie,Sprężysty przysiad,Robot przysiada i pochyla się zbyt płytko; nie wystarcza sama zgodność etykiety fazy,qualitative manual comparison; not a pose-distance score
+24.0,"Powrót z niskiej pozycji, ręce jeszcze nisko",Otwarte dłonie i zbliżenie rąk,Robot za wcześnie przechodzi do otwartej pozycji rąk,qualitative manual comparison; not a pose-distance score
+24.5,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+25.0,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+25.5,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+26.0,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+26.5,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+27.0,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+27.5,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+28.0,Otwarcie dłoni i ich zbliżanie,Otwarte dłonie i zbliżenie rąk,"Gest obecny w przybliżeniu, momenty zetknięcia i rozdzielenia do dopasowania",qualitative manual comparison; not a pose-distance score
+28.5,"Pochylenie, dłonie blisko przed tułowiem",Pochylenie i otwarcie ramion,Robot pochyla się słabiej i inaczej ustawia końcówki rąk,qualitative manual comparison; not a pose-distance score
+29.0,"Pochylenie, dłonie blisko przed tułowiem",Pochylenie i otwarcie ramion,Robot pochyla się słabiej i inaczej ustawia końcówki rąk,qualitative manual comparison; not a pose-distance score
+29.5,"Pochylenie, dłonie blisko przed tułowiem",Pochylenie i otwarcie ramion,Robot pochyla się słabiej i inaczej ustawia końcówki rąk,qualitative manual comparison; not a pose-distance score
+30.0,"Pochylenie, dłonie blisko przed tułowiem",Pochylenie i otwarcie ramion,Robot pochyla się słabiej i inaczej ustawia końcówki rąk,qualitative manual comparison; not a pose-distance score
+30.5,Otwarcie oraz zejście rąk w dół,Pochylenie i otwarcie ramion,"Otwarcie obecne, pozycja i moment opuszczania różnią się",qualitative manual comparison; not a pose-distance score
+31.0,Otwarcie oraz zejście rąk w dół,Pochylenie i otwarcie ramion,"Otwarcie obecne, pozycja i moment opuszczania różnią się",qualitative manual comparison; not a pose-distance score
+31.5,Otwarcie oraz zejście rąk w dół,Pochylenie i otwarcie ramion,"Otwarcie obecne, pozycja i moment opuszczania różnią się",qualitative manual comparison; not a pose-distance score
+32.0,Otwarcie oraz zejście rąk w dół,Pochylenie i otwarcie ramion,"Otwarcie obecne, pozycja i moment opuszczania różnią się",qualitative manual comparison; not a pose-distance score
+32.5,Ręka na piersi,Dłoń na piersi,Czytelna zbieżność ogólnego gestu; drobny rytm i orientacja do korekty,qualitative manual comparison; not a pose-distance score
+33.0,Ręka na piersi,Dłoń na piersi,Czytelna zbieżność ogólnego gestu; drobny rytm i orientacja do korekty,qualitative manual comparison; not a pose-distance score
+33.5,Ręka na piersi,Dłoń na piersi,Czytelna zbieżność ogólnego gestu; drobny rytm i orientacja do korekty,qualitative manual comparison; not a pose-distance score
+34.0,Ręka na piersi,Dłoń na piersi,Czytelna zbieżność ogólnego gestu; drobny rytm i orientacja do korekty,qualitative manual comparison; not a pose-distance score
+34.5,Ręka na piersi,Dłoń na piersi,Czytelna zbieżność ogólnego gestu; drobny rytm i orientacja do korekty,qualitative manual comparison; not a pose-distance score
+35.0,Obrót bokiem i zmiana ustawienia,Dłoń na piersi,Robot pozostaje bardziej frontalny i prawie w miejscu,qualitative manual comparison; not a pose-distance score
+35.5,Obrót bokiem i zmiana ustawienia,Dłoń na piersi,Robot pozostaje bardziej frontalny i prawie w miejscu,qualitative manual comparison; not a pose-distance score
+36.0,Obrót bokiem i zmiana ustawienia,Dłoń na piersi,Robot pozostaje bardziej frontalny i prawie w miejscu,qualitative manual comparison; not a pose-distance score
+36.5,Obrót bokiem i zmiana ustawienia,Dłoń na piersi,Robot pozostaje bardziej frontalny i prawie w miejscu,qualitative manual comparison; not a pose-distance score
+37.0,Gesty przy twarzy,Gesty przy twarzy i powrót,Robot podnosi końcówki rąk; wysokość ograniczona krótkimi kończynami,qualitative manual comparison; not a pose-distance score
+37.5,Gesty przy twarzy,Gesty przy twarzy i powrót,Robot podnosi końcówki rąk; wysokość ograniczona krótkimi kończynami,qualitative manual comparison; not a pose-distance score
+38.0,Gesty przy twarzy,Gesty przy twarzy i powrót,Robot podnosi końcówki rąk; wysokość ograniczona krótkimi kończynami,qualitative manual comparison; not a pose-distance score
+38.5,"Ręce schodzą, następny gest boczny",Gesty przy twarzy i powrót,Robot wygasza ruch do początku pętli zamiast śledzić dalszy gest,qualitative manual comparison; not a pose-distance score
+39.0,"Ręce schodzą, następny gest boczny",Gesty przy twarzy i powrót,Robot wygasza ruch do początku pętli zamiast śledzić dalszy gest,qualitative manual comparison; not a pose-distance score
+39.5,"Ręce schodzą, następny gest boczny",Gesty przy twarzy i powrót,Robot wygasza ruch do początku pętli zamiast śledzić dalszy gest,qualitative manual comparison; not a pose-distance score

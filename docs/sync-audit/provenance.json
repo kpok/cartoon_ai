@@ -1,0 +1,7 @@
+{
+  "model_sha256": "78c5686ff932a98cf1dfb0794a91945ce2295417f5d093d9ece48bb08df884ef",
+  "choreography_sha256": "e67be9a5be6b12b026735d78ad621dac8aa322f8ec56f5c5a012b2aa197621c3",
+  "reference_audio_fixture": "audio-grid.json",
+  "reference_video_sha256": "046f24a76b60edd225a4cdbbcfaef12a1153506321485b3035ccc83c6fa4ac63",
+  "scope": "Rhythm/phase correction and gesture timing adaptation; no raw reference media bundled"
+}

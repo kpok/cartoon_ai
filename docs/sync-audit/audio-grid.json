@@ -1,0 +1,21 @@
+{
+  "schema": 1,
+  "method": "Positive log-spectrum flux; robust subdivision grid fit, not semantic beat or lyric recognition",
+  "audio_start_offset_seconds": 0.043104,
+  "analysis_window": [
+    13,
+    28
+  ],
+  "subdivision_seconds": 0.21896743901973503,
+  "pulse_candidate_seconds": 0.43793487803947007,
+  "pulse_candidate_bpm": 137.0066715594923,
+  "grid_origin_seconds": 13.309488910485939,
+  "inlier_onsets": 68,
+  "fit_median_error_seconds": 0.002886036569072381,
+  "fit_max_error_seconds": 0.011463812650305272,
+  "expected_animation_pulse_period_range": [
+    0.42293487803947005,
+    0.4529348780394701
+  ],
+  "note": "Tempo has half/double-time ambiguity. Timing grid alone cannot certify visual imitation or the word hey."
+}

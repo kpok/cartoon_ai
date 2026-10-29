@@ -5,7 +5,7 @@ import {createHash} from 'node:crypto';
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import {GLTFLoader} from '../../node_modules/three/examples/jsm/loaders/GLTFLoader.js';
 import {GLTFExporter} from '../../node_modules/three/examples/jsm/exporters/GLTFExporter.js';
-import {DURATION,FPS,pose,CUES} from './choreography.mjs';
+import {DURATION,FPS,pose,CUES,RHYTHM} from './choreography.mjs';
 
 // GLTFExporter uses the browser FileReader interface for its binary Blob.
 globalThis.FileReader=class {
@@ -123,7 +123,7 @@ await writeFile(targetURL,Buffer.from(output));
 const manifestURL=new URL('../../published/robot/manifest.json',import.meta.url);
 const manifest=JSON.parse(await readFile(manifestURL,'utf8'));
 const hash=b=>createHash('sha256').update(b).digest('hex');
-manifest.animation={name:clip.name,duration:DURATION,fps:FPS,reference_timing:true,music_synchronized:false,cues:CUES,bounds:{min:bounds.min.toArray(),max:bounds.max.toArray()}};
+manifest.animation={name:clip.name,duration:DURATION,fps:FPS,reference_timing:true,music_synchronized:false,rhythm_alignment:{period: RHYTHM.period,accent: RHYTHM.accent,source:"measured reference audio onset grid",audio_bundled:false},cues:CUES,bounds:{min:bounds.min.toArray(),max:bounds.max.toArray()}};
 manifest.retarget={script:'experiments/dancing-robot/retarget.mjs',sha256:hash(await readFile(new URL(import.meta.url))),choreography_sha256:hash(await readFile(new URL('./choreography.mjs',import.meta.url))),base_sha256:hash(input)};
 manifest.provenance_note='Stage A geometry/preview metrics retained. ReferenceDance is deterministically retargeted from the archived approved rig. Hand-timed adaptation of supplied recording; no recording, audio or MP4 is published. Arms are segmented in-place; recessed joints added without rescaling.';
 manifest.files['robot.glb']={bytes:output.byteLength,sha256:hash(Buffer.from(output))};

@@ -1,0 +1,117 @@
+{
+  "pass": true,
+  "windows": [
+    {
+      "window_seconds": [
+        1,
+        7.5
+      ],
+      "pass": true,
+      "measured_animation_pulse_seconds": 0.43749999148505075,
+      "reference_pulse_candidate_seconds": 0.43793487803947007,
+      "period_difference_percent": -0.09930393221161404,
+      "phase_max_error_seconds": 0.014752796579752925,
+      "phase_median_error_seconds": 0.010404016185051823,
+      "pulse_events_seconds": [
+        1.0416666269302368,
+        1.5,
+        1.9166666269302368,
+        2.375,
+        2.7916667461395264,
+        3.25,
+        3.6666667461395264,
+        4.125,
+        4.541666507720947,
+        5,
+        5.416666507720947,
+        5.875,
+        6.291666507720947,
+        6.75,
+        7.166666507720947
+      ],
+      "criterion": "At least8 knee-down accents, period within15ms of reference and phase errors max32.84ms/median20.84ms (half a24fps frame plus measured12ms audio-grid uncertainty). This is not a visual similarity or lyric-recognition test."
+    },
+    {
+      "window_seconds": [
+        11.5,
+        17
+      ],
+      "pass": true,
+      "measured_animation_pulse_seconds": 0.438873636853564,
+      "reference_pulse_candidate_seconds": 0.43793487803947007,
+      "period_difference_percent": 0.21436036752691123,
+      "phase_max_error_seconds": 0.020431194164654443,
+      "phase_median_error_seconds": 0.01608241376995423,
+      "pulse_events_seconds": [
+        11.541666984558105,
+        12,
+        12.416666984558105,
+        12.875,
+        13.291666984558105,
+        13.75,
+        14.166666984558105,
+        14.625,
+        15.041666984558105,
+        15.5,
+        15.916666984558105,
+        16.375,
+        16.83333396911621
+      ],
+      "criterion": "At least8 knee-down accents, period within15ms of reference and phase errors max32.84ms/median20.84ms (half a24fps frame plus measured12ms audio-grid uncertainty). This is not a visual similarity or lyric-recognition test."
+    },
+    {
+      "window_seconds": [
+        17.5,
+        21.5
+      ],
+      "pass": true,
+      "measured_animation_pulse_seconds": 0.4375,
+      "reference_pulse_candidate_seconds": 0.43793487803947007,
+      "period_difference_percent": -0.09930198787018174,
+      "phase_max_error_seconds": 0.01949627823557165,
+      "phase_median_error_seconds": 0.0160172539198129,
+      "pulse_events_seconds": [
+        17.70833396911621,
+        18.125,
+        18.58333396911621,
+        19,
+        19.45833396911621,
+        19.875,
+        20.33333396911621,
+        20.75,
+        21.20833396911621
+      ],
+      "criterion": "At least8 knee-down accents, period within15ms of reference and phase errors max32.84ms/median20.84ms (half a24fps frame plus measured12ms audio-grid uncertainty). This is not a visual similarity or lyric-recognition test."
+    },
+    {
+      "window_seconds": [
+        32.5,
+        38.5
+      ],
+      "pass": true,
+      "measured_animation_pulse_seconds": 0.4391942202389895,
+      "reference_pulse_candidate_seconds": 0.43793487803947007,
+      "period_difference_percent": 0.2875638051842877,
+      "phase_max_error_seconds": 0.020760735575628075,
+      "phase_median_error_seconds": 0.016558422262093586,
+      "pulse_events_seconds": [
+        32.58333206176758,
+        33,
+        33.45833206176758,
+        33.875,
+        34.33333206176758,
+        34.75,
+        35.20833206176758,
+        35.625,
+        36.08333206176758,
+        36.5,
+        36.95833206176758,
+        37.41666793823242,
+        37.83333206176758,
+        38.29166793823242
+      ],
+      "criterion": "At least8 knee-down accents, period within15ms of reference and phase errors max32.84ms/median20.84ms (half a24fps frame plus measured12ms audio-grid uncertainty). This is not a visual similarity or lyric-recognition test."
+    }
+  ],
+  "scope": "Base knee pulse across four clean windows spanning1–38.5s; gesture shapes and lyric hey are not certified."
+}
