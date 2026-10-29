@@ -32,6 +32,7 @@ test('build inventory rejects unexpected files, symlinks and unresolved module d
   await cp(new URL('../node_modules/three/LICENSE',import.meta.url),join(dir,'vendor','THREE-LICENSE.txt'));
   for(const file of ['GLTFLoader.js','OrbitControls.js','BufferGeometryUtils.js','SkeletonUtils.js'])await cp(new URL(`../vendor/${file}`,import.meta.url),join(dir,'vendor',file));
   await cp(new URL('../published/',import.meta.url),join(dir,'published'),{recursive:true});
+  await cp(new URL('../assets/',import.meta.url),join(dir,'assets'),{recursive:true});
   await verifyBuild(dir);
   await writeFile(join(dir,'credentials.json'),'private');await assert.rejects(verifyBuild(dir),/Unexpected build file/);await unlink(join(dir,'credentials.json'));
   await unlink(join(dir,'src','app.js'));await symlink(new URL('../src/app.js',import.meta.url),join(dir,'src','app.js'));await assert.rejects(verifyBuild(dir),/symlink/);await unlink(join(dir,'src','app.js'));

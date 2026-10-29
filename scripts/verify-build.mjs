@@ -4,13 +4,13 @@ import {resolve,dirname,relative} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {publicFile,CONTENT_POLICY,ROBOT_POLICY} from './static-server.mjs';
 export async function verifyBuild(directory='dist'){
- const expected=['index.html','export.html','robot.html','published/robot/robot.glb','published/robot/preview.png','published/robot/manifest.json','vendor/GLTFLoader.js','vendor/OrbitControls.js','vendor/BufferGeometryUtils.js','vendor/SkeletonUtils.js','vendor/three.module.js','vendor/three.core.js','vendor/THREE-LICENSE.txt',...['app.js','dialogue.js','draw.js','episodes.js','export-frame.js','garden-state.js','garden-view.js','i18n.js','sound.js','story.js','style.css','robot-view.js','robot-stage.js','robot-playback.js','robot.css'].map(f=>`src/${f}`)].sort();
+ const expected=['assets/kalinka/red-square-ai.png','index.html','export.html','robot.html','published/robot/robot.glb','published/robot/preview.png','published/robot/manifest.json','vendor/GLTFLoader.js','vendor/OrbitControls.js','vendor/BufferGeometryUtils.js','vendor/SkeletonUtils.js','vendor/three.module.js','vendor/three.core.js','vendor/THREE-LICENSE.txt',...['app.js','dialogue.js','draw.js','episodes.js','export-frame.js','garden-state.js','garden-view.js','i18n.js','sound.js','story.js','style.css','robot-view.js','robot-kalinka.js','robot-stage.js','robot-playback.js','robot.css'].map(f=>`src/${f}`)].sort();
  const files=[];
  async function walk(dir,prefix=''){
   for(const entry of await readdir(dir,{withFileTypes:true})){
    const name=prefix+entry.name,path=resolve(dir,entry.name);
    assert.ok(!entry.isSymbolicLink(),`Build contains symlink: ${name}`);
-   if(entry.isDirectory()){assert.ok(['src','vendor','published','published/robot'].includes(name),`Unexpected build directory: ${name}`);await walk(path,name+'/');}
+   if(entry.isDirectory()){assert.ok(['src','vendor','published','published/robot','assets','assets/kalinka'].includes(name),`Unexpected build directory: ${name}`);await walk(path,name+'/');}
    else{assert.ok(entry.isFile()&&publicFile(name),`Unexpected build file: ${name}`);files.push(name);}
   }
  }
@@ -26,7 +26,7 @@ export async function verifyBuild(directory='dist'){
   const references=name.endsWith('.html')?[...text.matchAll(/\b(?:src|href)="([^"]+)"/g)].map(m=>m[1]):name.endsWith('.js')?[...text.matchAll(/\b(?:import|export)\s+(?:[^'";]*?\s+from\s*)?['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]/g)].map(m=>m[1]||m[2]):[...text.matchAll(/url\(\s*['"]?([^'"\s)]+)/g)].map(m=>m[1]);
   for(const reference of references){
    assert.ok(reference.startsWith('./')||reference.startsWith('../'),`${name}: external or absolute dependency ${reference}`);
-   const target=relative(resolve(directory),resolve(directory,dirname(name),reference));
+   const target=relative(resolve(directory),resolve(directory,dirname(name),reference.split(/[?#]/)[0]));
    assert.ok(files.includes(target||'index.html'),`${name}: missing or escaping dependency ${reference}`);
   }
  }
