@@ -31,3 +31,7 @@
 - Dodano proceduralną czapkę z nausznikami oraz wysokie ciemne cholewki z jasnym obszyciem.
 - Dodatki przypięte do głowy i podudzi; oryginalny GLB pozostaje bez zmian.
 - Weryfikacja wizualna nadal niewykonana z powodu niedostępnego podglądu przeglądarkowego.
+
+## Etap 4 — wejście ze strony głównej
+- Dodano osobny kafelek Robot — Kalinka obok trzech dotychczasowych animacji.
+- Dalej: weryfikacja wizualna, ewentualne poprawki i publikacja Pages; bez MP4.
