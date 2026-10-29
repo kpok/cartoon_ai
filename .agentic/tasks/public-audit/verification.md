@@ -48,3 +48,21 @@ required-check enforcement and optional PRIVATE_TERMS; no history rewrite perfor
 Supplemental coverage: raw reachable commit/tag messages and historical filenames
 are piped privately to a third Gitleaks stdin scan; nested annotated tag metadata
 is also inspected. Commit-message-only secret and nested-tag regressions passed.
+
+## Final verified delivery
+
+Implementation41bb650a98f6734ed6012f7fa132bd9ea985e459 is on main.
+Public audit40932480394 succeeded. Film checks/Pages40932480640 completed with
+all three jobs successful: test, Browser and export regression, and Pages deploy.
+The CI resource change preserved assertions/timeouts and original rendering quality.
+Source-scoped independent reviews and25 adversarial audit tests passed.
+
+The initial browser failure is retained as evidence, not treated as a clean run.
+The final corrected run above supersedes it. The optional private-term filter is
+not configured on GitHub yet; known private terms were checked locally without
+recording them in source, hashes or public reports. Owner instructions remain in
+docs/PUBLIC_AUDIT.md. No administrative permissions or legal clearance are claimed.
+
+Delivery state: HANDOFF / complete. This final verification supersedes the
+pre-CI ready-for-review state.json checkpoint. Owner administration remains a
+separate manual action, with instructions in docs/PUBLIC_AUDIT.md.
