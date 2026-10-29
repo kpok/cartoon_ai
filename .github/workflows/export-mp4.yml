@@ -79,4 +79,4 @@ jobs:
           name: cartoon-${{ inputs.story }}-${{ inputs.language }}-${{ inputs.format }}
           path: exports/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
