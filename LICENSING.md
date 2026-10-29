@@ -20,3 +20,17 @@ determine the license of an output; incorporated material must also be considere
 The audit checks declared licenses, inventory changes and required notices. It
 cannot establish ownership or legal clearance. Tool licenses (Blender, FFmpeg,
 eSpeak NG, Gitleaks) apply to the tools; they are not bundled into the Pages site.
+
+## Blender build-time usage
+
+The `robot-model.yml` GitHub Actions workflow downloads the official Blender binary,
+verifies its SHA-256 checksum, and executes it as a build-time tool. The Blender
+executable is not included in the GitHub Pages deployment or published robot assets.
+The generated files are licensed according to their own applicable terms; running
+Blender does not automatically impose the Blender GPL on its outputs.
+
+Blender is distributed under the GNU GPL; see the official
+[Blender licensing information](https://www.blender.org/about/license/).
+Published Python scripts that import `bpy` must carry a GPL-compatible SPDX
+identifier and be reviewed before publication. This repository's license audit
+checks tracked and untracked Python files for that requirement.

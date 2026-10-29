@@ -28,6 +28,14 @@ export async function auditLicenses(){
  }
  const manifest=await json('published/robot/manifest.json');assert.equal(manifest.license,'CC-BY-4.0');assert.equal(manifest.attribution,'Neon Tinker by kpok');assert.equal(manifest.audio,false);
  const lic=await readFile('experiments/dancing-robot/LICENSE','utf8');assert.ok(lic.includes('GNU GENERAL PUBLIC LICENSE')&&lic.includes('Version 3'));
+ // Check all repository Python scripts importing Blender's Python API, not only a fixed allowlist.
+ const pythonPaths=execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard','--','*.py'],{encoding:'utf8'}).split('\0').filter(Boolean);
+ for(const file of pythonPaths){
+  const source=await readFile(file,'utf8');
+  if(/(?:^|\\n)\\s*(?:import\\s+bpy(?:\\s|,|$)|from\\s+bpy\\s+import\\b)/m.test(source)){
+   assert.match(source.split('\\n').slice(0,5).join('\\n'),/^# SPDX-License-Identifier: GPL-(?:3\\.0-or-later|3\\.0-only|2\\.0-or-later|2\\.0-only)\\s*$/m,`Missing GPL SPDX identifier in Blender Python script: ${file}`);
+  }
+ }
  for(const file of ['experiments/dancing-robot/generator.py','scripts/validate-robot.py','experiments/dancing-robot/retarget.mjs'])assert.ok((await readFile(file,'utf8')).split('\n')[0].includes('SPDX-License-Identifier: GPL-3.0-or-later'));
  for(const file of ['LICENSING.md','docs/MEDIA_PROVENANCE.md'])assert.ok((await readFile(file)).length>500);
  // Verify the actual distributed notice, not just a statement in README.
