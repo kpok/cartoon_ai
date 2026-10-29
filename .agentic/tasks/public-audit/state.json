@@ -8,7 +8,7 @@
     "baseline_gitleaks": "passed; no findings",
     "baseline_npm_audit": "0 vulnerabilities",
     "npm_test": "42 passed",
-    "adversarial_audit_tests": "18 passed, verified Gitleaks binary",
+    "adversarial_audit_tests": "23 passed, verified Gitleaks binary",
     "public_audit": "full local pipeline passed including private-term filter, dependency registry and build",
     "robot_checks": "byte-identical GLB; validator and rhythm audit passed",
     "png_cleanup": "both compressed pixel payloads unchanged",

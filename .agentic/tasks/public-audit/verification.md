@@ -7,7 +7,7 @@ Local additional checkpoint commits increase subsequent scan counts.
 
 Checks on the final implementation working tree:
 - `npm test`:42 passed.
-- Python audit tests with verified Gitleaks:18 passed. Cases include deleted
+- Python audit tests with verified Gitleaks:23 passed. Cases include deleted
   historical content, other branch, annotated tag, shallow clone, unknown identity,
   encoded private terms/emails, GLB/PNG metadata, redacted failure messages,
   merge-only secret, ignorefile bypass, unknown license, modified/new asset and
