@@ -1,43 +1,34 @@
-// Original procedural scenery. All geometry stays local; no external textures or HDRI.
+// Procedural digital rain: local geometry only, with deterministic timeline seeking.
 export function createRobotStage(THREE,floorY){
- const group=new THREE.Group();group.name='AI_Ruins_Stage';group.position.y=floorY;
+ const group=new THREE.Group();group.name='Green_Code_Stage';group.position.y=floorY;
  let seed=72413;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
- const steel=new THREE.MeshLambertMaterial({color:0x172d39}),dark=new THREE.MeshLambertMaterial({color:0x0b1722});
- const cyan=new THREE.MeshBasicMaterial({color:0x29dbe6,toneMapped:false}),pink=new THREE.MeshBasicMaterial({color:0xd72e91,toneMapped:false});
- const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshBasicMaterial({color:0x08131c}));floor.rotation.x=-Math.PI/2;floor.position.set(0,-.045,-25);group.add(floor);
- const pad=new THREE.Mesh(new THREE.CylinderGeometry(2.8,3,.08,64),steel);pad.position.y=-.04;group.add(pad);
- for(const [r,mat] of [[2.73,cyan],[2.52,pink]]){
-  const ring=new THREE.Mesh(new THREE.RingGeometry(r-.018,r,96),mat);ring.rotation.x=-Math.PI/2;ring.position.y=.003;group.add(ring);
+ const floor=new THREE.Mesh(new THREE.PlaneGeometry(100,100),new THREE.MeshBasicMaterial({color:0x073d26}));floor.rotation.x=-Math.PI/2;floor.position.set(0,-.045,-25);group.add(floor);
+ const pad=new THREE.Mesh(new THREE.CylinderGeometry(2.8,3,.08,64),new THREE.MeshLambertMaterial({color:0x176344}));pad.position.y=-.04;group.add(pad);
+ for(const [r,color] of [[2.73,0x81ffba],[2.52,0x22dc71]]){
+  const ring=new THREE.Mesh(new THREE.RingGeometry(r-.018,r,96),new THREE.MeshBasicMaterial({color,toneMapped:false}));ring.rotation.x=-Math.PI/2;ring.position.y=.003;group.add(ring);
  }
- const dummy=new THREE.Object3D(),buildings=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),dark,42);
- const windows=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),cyan,126);
- for(let i=0;i<42;i++){
-  const side=i%2?-1:1,x=side*(4.5+random()*20),z=-8-random()*35,h=3+random()*11,w=1+random()*2;
-  dummy.position.set(x,h/2,z);dummy.rotation.set(0,(random()-.5)*.3,(random()-.5)*.16);dummy.scale.set(w,h,1+random()*2);dummy.updateMatrix();buildings.setMatrixAt(i,dummy.matrix);
-  for(let j=0;j<3;j++){dummy.position.set(x+(j-1)*w*.22,h*(.35+random()*.4),z+1.7);dummy.rotation.set(0,0,0);dummy.scale.set(.07,.3+random()*.6,.04);dummy.updateMatrix();windows.setMatrixAt(i*3+j,dummy.matrix);}
+ const grid=new THREE.GridHelper(80,80,0x48e68a,0x167346);grid.position.set(0,.002,-24);group.add(grid);
+ // Seven-segment digits form luminous vertical streams without fonts or images.
+ const segments=[[-.09,.15,.09,.15],[.09,.15,.09,0],[.09,0,.09,-.15],[-.09,-.15,.09,-.15],[-.09,0,-.09,-.15],[-.09,.15,-.09,0],[-.09,0,.09,0]];
+ const digits=[[0,1,2,3,4,5],[1,2],[0,1,6,4,3],[0,1,6,2,3],[5,6,1,2],[0,5,6,2,3],[0,5,6,4,2,3],[0,1,2],[0,1,2,3,4,5,6],[0,1,2,3,5,6]];
+ const streams=[];
+ for(let layer=0;layer<8;layer++){
+  const vertices=[],heads=[];
+  for(let column=0;column<20;column++){
+   const x=(column-9.5)*1.05+(random()-.5)*.4,z=-9-layer*1.6,offset=random()*20;
+   for(let row=0;row<22;row++){
+    const y=offset-row*.48;
+    for(const index of digits[Math.floor(random()*10)]){
+     const [ax,ay,bx,by]=segments[index];(row<2?heads:vertices).push(x+ax,y+ay,z,x+bx,y+by,z);
+    }
+   }
+  }
+  const stream=new THREE.Group();
+  for(const [points,color,opacity] of [[vertices,0x29f27d,.36+layer*.025],[heads,0xbeffd7,.95]]){
+   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(points,3));
+   stream.add(new THREE.LineSegments(geometry,new THREE.LineBasicMaterial({color,transparent:true,opacity,toneMapped:false})));
+  }
+  group.add(stream);streams.push(stream);
  }
- group.add(buildings,windows);
- const rubble=new THREE.InstancedMesh(new THREE.BoxGeometry(1,1,1),steel,38);
- for(let i=0;i<38;i++){
-  const sign=i%2?1:-1,size=.2+random()*.65;dummy.position.set(sign*(3.1+random()*8),size*.3,-2-random()*17);dummy.rotation.set(random(),random()*Math.PI,random());dummy.scale.set(size,size*.6,size*1.5);dummy.updateMatrix();rubble.setMatrixAt(i,dummy.matrix);
- }group.add(rubble);
- // Broken transmission gate, behind the dancer rather than across its silhouette.
- const gate=new THREE.Mesh(new THREE.TorusGeometry(5,.17,8,64,Math.PI*1.5),steel);gate.position.set(.8,5.5,-14);gate.rotation.z=-Math.PI/4;group.add(gate);
- const signal=new THREE.Mesh(new THREE.TorusGeometry(4.73,.035,6,64,Math.PI*1.25),cyan);signal.position.copy(gate.position);signal.position.z+=.2;signal.rotation.copy(gate.rotation);group.add(signal);
- const wires=[];
- for(let i=0;i<70;i++){
-  const x=(random()-.5)*45,z=4-random()*46,length=1+random()*5;
-  wires.push(x,.006,z,x,.006,z-length,x,.006,z-length,x+length*.4,.006,z-length);
- }
- const wireGeometry=new THREE.BufferGeometry();wireGeometry.setAttribute('position',new THREE.Float32BufferAttribute(wires,3));
- group.add(new THREE.LineSegments(wireGeometry,new THREE.LineBasicMaterial({color:0x1e8eaa,transparent:true,opacity:.4})));
- const particles=new Float32Array(100*3);
- for(let i=0;i<100;i++){particles[i*3]=(random()-.5)*34;particles[i*3+1]=.6+random()*10;particles[i*3+2]=-5-random()*25;}
- const sparksGeometry=new THREE.BufferGeometry();sparksGeometry.setAttribute('position',new THREE.BufferAttribute(particles,3));
- const sparks=new THREE.Points(sparksGeometry,new THREE.PointsMaterial({color:0xffad54,size:.035,transparent:true,opacity:.6,sizeAttenuation:true}));group.add(sparks);
- // A small damaged surveillance unit hangs over the ruined city.
- const drone=new THREE.Group();drone.position.set(-4,6.3,-10);
- const body=new THREE.Mesh(new THREE.IcosahedronGeometry(.42,0),steel);body.scale.set(1.5,.65,1);drone.add(body);
- const eye=new THREE.Mesh(new THREE.SphereGeometry(.11,12,8),pink);eye.position.z=.4;drone.add(eye);group.add(drone);
- return {group,update(time){sparks.position.y=.2*Math.sin(time*Math.PI/2.5);drone.position.y=6.3+.18*Math.sin(time*Math.PI/2);drone.rotation.z=.08*Math.sin(time*Math.PI/2);}};
+ return {group,update(time){for(let i=0;i<streams.length;i++)streams[i].position.y=8-((time*(.7+i*.075)+i*2)%24);}};
 }

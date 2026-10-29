@@ -23,7 +23,7 @@ try{
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
  renderer.setPixelRatio(exporting?1:Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
- const scene=new THREE.Scene();scene.background=new THREE.Color(0x050d18);scene.fog=new THREE.Fog(0x071524,20,65);const camera=new THREE.PerspectiveCamera(35,1,.01,100);
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x083d27);scene.fog=new THREE.Fog(0x0b4c30,24,75);const camera=new THREE.PerspectiveCamera(35,1,.01,100);
  scene.add(new THREE.HemisphereLight(0xdceeff,0x526083,3));
  for(const [color,intensity,position] of [[0xffffff,5,[3,5,5]],[0x48d8ee,3,[-4,2,2]],[0xff71da,4,[3,2,-3]]]){const light=new THREE.DirectionalLight(color,intensity);light.position.set(...position);scene.add(light);}
  // A procedural studio reflection avoids external HDRI files and image decoders.
