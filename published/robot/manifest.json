@@ -3,7 +3,6 @@
   "generator": "Neon Tinker Stage A",
   "seed": 27,
   "blender": "4.2.0",
-  "source_commit": "5219388806f4c300cb85a134712f81e5b98c260c",
   "generator_sha256": "997b5f10cd61ebfab5163f2c0c29fd284e1ba7f61e67c0fbcc0bf37d9eaaa72d",
   "generation_seconds": 1.849,
   "render_seconds": 7.835,
@@ -17,18 +16,29 @@
   "triangles_before_export": 56784,
   "objects": 133,
   "audio": false,
-  "stage": "A",
+  "stage": "B",
   "body": "humanoid",
   "license": "CC-BY-4.0",
   "attribution": "Neon Tinker by kpok",
   "files": {
     "robot.glb": {
-      "sha256": "d0ea628eda5eb2c4707eb5b3845e25641bc5a9de2f5df630b87f9e6c214b5d12",
-      "bytes": 1352524
+      "bytes": 1396220,
+      "sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44"
     },
     "preview.png": {
-      "sha256": "5502dd554a343eeed2ad2ace52173cdef88ba00916d60513ab8daf1411249276",
-      "bytes": 798668
+      "bytes": 798668,
+      "sha256": "5502dd554a343eeed2ad2ace52173cdef88ba00916d60513ab8daf1411249276"
     }
-  }
+  },
+  "geometry_source_commit": "5219388806f4c300cb85a134712f81e5b98c260c",
+  "source_commit": "193b22b1e5820fcf130d4dbc82e84b962e16f050",
+  "source_dirty": true,
+  "animation": {
+    "name": "NeonDance",
+    "duration": 8,
+    "fps": 24,
+    "bpm": 120,
+    "music_synchronized": false
+  },
+  "provenance_note": "Original Stage A geometry/preview metrics retained. Animated GLB recovered byte-for-byte from the previously exported uncommitted dance draft; full motion generator source recovery remains separate. No MP4 is published."
 }

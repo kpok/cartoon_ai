@@ -13,10 +13,10 @@ validator = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(validator)
 
 
-def glb(document):
+def glb(document, binary=None):
     text = json.dumps(document).encode()
     text += b' ' * (-len(text) % 4)
-    binary = struct.pack('<9f', 0,0,0, 1,0,0, 0,1,0)
+    if binary is None: binary = struct.pack('<9f', 0,0,0, 1,0,0, 0,1,0)
     return struct.pack('<4sII', b'glTF',2,28+len(text)+len(binary)) + struct.pack('<II',len(text),0x4E4F534A) + text + struct.pack('<II',len(binary),0x004E4942) + binary
 
 
@@ -38,6 +38,18 @@ class ValidatorTests(unittest.TestCase):
             path.write_bytes(glb(scene())[:-1])
             with self.assertRaises(ValueError):
                 validator.validate_glb(path)
+
+    def test_published_dance_and_unsupported_motion(self):
+        source=Path(__file__).resolve().parents[2]/'published/robot/robot.glb'
+        data=source.read_bytes();length=struct.unpack_from('<I',data,12)[0]
+        document=json.loads(data[20:20+length]);binary=data[28+length:]
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'dance.glb';path.write_bytes(glb(document,binary))
+            validator.validate_glb(path,animated=True)
+            with self.assertRaises(ValueError):validator.validate_glb(path)
+            for edit in [lambda d:d.update(animations=[]),lambda d:d['animations'][0]['channels'][0]['target'].update(path='scale'),lambda d:d['animations'][0]['samplers'][0].update(interpolation='CUBICSPLINE')]:
+                changed=json.loads(json.dumps(document));edit(changed);path.write_bytes(glb(changed,binary))
+                with self.assertRaises(ValueError):validator.validate_glb(path,animated=True)
 
     def test_png_crc_and_dimensions(self):
         def chunk(kind,payload):

@@ -14,6 +14,7 @@ test('robot loads locally with orbit controls and preserves story navigation',as
  const names=gltf.nodes.map(node=>node.name);
  for(const side of ['Left','Right'])for(const part of ['short thigh','knee joint','short shin','rounded foot'])expect(names).toContain(`${side} ${part}`);
 
+ await page.getByRole('button',{name:'Wstrzymaj taniec'}).click();await page.waitForTimeout(300);
  const canvas=page.locator('#robot-canvas'),initial=await canvas.screenshot();
  await page.getByRole('button',{name:'Obróć w lewo'}).click();
  await expect.poll(async()=>!(await canvas.screenshot()).equals(initial),{timeout:10000}).toBe(true);
@@ -24,6 +25,20 @@ test('robot loads locally with orbit controls and preserves story navigation',as
  await page.getByRole('link',{name:'Małe historie'}).click();await expect(page.locator('button[data-story="meadow"]')).toBeVisible();await expect(page.locator('button[data-story="garden"]')).toBeVisible();
 });
 test('robot failed download retains useful PNG fallback',async({page})=>{
- await page.route('**/published/robot/robot.glb',route=>route.abort());await page.goto('/robot.html');
+ await page.route('**/published/robot/robot.glb*',route=>route.abort());await page.goto('/robot.html');
  await expect(page.getByRole('status')).toContainText('Podgląd 3D jest niedostępny');await expect(page.locator('#preview')).toBeVisible();await expect(page.locator('#robot-canvas')).toBeHidden();await expect(page.getByRole('link',{name:'Pobierz model GLB'})).toBeVisible();
+});
+
+test('dance advances, pauses and restarts independently of orbit',async({page})=>{
+ await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');
+ await expect.poll(async()=>Number(await canvas.getAttribute('data-time'))).toBeGreaterThan(.2);
+ await page.locator('#dance-toggle').click();const time=await canvas.getAttribute('data-time');await page.waitForTimeout(250);expect(await canvas.getAttribute('data-time')).toBe(time);
+ await page.getByRole('button',{name:'Obróć w lewo'}).click();expect(await canvas.getAttribute('data-time')).toBe(time);
+ await page.locator('#dance-restart').click();await expect(canvas).toHaveAttribute('data-time','0.000');
+ await page.locator('#dance-toggle').click();await expect.poll(async()=>Number(await canvas.getAttribute('data-time'))).toBeGreaterThan(.2);
+});
+test('reduced motion pauses autoplay and context loss stops rendering',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await expect(canvas).toHaveAttribute('data-playing','false');
+ await canvas.evaluate(element=>element.dispatchEvent(new Event('webglcontextlost',{cancelable:true})));
+ await expect(canvas).toBeHidden();await expect(page.locator('#preview')).toBeVisible();await expect(page.locator('#dance-toggle')).toBeDisabled();
 });

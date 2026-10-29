@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Validate the bounded, self-contained Stage A publication bundle."""
+"""Validate the bounded, self-contained Stage A/B publication bundle."""
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -18,7 +19,7 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def validate_glb(path):
+def validate_glb(path, animated=False):
     require(path.is_file() and not path.is_symlink(), 'GLB must be a regular file')
     data = path.read_bytes()
     require(20 <= len(data) <= MAX_GLB, 'GLB exceeds 10 MiB budget or is truncated')
@@ -51,7 +52,8 @@ def validate_glb(path):
     require(set(gltf.get('extensionsUsed', [])) <= ALLOWED_EXTENSIONS, 'Unsupported GLB extension')
     require(set(gltf.get('extensionsRequired', [])) <= ALLOWED_EXTENSIONS, 'Unsupported required GLB extension')
     require(not gltf.get('images') and not gltf.get('textures'), 'Texture-free mobile model required')
-    require(not gltf.get('animations') and not gltf.get('cameras') and not gltf.get('skins'), 'Stage A must be a static model without cameras or skins')
+    require(not gltf.get('cameras') and not gltf.get('skins'), 'Cameras and skins are forbidden')
+    if not animated: require(not gltf.get('animations'), 'Stage A must be static')
     buffers = gltf.get('buffers', [])
     require(len(buffers) == 1 and 'uri' not in buffers[0], 'GLB buffer must be embedded')
     require(0 < buffers[0].get('byteLength', 0) <= len(chunks[1][1]), 'Invalid binary buffer length')
@@ -109,6 +111,34 @@ def validate_glb(path):
             require(count % 3 == 0, 'Incomplete triangle')
             triangles += count // 3
     require(0 < triangles <= MAX_TRIANGLES, 'GLB exceeds 100000 triangle budget')
+    if animated:
+        animations=gltf.get('animations',[])
+        require(len(animations)==1 and animations[0].get('name')=='NeonDance','Expected one NeonDance clip')
+        clip=animations[0];samplers=clip.get('samplers',[]);channels=clip.get('channels',[])
+        require(1<=len(samplers)<=33 and 1<=len(channels)<=33,'Unbounded animation')
+        allowed={'DanceRoot','TorsoPivot','HeadPivot'}|{side+part+'Pivot' for side in ['Left','Right'] for part in ['Arm','Hip','Knee','Foot']}
+        def read_accessor(index, kind):
+            require(isinstance(index,int) and 0<=index<len(accessors),'Invalid animation accessor')
+            a=accessors[index];require(a['componentType']==5126 and a['type']==kind,'Invalid motion accessor type')
+            require(2<=a['count']<=193,'Unbounded motion keys')
+            view=views[a['bufferView']];width=widths[kind];stride=view.get('byteStride',width*4)
+            start=view.get('byteOffset',0)+a.get('byteOffset',0)
+            return [struct.unpack_from('<'+'f'*width,binary,start+i*stride) for i in range(a['count'])]
+        seen=set()
+        for channel in channels:
+            target=channel.get('target',{});node=target.get('node');path=target.get('path')
+            require(isinstance(node,int) and 0<=node<len(gltf['nodes']) and gltf['nodes'][node].get('name') in allowed,'Unexpected motion target')
+            require(path in {'translation','rotation'} and (node,path) not in seen,'Invalid or duplicate motion channel');seen.add((node,path))
+            index=channel.get('sampler');require(isinstance(index,int) and 0<=index<len(samplers),'Invalid motion sampler')
+            sampler=samplers[index];interpolation=sampler.get('interpolation','LINEAR')
+            require(interpolation in {'LINEAR','STEP'},'Unsupported interpolation')
+            times=[t[0] for t in read_accessor(sampler.get('input'),'SCALAR')]
+            values=read_accessor(sampler.get('output'),'VEC4' if path=='rotation' else 'VEC3')
+            require(len(times)==len(values) and abs(times[0])<1e-5 and abs(times[-1]-8)<1e-4 and all(a<b for a,b in zip(times,times[1:])),'Invalid dance timeline')
+            require(max(abs(a-b) for a,b in zip(values[0],values[-1]))<1e-4,'Dance loop is open')
+            if interpolation=='STEP': require(all(max(abs(a-b) for a,b in zip(v,values[0]))<1e-5 for v in values),'Only constant STEP is allowed')
+            if path=='rotation': require(all(abs(sum(v*v for v in q)-1)<1e-3 for q in values),'Invalid rotation')
+        require(len({node for node,_ in seen})>=9,'Missing articulated joints')
     return {'bytes': len(data), 'triangles': triangles, 'meshes': len(meshes)}
 
 
@@ -140,14 +170,22 @@ def validate_png(path):
 def validate(directory, require_blend=False, published=False):
     root = Path(directory)
     require(not root.is_symlink(), 'Bundle cannot be a symlink')
-    result = {'glb':validate_glb(root/'robot.glb'), 'png':validate_png(root/('preview.png' if published else 'robot.png'))}
     report_path = root/('manifest.json' if published else 'report.json')
     require(report_path.is_file() and not report_path.is_symlink() and report_path.stat().st_size < 16384, 'Missing or invalid report')
     report = json.loads(report_path.read_text(encoding='utf-8'))
-    require(report.get('stage') == 'A' and report.get('schema') == 1 and report.get('resolution') == [768,768], 'Unexpected report schema')
+    require(report.get('stage') in {'A','B'} and report.get('schema') == 1 and report.get('resolution') == [768,768], 'Unexpected report schema')
     for key in ['generation_seconds','render_seconds','total_seconds','peak_rss_kib']:
         require(isinstance(report.get(key), (int,float)) and math.isfinite(report[key]) and report[key] >= 0, 'Invalid report measurement: '+key)
     require(report.get('license') == 'CC-BY-4.0', 'Missing output license')
+    result = {'glb':validate_glb(root/'robot.glb',animated=report['stage']=='B'), 'png':validate_png(root/('preview.png' if published else 'robot.png'))}
+    if report['stage']=='B':
+        require(report.get('animation',{}).get('duration')==8 and report['animation'].get('fps')==24,'Invalid dance metadata')
+    if published:
+        require(set(report.get('files',{}))=={'robot.glb','preview.png'},'Incomplete asset manifest')
+        for name,identity in report['files'].items():
+            asset=root/name
+            require(asset.is_file() and not asset.is_symlink(),'Missing asset')
+            require(asset.stat().st_size==identity['bytes'] and hashlib.sha256(asset.read_bytes()).hexdigest()==identity['sha256'],'Asset hash mismatch')
     if require_blend:
         blend = root/'robot.blend'
         require(blend.is_file() and not blend.is_symlink() and blend.stat().st_size <= 50*1024*1024, 'Missing or oversized BLEND')
