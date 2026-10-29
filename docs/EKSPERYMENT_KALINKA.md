@@ -41,3 +41,8 @@
 - Podłączono obraz jako tło tylko wariantu Kalinka, zamiast zielonej sceny kodowej.
 - Dodano zasób do buildu i jawnej listy publicznych plików.
 - Weryfikacja wizualna i publikacja pozostają do wykonania.
+
+## Etap 6 — przygotowanie publikacji
+- Na polecenie użytkownika pominięto kontrolę wizualną w przeglądarce.
+- Uzupełniono wymagany rejestr zasobów o tło AI i hash; brak dodatkowej licencji na ponowne wykorzystanie.
+- Do wykonania: zielony audyt, scalenie PR #2 i potwierdzenie wdrożenia Pages.

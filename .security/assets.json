@@ -33,5 +33,12 @@
     "attribution": "Concept image generated with ChatGPT; supplied by kpok",
     "origin": "Owner-supplied ChatGPT-generated concept image used as a visual reference for the procedural robot",
     "review": "Original supplied image inspected; JPEG with ICC/JFIF, no EXIF. Documentation reference only; no additional reuse license granted or ownership/exclusivity certification."
+  },
+  "assets/kalinka/red-square-ai.png": {
+    "sha256": "040dd68eb982564967ddbcc15f864a3574cf69d94af92acfef810e0c1c9a5dff",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Kalinka background generated with ChatGPT; supplied by kpok",
+    "origin": "Generated with ChatGPT image generation on 2026-10-29 for the owner-requested Kalinka background; no source photograph used",
+    "review": "Synthetic photorealistic depiction, not a documentary photograph; no additional reuse license or exclusivity certification."
   }
 }
