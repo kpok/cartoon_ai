@@ -70,3 +70,7 @@ The story/export HTML entry points carry a Content Security Policy restricting s
 Build verification checks the exact public file inventory, absence of symlinks, local module/link dependencies, CSP and vendored Three.js bytes against the locked package. Default browser tests build and serve `dist`, the same directory uploaded for Pages. A trusted project file change still requires review; this is not a malicious-code scanner.
 
 MP4 exports validate actual FFprobe codec/stream/frame/timing/audio properties and publish MP4/SRT/JSON without replacing existing files. MP4 is linked last as the completion marker. Publication uses hard links on the destination filesystem; unsupported filesystems fail without replacing an output. The three-file bundle is not one filesystem transaction: another reader may briefly observe sidecars before MP4, and a process crash may leave partial sidecars requiring explicit cleanup.
+
+## Public audit gates
+
+The owner-only `public-audit.yml` scans branch and tag pushes, including documentation-only changes. Publishing jobs also repeat this audit before upload. See [audit scope and private-term configuration](docs/PUBLIC_AUDIT.md), [license map](LICENSING.md), and [media provenance](docs/MEDIA_PROVENANCE.md). Scan reports and matched values are not uploaded. These checks do not establish rights clearance or prevent a leak in the initial public push.

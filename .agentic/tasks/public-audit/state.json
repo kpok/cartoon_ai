@@ -1,1 +1,25 @@
-{"task_id":"public-audit","baseline_revision":"6199a1df62c9fc7bb22e0d812536bce2a9401668","phase":"IMPLEMENT","status":"in_progress","checks":{"baseline_history":"39 commits; nickname and exact GitHub service identities","baseline_gitleaks":"passed; no findings","baseline_npm_audit":"0 vulnerabilities"},"limitations":["private text filter requires optional PRIVATE_TERMS repository secret","no independent media rights clearance","no admin settings mutation","no initial-push prevention"],"next_step":"adversarial tests, independent implementation review, remote CI"}
+{
+  "task_id": "public-audit",
+  "baseline_revision": "6199a1df62c9fc7bb22e0d812536bce2a9401668",
+  "phase": "VERIFY",
+  "status": "ready_for_review",
+  "checks": {
+    "baseline_history": "39 commits; nickname and exact GitHub service identities",
+    "baseline_gitleaks": "passed; no findings",
+    "baseline_npm_audit": "0 vulnerabilities",
+    "npm_test": "42 passed",
+    "adversarial_audit_tests": "18 passed, verified Gitleaks binary",
+    "public_audit": "full local pipeline passed including private-term filter, dependency registry and build",
+    "robot_checks": "byte-identical GLB; validator and rhythm audit passed",
+    "png_cleanup": "both compressed pixel payloads unchanged",
+    "branch_ci": "checkpoint7d738a2 public audit success",
+    "admin_read": "rulesets returned empty; branch protection unavailable to integration (403)"
+  },
+  "limitations": [
+    "private text filter requires optional PRIVATE_TERMS repository secret",
+    "no independent media rights clearance",
+    "no admin settings mutation",
+    "no initial-push prevention"
+  ],
+  "next_step": "publish final branch; verify remote audit; fast-forward main and verify CI/Pages"
+}

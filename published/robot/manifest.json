@@ -145,5 +145,6 @@
     "base_sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44",
     "face_sha256": "f2523dfdadc00d449e634f5961d46470036f1398f744245072e4c6b67d6e56f1",
     "slices_sha256": "923dea9a21546a881ca08e48e19b16f039b834eb9e0e3cd8bc3208ca30930509"
-  }
+  },
+  "license_url": "https://creativecommons.org/licenses/by/4.0/"
 }

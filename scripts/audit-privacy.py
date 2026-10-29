@@ -28,6 +28,8 @@ def check_text(text, terms):
         text=unquote(html.unescape(text))
         text=re.sub(r'\\u([a-fA-F0-9]{4})',lambda m:chr(int(m[1],16)),text)
         text=re.sub(r'\\x([a-fA-F0-9]{2})',lambda m:chr(int(m[1],16)),text)
+    if any(mail.lower() not in EMAILS for mail in EMAIL.findall(text)):
+        raise ValueError('unapproved encoded email')
     normalized = normalize(text)
     if any(normalize(term) in normalized for term in terms):
         raise ValueError('private term')

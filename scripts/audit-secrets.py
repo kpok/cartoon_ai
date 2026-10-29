@@ -9,7 +9,7 @@ with tempfile.TemporaryDirectory(prefix='cartoon-secret-audit-') as temporary:
     binary=os.environ.get('GITLEAKS_PATH','gitleaks')
     empty_ignore=Path(temporary)/'.gitleaksignore';empty_ignore.write_text('')
     common=['--gitleaks-ignore-path',str(empty_ignore),'--max-archive-depth','2','--config','.security/gitleaks.toml','--redact=100','--no-banner','--log-level','fatal','--ignore-gitleaks-allow','--report-format','json']
-    commands=[['git','--log-opts=--all --full-history'],['dir','.']]
+    commands=[['git','--log-opts=--all --full-history -m'],['dir','.']]
     for index,command in enumerate(commands):
         report=str(Path(temporary)/f'report-{index}.json')
         try:

@@ -58,6 +58,9 @@ class PrivacyTests(unittest.TestCase):
     def test_encoded_private_terms_fail(self):
         for text in ['Synthetic\\u0048iddenPhrase','%53yntheticHiddenPhrase','Synthetic&#72;iddenPhrase']:
             with self.assertRaises(ValueError):privacy.check_text(text,['SyntheticHiddenPhrase'])
+    def test_encoded_emails_fail_without_private_terms(self):
+        for text in ['person'+separator+'example.invalid' for separator in ['%40','\\u0040','&#64;']]:
+            with self.assertRaises(ValueError):privacy.check_text(text,[])
     def test_shallow_clone_fails(self):
         (self.path/'.git/shallow').write_bytes(self.git('rev-parse','HEAD'))
         with self.assertRaises(ValueError):privacy.scan()
@@ -77,7 +80,39 @@ class SecretTests(unittest.TestCase):
         token='ghp_'+''.join(chr(65+(i*7)%26) for i in range(36))
         (self.path/'old.txt').write_text('token = "'+token+'"');self.commit()
         (self.path/'old.txt').unlink();self.commit();self.git('checkout','-q','-')
-        run=subprocess.run([os.environ['GITLEAKS_PATH'],'git','--log-opts=--all --full-history','--redact=100','--no-banner','--log-level','fatal'],capture_output=True,text=True)
+        run=subprocess.run([os.environ['GITLEAKS_PATH'],'git','--log-opts=--all --full-history -m','--redact=100','--no-banner','--log-level','fatal'],capture_output=True,text=True)
         self.assertEqual(run.returncode,1);self.assertNotIn(token,run.stdout+run.stderr)
+
+    @unittest.skipUnless(os.environ.get('GITLEAKS_PATH'),'Run with the verified Gitleaks binary')
+    def test_secret_introduced_only_by_merge_is_detected(self):
+        first=self.git('rev-parse','HEAD').strip().decode()
+        self.git('checkout','-qb','merge-parent')
+        (self.path/'branch.md').write_text('Other parent');self.commit()
+        second=self.git('rev-parse','HEAD').strip().decode()
+        self.git('checkout','-q','-')
+        token='ghp_'+''.join(chr(65+(i*7)%26) for i in range(36))
+        (self.path/'merge.txt').write_text('token = "'+token+'"');self.git('add','.')
+        tree=self.git('write-tree').strip().decode()
+        merge=self.git('commit-tree',tree,'-p',first,'-p',second,input=b'Merge-only synthetic fixture').strip().decode()
+        self.git('update-ref','HEAD',merge)
+        run=subprocess.run([os.environ['GITLEAKS_PATH'],'git','--log-opts=--all --full-history -m','--redact=100','--no-banner','--log-level','fatal'],capture_output=True,text=True)
+        self.assertEqual(run.returncode,1);self.assertNotIn(token,run.stdout+run.stderr)
+
+    @unittest.skipUnless(os.environ.get('GITLEAKS_PATH'),'Run with the verified Gitleaks binary')
+    def test_repository_ignore_file_cannot_bypass_wrapper(self):
+        token='ghp_'+''.join(chr(65+(i*7)%26) for i in range(36))
+        (self.path/'key.txt').write_text('token = "'+token+'"');self.commit()
+        report=self.path.parent/(self.path.name+'-report.json')
+        try:
+            command=[os.environ['GITLEAKS_PATH'],'git','--redact=100','--no-banner','--log-level','fatal']
+            run=subprocess.run([*command,'--report-format','json','--report-path',str(report)],capture_output=True,text=True)
+            self.assertEqual(run.returncode,1)
+            findings=json.loads(report.read_text());self.assertTrue(findings)
+            (self.path/'.gitleaksignore').write_text('\n'.join(f['Fingerprint'] for f in findings))
+            self.assertEqual(subprocess.run(command,capture_output=True).returncode,0)
+            (self.path/'.security').mkdir();shutil.copyfile(ROOT/'.security/gitleaks.toml',self.path/'.security/gitleaks.toml')
+            wrapped=subprocess.run(['python3',str(ROOT/'scripts/audit-secrets.py')],capture_output=True,text=True)
+            self.assertEqual(wrapped.returncode,1);self.assertNotIn(token,wrapped.stdout+wrapped.stderr)
+        finally:report.unlink(missing_ok=True)
 
 if __name__=='__main__':unittest.main()
