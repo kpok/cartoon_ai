@@ -1,6 +1,7 @@
 import {rm,mkdir,cp} from 'node:fs/promises';
 await import('./vendor.mjs');
 await rm('dist',{recursive:true,force:true});await mkdir('dist');
+await mkdir('dist/assets/kalinka',{recursive:true});await cp('assets/kalinka/red-square-ai.png','dist/assets/kalinka/red-square-ai.png');
 await cp('robot.html','dist/robot.html');
 await mkdir('dist/published/robot',{recursive:true});
 for(const file of ['robot.glb','preview.png','manifest.json'])await cp(`published/robot/${file}`,`dist/published/robot/${file}`);

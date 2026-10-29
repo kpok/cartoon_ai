@@ -35,3 +35,9 @@
 ## Etap 4 — wejście ze strony głównej
 - Dodano osobny kafelek Robot — Kalinka obok trzech dotychczasowych animacji.
 - Dalej: weryfikacja wizualna, ewentualne poprawki i publikacja Pages; bez MP4.
+
+## Etap 5 — tło AI w scenie
+- Obraz zapisany w assets/kalinka/red-square-ai.png; pochodzenie opisano w README przy zasobie.
+- Podłączono obraz jako tło tylko wariantu Kalinka, zamiast zielonej sceny kodowej.
+- Dodano zasób do buildu i jawnej listy publicznych plików.
+- Weryfikacja wizualna i publikacja pozostają do wykonania.

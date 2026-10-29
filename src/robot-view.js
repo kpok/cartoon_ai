@@ -11,7 +11,7 @@ let unavailable=false;
 const kalinka=new URLSearchParams(location.search).get('dance')==='kalinka';
 let variant;
 function pose(time){if(variant)variant.update(time);else mixer.setTime(time);}
-if(kalinka){document.title='Robot — Kalinka';document.querySelector('h1').innerHTML='Ten sam robot.<br><span>Nowe długie nogi.</span>';document.querySelector('.intro > p:last-child').textContent='Eksperyment 02 · przysiady, wykopy i podskoki · 24 sekundy bez dźwięku';document.querySelector('.details').textContent='Wariant proceduralny tego samego robota z wydłużonymi nogami. Choreografia inspirowana tańcem przysiadowym: zejście do przysiadu, naprzemienne wykopy, ręce przed tułowiem i na boki, powrót do pozycji stojącej. Model GLB do pobrania pozostaje oryginalnym wariantem.';document.querySelector('.studio-top strong').textContent='ROBOT / KALINKA';}
+if(kalinka){viewport.style.backgroundImage='url(./assets/kalinka/red-square-ai.png)';viewport.style.backgroundSize='cover';viewport.style.backgroundPosition='center';document.title='Robot — Kalinka';document.querySelector('h1').innerHTML='Ten sam robot.<br><span>Nowe długie nogi.</span>';document.querySelector('.intro > p:last-child').textContent='Eksperyment 02 · przysiady, wykopy i podskoki · 24 sekundy bez dźwięku';document.querySelector('.details').textContent='Wariant proceduralny tego samego robota z wydłużonymi nogami. Choreografia inspirowana tańcem przysiadowym: zejście do przysiadu, naprzemienne wykopy, ręce przed tułowiem i na boki, powrót do pozycji stojącej. Fotorealistyczne tło wygenerowano w AI — to nie jest fotografia dokumentalna. Model GLB do pobrania pozostaje oryginalnym wariantem.';document.querySelector('.studio-top strong').textContent='ROBOT / KALINKA';}
 const exporting=new URLSearchParams(location.search).get('export')==='1';
 if(exporting)document.documentElement.classList.add('robot-export');
 let cues=[];
@@ -29,6 +29,7 @@ try{
  renderer.setPixelRatio(exporting?1:Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
  const scene=new THREE.Scene();scene.background=new THREE.Color(0x083d27);scene.fog=new THREE.Fog(0x0b4c30,24,75);const camera=new THREE.PerspectiveCamera(35,1,.01,100);
+ if(kalinka){scene.background=null;scene.fog=null;}
  scene.add(new THREE.HemisphereLight(0xdceeff,0x526083,3));
  for(const [color,intensity,position] of [[0xffffff,5,[3,5,5]],[0x48d8ee,3,[-4,2,2]],[0xff71da,4,[3,2,-3]]]){const light=new THREE.DirectionalLight(color,intensity);light.position.set(...position);scene.add(light);}
  // A procedural studio reflection avoids external HDRI files and image decoders.
@@ -55,7 +56,8 @@ try{
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
   if(!Number.isFinite(size.length())||size.length()===0){failed();return;}
   model.position.sub(center);scene.add(model);
-  stage=createRobotStage(THREE,box.min.y-center.y);scene.add(stage.group);stage.update(0);
+  if(kalinka){stage={group:new THREE.Group(),update(){}};}else{stage=createRobotStage(THREE,box.min.y-center.y);}
+  scene.add(stage.group);stage.update(0);
   const radius=size.length()/2*1.18,distance=radius/Math.sin(THREE.MathUtils.degToRad(35/2))*1.05;
   homePosition=new THREE.Vector3(distance*.10,radius*.12,distance);
   if(exporting){
