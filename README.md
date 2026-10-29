@@ -1,19 +1,80 @@
-# Małe historie — two browser cartoons
+# Cartoon AI — animacje tworzone kodem z pomocą ChatGPT
 
-A small Polish/English story library with two independently selectable episodes on one GitHub Pages site:
+Czy da się tworzyć krótkie filmy z pomocą AI, generując **kod, który buduje scenę i ją animuje**? To właśnie sprawdzam w tym repozytorium.
 
-- **Kitten and Butterfly / Kotek i motyl** — 65 seconds, Canvas 2D. The original artwork is retained, with the long walks compressed to about 4–5 seconds each.
-- **Kitten and the Little Seed / Kotek i małe nasionko** — 90 seconds, real-time 3D with Three.js. The kitten plants a seed, gives it a little water, moves its pot into light and waits through days and nights before a sprout, leaves and a flower appear.
+Projekt powstał przez rozmowy z **ChatGPT w trybie Work**, połączonym z publicznym repozytorium GitHub. Opisywałem, co chciałem zobaczyć, oglądałem kolejne wersje i zgłaszałem poprawki. W ten sposób powstały dwie bajki o kotku i tańczący robot 3D.
 
-The garden is an original procedural clay-style diorama: 3D kitten, terracotta pot, watering can, plant, butterfly, lights, shadows and changing camera shots. It does not use generated video, downloaded character models or paid AI services. The garden teaches a simplified preschool lesson: water, light and time help plants grow; the leaves use light. Growth represents many days, not an immediate result of watering.
+## Obejrzyj trzy gotowe animacje
 
-## Watch
+Wystarczy przeglądarka — nie trzeba instalować projektu ani programów do animacji.
 
-[Open the story library](https://kpok.github.io/cartoon_ai/).
+| Animacja | Co zobaczysz | Otwórz |
+| --- | --- | --- |
+| **Kotek i motyl** · 65 sekund · 2D | Krótka historia o spotkaniu kotka z motylem i pomaganiu przyjacielowi. | [Obejrzyj bajkę](https://kpok.github.io/cartoon_ai/?story=meadow&lang=pl) |
+| **Kotek i małe nasionko** · 90 sekund · 3D | Edukacyjna bajka o tym, że rośliny potrzebują wody, światła i czasu. | [Obejrzyj bajkę](https://kpok.github.io/cartoon_ai/?story=garden&lang=pl) |
+| **Neonowy robot** · 40 sekund w pętli · 3D | Robot z dużą głową, krótkimi kończynami, mimiką i tańcem na tle zielonego deszczu cyfr. Model można obracać także podczas tańca. | [Obejrzyj robota](https://kpok.github.io/cartoon_ai/robot.html) |
 
-Direct links use `?story=meadow&lang=pl`, `?story=garden&lang=pl`, or `?story=garden&lang=en`. Choose a story and language on the page. Switching stories resets playback; switching language pauses at the same time. Nothing starts automatically.
+[Otwórz całą bibliotekę na GitHub Pages](https://kpok.github.io/cartoon_ai/).
 
-Requires a modern browser; the 3D episode requires WebGL2. If 3D is unavailable or its context is lost, the player displays a message and a button back to the first story. It does not substitute a blank or 2D garden. Rendering resolution is capped at 1.5× device pixel ratio and shadows at 1024 pixels.
+Bajki mają wersję polską i angielską oraz wybór kadru poziomego lub pionowego. Odtwarzanie uruchamia się przyciskiem. Sceny 3D wymagają przeglądarki z obsługą WebGL2; robot ma również podgląd PNG.
+
+## Skąd wziął się pomysł
+
+Chciałem spróbować tworzenia krótkich filmów przy użyciu AI. Koszt generowania wideo, zwłaszcza przy kolejnych próbach i poprawkach, wydawał mi się jednak zbyt wysoki na taki eksperyment.
+
+Pomyślałem więc: **a gdyby poprosić AI o napisanie programu, który sam stworzy animację?**
+
+Kod opisuje postacie, scenę, ruchy, kamerę i przebieg wydarzeń. Przeglądarka odtwarza animację na podstawie tego kodu. Można też wyrenderować kolejne klatki i złożyć je w MP4. Poprawka tempa, gestu czy tła staje się kolejną zmianą w projekcie.
+
+To był cel eksperymentu: sprawdzić, jak daleko można dojść od opisu pomysłu do działającego filmu za pomocą kodu tworzonego wspólnie z AI.
+
+## Jak pracowałem — vibe coding przez rozmowę
+
+Nie pisałem ręcznie kodu. Nie otwierałem go też, żeby go przeglądać ani samodzielnie poprawiać. Sterowałem projektem opisowo, przez rozmowę z ChatGPT Work.
+
+Mój udział polegał na wymyślaniu scenariuszy, opisywaniu oczekiwanego efektu i oglądaniu kolejnych wersji. Mówiłem na przykład, że bajka jest za wolna, robot powinien mieć krótsze nóżki, głowa ma przesuwać się na boki, a machnięcie dłonią powinno wypadać w konkretnym momencie.
+
+ChatGPT przekładał te uwagi na zmiany w repozytorium: przygotowywał kod, modele proceduralne, animacje, testy, eksportery oraz workflow GitHub Actions. Kolejne wersje trafiały na GitHub i GitHub Pages, gdzie mogłem zobaczyć rezultat i zgłosić następne uwagi. Pracowałem w ten sposób również z przeglądarki i aplikacji ChatGPT na Androidzie.
+
+W miarę rozwoju projektu doszły planowanie, przeglądy z udziałem agentów, automatyczne testy oraz audyt repozytorium. Moja ocena dotyczyła przede wszystkim efektu wizualnego. Testy i przeglądy pomagają wykrywać błędy, ale nie są gwarancją poprawności ani zastępstwem dla oceny praw do używanych materiałów.
+
+## Jak działa rozwiązanie
+
+1. **Opisuję pomysł i poprawki** w rozmowie z ChatGPT Work.
+2. **ChatGPT przygotowuje zmiany w kodzie** i plikach projektu w repozytorium GitHub.
+3. **Kod tworzy scenę i animację** — postacie, geometrię, materiały, ruchy oraz ustawienia kamery.
+4. **GitHub Actions wykonuje kontrole**, a po odpowiednich sprawdzeniach publikuje stronę na GitHub Pages.
+5. **Oglądam wynik w przeglądarce** i opisuję kolejne zmiany.
+6. **Osobny, ręcznie uruchamiany workflow eksportuje MP4**, który można następnie wykorzystać do publikacji.
+
+Odtwarzanie i eksport działają bez wywoływania płatnego API do generowania wideo. Przy robocie wykorzystałem też obraz referencyjny wygenerowany wcześniej w ChatGPT; model 3D powstaje proceduralnie i jest animowany kodem.
+
+| Technologia | Zastosowanie |
+| --- | --- |
+| JavaScript i Canvas 2D | Pierwsza bajka oraz logika odtwarzania. |
+| Three.js i WebGL | Ogród 3D, podgląd robota, oświetlenie, kamera i animacja w przeglądarce. |
+| Blender i Python | Proceduralne tworzenie modelu robota. |
+| GLB / glTF | Zapis modelu i animacji robota do odtwarzania w przeglądarce. |
+| Node.js, Playwright i FFmpeg | Renderowanie klatek i eksport do MP4. |
+| GitHub Actions i GitHub Pages | Automatyczne kontrole, ręczne eksporty i hosting podglądu. |
+
+## Dźwięk i publikowanie filmów
+
+W dwóch bajkach muzyka jest syntezowana programowo, a dialogi w przeglądarce korzystają z głosów systemowych. Eksport bajek może zawierać muzykę i dialogi generowane lokalnie przez eSpeak NG, dlatego głos w MP4 może różnić się od głosu w przeglądarce.
+
+Podgląd i eksport robota są **bez dźwięku**. Do opublikowanej wersji Facebook Reels dodałem utwór dostępny w edytorze Facebooka. Źródło referencji tańca i zakres wykorzystania materiałów opisuje [dokumentacja pochodzenia zasobów](docs/MEDIA_PROVENANCE.md).
+
+## Co dalej
+
+Każdą animację rozwijam iteracyjnie w rozmowie: od pomysłu, przez pierwszą działającą wersję, po poprawki ruchu, tempa i wyglądu. Repozytorium zachowuje kod, z którego można odtworzyć i dalej rozwijać te sceny.
+
+- [Roadmapa eksperymentu](docs/ROADMAP_PL.md)
+- [Eksport robota do MP4](docs/ROBOT_MP4.md)
+- [Licencje poszczególnych części projektu](LICENSING.md)
+- [Kontrole prywatności, sekretów i zależności](docs/PUBLIC_AUDIT.md)
+
+<details>
+<summary>Dokumentacja techniczna: uruchomienie, testy, dźwięk i eksport (English)</summary>
 
 ## Local development
 
@@ -51,7 +112,7 @@ Garden beats: 0–7 discover seed; 7–15 plant; 15–23 water; 23–30 light; 3
 
 ## Deployment
 
-GitHub Actions checks workflow security, model validation, unit tests and build, then deploys that same `dist/` artifact to GitHub Pages after those fast checks succeed on main. By explicit owner choice, full browser/MP4 regression runs in parallel with deployment; check its separate result. Set Pages source to **GitHub Actions** and repository variable `ENABLE_GITHUB_PAGES=true` for deployment. Public pull requests do not start workflows; only owner-initiated runs on main are allowed. The deploy job has scoped Pages/OIDC permissions and serialized deployments; no personal access token is needed. Setting the variable to false pauses future publication.
+GitHub Actions checks workflow security, model validation, unit tests and build, then deploys that same `dist/` artifact to GitHub Pages after those fast checks succeed on main. By explicit owner choice, full browser/MP4 regression runs in parallel with deployment; check its separate result. Set Pages source to **GitHub Actions** and repository variable `ENABLE_GITHUB_PAGES=true` for deployment. Public pull requests do not start workflows. CI/Pages and manual exports require owner-initiated runs on main; the separate public audit also checks owner pushes to other branches and tags. The deploy job has scoped Pages/OIDC permissions and serialized deployments; no personal access token is needed. Setting the variable to false pauses future publication.
 
 Only the static build is published; project reports, tests and development scripts are excluded. Source and deployed assets are publicly readable. Three.js's MIT license is included with the vendored modules.
 
@@ -127,3 +188,5 @@ The third card opens [the robot studio](https://kpok.github.io/cartoon_ai/robot.
 ## Privacy, licenses and sharing
 
 See [licensing map](LICENSING.md), [media provenance](docs/MEDIA_PROVENANCE.md) and [audit controls and limitations](docs/PUBLIC_AUDIT.md). No reference music is distributed with the robot. Public logs must never contain private scan matches.
+
+</details>
