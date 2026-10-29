@@ -51,7 +51,7 @@ try{
   if(unavailable)return;
   if(gltf.animations.length!==1||gltf.animations[0].name!=='ReferenceDance'||Math.abs(gltf.animations[0].duration-40)>.01||manifest.animation.duration!==40||!Array.isArray(cues)){failed();return;}
   model=gltf.scene;mixer=new THREE.AnimationMixer(model);mixer.clipAction(gltf.animations[0]).play();mixer.setTime(0);clock=new DanceClock(gltf.animations[0].duration);
-  if(kalinka){mixer.stopAllAction();variant=createKalinka(model);variant.update(0);clock=new DanceClock(24);cues=[[0,3,'Zejście do przysiadu'],[3,11,'Naprzemienne wykopy'],[11,19,'Ręce na boki'],[19,21,'Finałowe wykopy'],[21,24,'Powrót']];}
+  if(kalinka){mixer.stopAllAction();variant=createKalinka(model,THREE);variant.update(0);clock=new DanceClock(24);cues=[[0,3,'Zejście do przysiadu'],[3,11,'Naprzemienne wykopy'],[11,19,'Ręce na boki'],[19,21,'Finałowe wykopy'],[21,24,'Powrót']];}
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
   if(!Number.isFinite(size.length())||size.length()===0){failed();return;}
   model.position.sub(center);scene.add(model);

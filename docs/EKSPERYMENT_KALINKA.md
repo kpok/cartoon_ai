@@ -26,3 +26,8 @@
 - npm test: 43/43; npm run build: OK; npm run check:workflows: OK.
 - Pipeline CI/Pages działa tylko na main; generowanie modelu i MP4 jest ręczne. Audyt branchy pozostaje aktywny.
 - Weryfikacja wizualna i publikacja nadal oczekują; PR jest roboczy.
+
+## Etap 3 — uszatka i kozaki
+- Dodano proceduralną czapkę z nausznikami oraz wysokie ciemne cholewki z jasnym obszyciem.
+- Dodatki przypięte do głowy i podudzi; oryginalny GLB pozostaje bez zmian.
+- Weryfikacja wizualna nadal niewykonana z powodu niedostępnego podglądu przeglądarkowego.

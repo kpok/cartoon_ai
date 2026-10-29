@@ -10,8 +10,21 @@ export function kalinkaPose(time) {
   legs:[0,1].map(i=>({y:-height+(active&&side===i?.24*pulse:0),z:active&&side===i?1.12*pulse:0})),
   spread:t>=11&&t<19};
 }
-export function createKalinka(model) {
+export function createKalinka(model, THREE) {
  const root=model.getObjectByName('DanceRoot'),torso=model.getObjectByName('TorsoPivot'),head=model.getObjectByName('HeadPivot');
+ // Accessories follow their anatomical pivots, including during kicks.
+ const leather=new THREE.MeshStandardMaterial({color:0x241b22,roughness:.72,metalness:.12});
+ const fur=new THREE.MeshStandardMaterial({color:0x6b5547,roughness:1});
+ const trim=new THREE.MeshStandardMaterial({color:0xc8ad88,roughness:1});
+ function piece(parent,name,geometry,material,x,y,z){const mesh=new THREE.Mesh(geometry,material);mesh.name=name;mesh.position.set(x,y,z);parent.add(mesh);return mesh;}
+ model.updateMatrixWorld(true);
+ const shell=model.getObjectByName('Rounded_head_shell');
+ const bounds=new THREE.Box3().setFromObject(shell);
+ const top=head.worldToLocal(new THREE.Vector3((bounds.min.x+bounds.max.x)/2,bounds.max.y,(bounds.min.z+bounds.max.z)/2));
+ const width=bounds.max.x-bounds.min.x,depth=bounds.max.z-bounds.min.z;
+ piece(head,'Kalinka_Ushanka_Crown',new THREE.BoxGeometry(width*1.04,.46,depth*.95),fur,top.x,top.y+.18,top.z);
+ piece(head,'Kalinka_Ushanka_Front_Trim',new THREE.BoxGeometry(width*1.06,.25,.18),trim,top.x,top.y+.04,top.z+depth*.49);
+ for(const side of [-1,1])piece(head,'Kalinka_Ushanka_Earflap',new THREE.BoxGeometry(.24,.68,depth*.67),fur,top.x+side*width*.52,top.y-.27,top.z);
  const limbs=['Left','Right'].map(side=>{
   const hip=model.getObjectByName(side+'HipPivot'),knee=model.getObjectByName(side+'KneePivot'),foot=model.getObjectByName(side+'FootPivot');
   for(const [pivot,next] of [[hip,knee],[knee,foot]])for(const child of pivot.children){
@@ -19,6 +32,9 @@ export function createKalinka(model) {
    if(child!==next&&child.isMesh)child.scale.y*=2.6;
   }
   knee.position.set(0,-.858,0);foot.position.set(0,-.832,0);
+  piece(knee,side+'_Kalinka_Boot_Shaft',new THREE.CylinderGeometry(.20,.22,.61,20),leather,0,-.49,0);
+  piece(knee,side+'_Kalinka_Boot_Cuff',new THREE.CylinderGeometry(.23,.23,.10,20),trim,0,-.20,0);
+  for(const child of foot.children)if(child.isMesh)child.material=leather;
   return {hip,knee,foot,arm:model.getObjectByName(side+'ArmPivot'),elbow:model.getObjectByName(side+'ElbowPivot')};
  });
  return {update(time){
