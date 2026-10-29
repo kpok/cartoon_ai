@@ -30,6 +30,7 @@ export async function verifyBuild(directory='dist'){
    assert.ok(files.includes(target||'index.html'),`${name}: missing or escaping dependency ${reference}`);
   }
  }
+ assert.deepEqual(await readFile(resolve(directory,'vendor/THREE-LICENSE.txt')),await readFile(new URL('../node_modules/three/LICENSE',import.meta.url)),'Upstream license notice differs');
  for(const name of ['three.module.js','three.core.js'])assert.deepEqual(await readFile(resolve(directory,'vendor',name)),await readFile(new URL(`../node_modules/three/build/${name}`,import.meta.url)),'Vendored Three.js differs from locked dependency');
  for(const [name,path] of [['GLTFLoader.js','loaders/GLTFLoader.js'],['OrbitControls.js','controls/OrbitControls.js'],['BufferGeometryUtils.js','utils/BufferGeometryUtils.js'],['SkeletonUtils.js','utils/SkeletonUtils.js']]){
   const source=await readFile(new URL(`../node_modules/three/examples/jsm/${path}`,import.meta.url),'utf8');

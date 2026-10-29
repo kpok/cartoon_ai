@@ -30,11 +30,16 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
+      - name: Public repository audit before publication
+        run: bash scripts/run-public-audit.sh
+        env:
+          PRIVATE_TERMS: ${{ secrets.PRIVATE_TERMS }}
       - run: npm run check:workflows
       - run: python3 -m unittest discover -s experiments/dancing-robot -p "test_*.py"
       - run: python3 scripts/validate-robot.py published/robot --published
@@ -76,6 +81,7 @@ jobs:
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 22

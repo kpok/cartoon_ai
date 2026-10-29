@@ -1,0 +1,41 @@
+name: Public repository audit
+on:
+  push:
+    branches: ["**"]
+    tags: ["**"]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  audit:
+    if: >-
+      github.repository == 'kpok/cartoon_ai' &&
+      github.repository_id == '1433681495' &&
+      github.repository_owner_id == '10676481' &&
+      github.actor_id == '10676481' &&
+      github.actor == 'kpok' &&
+      github.triggering_actor == 'kpok' &&
+      (github.ref_type == 'branch' || github.ref_type == 'tag') &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: trusted-public-audit
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check:workflows
+      - name: Scan reachable history, identity, secrets and licenses
+        run: bash scripts/run-public-audit.sh
+        env:
+          PRIVATE_TERMS: ${{ secrets.PRIVATE_TERMS }}

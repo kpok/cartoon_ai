@@ -107,7 +107,7 @@ These files are automatically scheduled, normalized and mixed with ducked music.
 
 ### GitHub Actions export
 
-Open **Actions → Export cartoon MP4 → Run workflow**. Select story, language, portrait/landscape, full/draft resolution and TTS/music-only. After completion, download the `cartoon-…` artifact ZIP containing MP4, SRT and metadata (retained14days). The manual workflow installs all tools; no local setup is needed. It does not publish to YouTube or Facebook and does not run on every push. Pages deployment runs after fast checks; a separate parallel regression job additionally checks a small voiced MP4 from each renderer.
+Open **Actions → Export cartoon MP4 → Run workflow**. Select story, language, portrait/landscape, full/draft resolution and TTS/music-only. After completion, download the `cartoon-…` artifact ZIP containing MP4, SRT and metadata (retained 1 day). The manual workflow installs all tools; no local setup is needed. It does not publish to YouTube or Facebook and does not run on every push. Pages deployment runs after the repository audit and fast checks; a separate parallel regression job additionally checks a small voiced MP4 from each renderer.
 
 ## Workflow security
 
@@ -116,10 +116,14 @@ CI/Pages and manual MP4 export are restricted to owner-initiated runs on main in
 
 ## Roadmap
 
-See [Roadmapa — filmy tworzone kodem](docs/ROADMAP_PL.md) for the accepted Sprint 1 plan: a procedural Blender/Python robot experiment in this repository, mobile GLB preview and a silent third film on the existing Pages site. The generator does not call AI APIs at runtime. This is a plan, not an implemented third episode.
+See [Roadmapa — filmy tworzone kodem](docs/ROADMAP_PL.md) for the accepted Sprint 1 plan: a procedural Blender/Python robot experiment in this repository, mobile GLB preview and a silent third film on the existing Pages site. The generator does not call AI APIs at runtime. The robot viewer and manual MP4 exporter are now implemented.
 
-Automatic CI/Pages skips pushes changing only Markdown (`**/*.md`) or files under `docs/`. Mixed code/documentation changes still run CI; manual workflows remain available.
+Heavy film checks still skip documentation-only pushes. The lightweight repository audit runs on every owner push, including documentation, and gates deployment and manual exports.
 
 ## Procedural robot — Stage A
 
-The third card opens [the robot studio](https://kpok.github.io/cartoon_ai/robot.html): orbit/zoom/reset a static procedural head and shoulders, with PNG fallback. No dance or robot MP4 yet. Selected files in `published/robot/` survive all later builds; Blender never runs on a website visit or normal push. Use **Actions → Generate robot model (Stage A)** for a bounded manual render and download its seven-day artifact. Promotion of selected validated outputs remains a separate reviewed commit. Generator commands, mobile budgets and separate code/output licenses: [experiment README](experiments/dancing-robot/README.md).
+The third card opens [the robot studio](https://kpok.github.io/cartoon_ai/robot.html): orbit/zoom/reset the full procedural dancing robot, with PNG fallback. Includes a 40-second dance, short limbs, facial expressions and green digital rain; manual silent MP4 export is available. Selected files in `published/robot/` survive all later builds; Blender never runs on a website visit or normal push. Use **Actions → Generate robot model (Stage A)** for a bounded manual render and download its one-day artifact. Promotion of selected validated outputs remains a separate reviewed commit. Generator commands, mobile budgets and separate code/output licenses: [experiment README](experiments/dancing-robot/README.md).
+
+## Privacy, licenses and sharing
+
+See [licensing map](LICENSING.md), [media provenance](docs/MEDIA_PROVENANCE.md) and [audit controls and limitations](docs/PUBLIC_AUDIT.md). No reference music is distributed with the robot. Public logs must never contain private scan matches.

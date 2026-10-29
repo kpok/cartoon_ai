@@ -16,7 +16,9 @@
     "robot:retarget": "node experiments/dancing-robot/retarget.mjs",
     "robot:check": "node experiments/dancing-robot/retarget.mjs --check",
     "robot:sync": "node scripts/audit-robot-sync.mjs",
-    "robot:mp4": "node scripts/export-robot.mjs"
+    "robot:mp4": "node scripts/export-robot.mjs",
+    "audit:public": "bash scripts/run-public-audit.sh",
+    "audit:privacy": "python3 scripts/audit-privacy.py"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

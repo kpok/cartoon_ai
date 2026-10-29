@@ -6,7 +6,7 @@ wybierając main. Użytkownik najpierw ocenia wynik na Pages. Żaden push, nawet
 tego workflow, nie rozpoczyna automatycznie renderowania filmu.
 Wymagany jest właściciel kpok; bramki konta/repo/ref i token read-only pozostają aktywne.
 
-Wynik: artefakt **dancing-robot-mp4**, dostępny przez7 dni od udanego uruchomienia.
+Wynik: artefakt **dancing-robot-mp4**, dostępny przez 1 dzień od udanego uruchomienia.
 Zawiera `robot-dance.mp4` i metadane `robot-dance.json` z rewizją oraz hashem modelu.
 Format:720×1280,40 sekund,24fps,960 klatek, H.264/yuv420p, bez ścieżki dźwiękowej.
 Nie zawiera interfejsu strony. Kamera jest stała, frontowa, z zapasem na ruch.

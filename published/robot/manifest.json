@@ -26,8 +26,8 @@
       "sha256": "da4937c6996bb175f510c1506af686f73eb7a0ba42bba959106a98e6556487b1"
     },
     "preview.png": {
-      "bytes": 798668,
-      "sha256": "5502dd554a343eeed2ad2ace52173cdef88ba00916d60513ab8daf1411249276"
+      "bytes": 798030,
+      "sha256": "a4992ddb3ff81a172124904c19953ea105fad15532c5a71175af788988d91e64"
     }
   },
   "geometry_source_commit": "5219388806f4c300cb85a134712f81e5b98c260c",

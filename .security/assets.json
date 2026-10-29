@@ -1,0 +1,30 @@
+{
+  "published/robot/preview.png": {
+    "sha256": "a4992ddb3ff81a172124904c19953ea105fad15532c5a71175af788988d91e64",
+    "license": "CC-BY-4.0",
+    "attribution": "Neon Tinker by kpok",
+    "origin": "Procedural project robot; AI-generated visual reference supplied by project owner",
+    "review": "technical-provenance-only; animation reference rights not independently cleared"
+  },
+  "published/robot/robot.glb": {
+    "sha256": "da4937c6996bb175f510c1506af686f73eb7a0ba42bba959106a98e6556487b1",
+    "license": "CC-BY-4.0",
+    "attribution": "Neon Tinker by kpok",
+    "origin": "Procedural project robot; AI-generated visual reference supplied by project owner",
+    "review": "technical-provenance-only; animation reference rights not independently cleared"
+  },
+  "experiments/dancing-robot/assets/rig-base.glb": {
+    "sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44",
+    "license": "CC-BY-4.0",
+    "attribution": "Neon Tinker by kpok",
+    "origin": "Procedural project robot; AI-generated visual reference supplied by project owner",
+    "review": "technical-provenance-only; animation reference rights not independently cleared"
+  },
+  "experiments/dancing-robot/previews/humanoid.png": {
+    "sha256": "a4992ddb3ff81a172124904c19953ea105fad15532c5a71175af788988d91e64",
+    "license": "CC-BY-4.0",
+    "attribution": "Neon Tinker by kpok",
+    "origin": "Procedural project robot; AI-generated visual reference supplied by project owner",
+    "review": "technical-provenance-only; animation reference rights not independently cleared"
+  }
+}

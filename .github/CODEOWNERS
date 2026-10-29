@@ -4,3 +4,7 @@
 /package.json @kpok
 /package-lock.json @kpok
 /SECURITY.md @kpok
+
+/.security/ @kpok
+/LICENSING.md @kpok
+/docs/MEDIA_PROVENANCE.md @kpok

@@ -1,0 +1,3 @@
+title = "Repository secret policy"
+[extend]
+useDefault = true
