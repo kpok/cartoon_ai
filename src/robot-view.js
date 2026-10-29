@@ -1,12 +1,17 @@
 import * as THREE from '../vendor/three.module.js';
 import {GLTFLoader} from '../vendor/GLTFLoader.js';
 import {createRobotStage} from './robot-stage.js';
+import {createKalinka} from './robot-kalinka.js';
 import {DanceClock} from './robot-playback.js';
 import {OrbitControls} from '../vendor/OrbitControls.js';
 const canvas=document.querySelector('#robot-canvas'),preview=document.querySelector('#preview'),status=document.querySelector('#model-status'),viewport=document.querySelector('#viewport');
 const buttons=[...document.querySelectorAll('.tools button')];
 let renderer,controls,model,homePosition,mixer,clock,stage;
 let unavailable=false;
+const kalinka=new URLSearchParams(location.search).get('dance')==='kalinka';
+let variant;
+function pose(time){if(variant)variant.update(time);else mixer.setTime(time);}
+if(kalinka){document.title='Robot — Kalinka';document.querySelector('h1').innerHTML='Ten sam robot.<br><span>Nowe długie nogi.</span>';document.querySelector('.intro > p:last-child').textContent='Eksperyment 02 · przysiady, wykopy i podskoki · 24 sekundy bez dźwięku';document.querySelector('.details').textContent='Wariant proceduralny tego samego robota z wydłużonymi nogami. Choreografia inspirowana tańcem przysiadowym: zejście do przysiadu, naprzemienne wykopy, ręce przed tułowiem i na boki, powrót do pozycji stojącej. Model GLB do pobrania pozostaje oryginalnym wariantem.';document.querySelector('.studio-top strong').textContent='ROBOT / KALINKA';}
 const exporting=new URLSearchParams(location.search).get('export')==='1';
 if(exporting)document.documentElement.classList.add('robot-export');
 let cues=[];
@@ -33,7 +38,7 @@ try{
  const pmrem=new THREE.PMREMGenerator(renderer),target=pmrem.fromScene(environment,.1,.1,50);scene.environment=target.texture;pmrem.dispose();
  controls=new OrbitControls(camera,canvas);controls.enableDamping=!exporting;controls.enabled=!exporting;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.92;controls.minPolarAngle=Math.PI*.08;
  let frame=null;
- function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){mixer.setTime(clock.tick(now));stage?.update(clock.time);syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
+ function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){pose(clock.tick(now));stage?.update(clock.time);syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
  controls.addEventListener('change',requestRender);
  document.addEventListener('visibilitychange',()=>{clock?.suspend();if(document.hidden){if(frame!==null)cancelAnimationFrame(frame);frame=null;}else requestRender();});
  function resize(){renderer.setSize(viewport.clientWidth,viewport.clientHeight,false);camera.aspect=viewport.clientWidth/viewport.clientHeight;camera.updateProjectionMatrix();requestRender();}
@@ -46,6 +51,7 @@ try{
   if(unavailable)return;
   if(gltf.animations.length!==1||gltf.animations[0].name!=='ReferenceDance'||Math.abs(gltf.animations[0].duration-40)>.01||manifest.animation.duration!==40||!Array.isArray(cues)){failed();return;}
   model=gltf.scene;mixer=new THREE.AnimationMixer(model);mixer.clipAction(gltf.animations[0]).play();mixer.setTime(0);clock=new DanceClock(gltf.animations[0].duration);
+  if(kalinka){mixer.stopAllAction();variant=createKalinka(model);variant.update(0);clock=new DanceClock(24);cues=[[0,3,'Zejście do przysiadu'],[3,11,'Naprzemienne wykopy'],[11,19,'Ręce na boki'],[19,21,'Finałowe wykopy'],[21,24,'Powrót']];}
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
   if(!Number.isFinite(size.length())||size.length()===0){failed();return;}
   model.position.sub(center);scene.add(model);
@@ -64,16 +70,16 @@ try{
   if(exporting){
    window.renderRobotFrame=time=>{
     if(unavailable||!Number.isFinite(time)||time<0||time>=clock.duration)throw new Error('Invalid robot export frame');
-    clock.seek(time);mixer.setTime(time);stage.update(time);syncDance();controls.update();renderer.render(scene,camera);
+    clock.seek(time);pose(time);stage.update(time);syncDance();controls.update();renderer.render(scene,camera);
     return {time,width:canvas.width,height:canvas.height};
    };
    window.robotExportReady=true;
   }
   }catch{failed();}
  },undefined,failed);
- timeline.addEventListener('input',()=>{if(!clock||unavailable)return;clock.seek(Number(timeline.value));mixer.setTime(clock.time);stage?.update(clock.time);syncDance();requestRender();});
+ timeline.addEventListener('input',()=>{if(!clock||unavailable)return;clock.seek(Number(timeline.value));pose(clock.time);stage?.update(clock.time);syncDance();requestRender();});
  danceButton.addEventListener('click',()=>{if(!clock||unavailable)return;clock.setPlaying(!clock.playing);syncDance();requestRender();});
- document.querySelector('#dance-restart').addEventListener('click',()=>{if(!clock||unavailable)return;clock.restart();mixer.setTime(0);stage?.update(0);syncDance();requestRender();});
+ document.querySelector('#dance-restart').addEventListener('click',()=>{if(!clock||unavailable)return;clock.restart();pose(0);stage?.update(0);syncDance();requestRender();});
  reducedMotion.addEventListener('change',event=>{if(event.matches&&clock){clock.setPlaying(false);syncDance();requestRender();}});
  document.querySelector('#rotate-left').addEventListener('click',()=>{if(model){model.rotation.y-=Math.PI/8;requestRender();}});
  document.querySelector('#zoom-in').addEventListener('click',()=>{camera.position.multiplyScalar(.85);controls.update();});
