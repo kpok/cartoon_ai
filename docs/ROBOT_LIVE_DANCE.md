@@ -1,3 +1,5 @@
+> Aktualizacja: [40-sekundowy układ według referencji i odtwarzalny generator ruchu](ROBOT_REFERENCE_DANCE.md). Poniżej historyczny opis pierwszej publikacji.
+
 # Interaktywny taniec robota — publikacja bez MP4
 
 Na prośbę właściciela publikujemy najpierw animowany GLB w `robot.html`, bez generowania
