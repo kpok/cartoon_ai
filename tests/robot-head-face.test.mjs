@@ -25,3 +25,11 @@ test('the actual greeting hand reaches both user-specified hey times',async()=>{
   assert.ok(Math.abs(bestTime-peak)<=1/24,'hand peak must coincide with sung hey');assert.ok(bestHeight>1.2,'hand must be visibly raised');
  }
 });
+test('forearm shells have straight closed cuts instead of jagged triangle boundaries',async()=>{
+ const b=await readFile(new URL('../published/robot/robot.glb',import.meta.url));const g=await new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');
+ for(const side of ['Left','Right']){
+  const geometry=g.scene.getObjectByName(side+'Forearm').geometry,p=geometry.attributes.position,n=geometry.attributes.normal;let caps=0;
+  for(let i=0;i<p.count;i++){assert.ok(p.getY(i)>=.24999&&p.getY(i)<=.49001,'all surface triangles stay within cut planes');if(Math.abs(Math.abs(n.getY(i))-1)<1e-6&&Math.abs(n.getX(i))<1e-6&&Math.abs(n.getZ(i))<1e-6)caps++;}
+  assert.ok(caps>12,'both cut surfaces must have flat caps');
+ }
+});

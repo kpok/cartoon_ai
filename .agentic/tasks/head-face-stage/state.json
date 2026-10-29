@@ -1,1 +1,32 @@
-{"task_id":"head-face-stage","baseline":"b3c3faddad7bfa52480b8a482101ff74703f2ad5","phase":"VERIFY","status":"in_progress","branch":"robot/head-face-ai-ruins","greeting_reference_seconds":[2,5.5],"implemented":["faster accented head","open palms/fingers and wrist waving","mechanical facial expressions","procedural ruined AI city","closed arm segment surfaces"],"remaining":["final visual review of capped arms","final browser checks","merge main","Actions MP4 regeneration"],"authorization":"User asks to checkpoint partial work on a separate GitHub branch, then merge automatically once ready."}
+{
+  "task_id": "head-face-stage",
+  "baseline": "b3c3faddad7bfa52480b8a482101ff74703f2ad5",
+  "phase": "HANDOFF",
+  "status": "ready_for_delivery",
+  "branch": "robot/head-face-ai-ruins",
+  "greeting_reference_seconds": [
+    2,
+    5.5
+  ],
+  "implemented": [
+    "faster accented head",
+    "open palms/fingers and wrist waving",
+    "mechanical facial expressions",
+    "procedural ruined AI city",
+    "closed arm segment surfaces"
+  ],
+  "remaining": [
+    "merge main",
+    "Actions MP4 regeneration"
+  ],
+  "authorization": "User asks to checkpoint partial work on a separate GitHub branch, then merge automatically once ready.",
+  "checks": {
+    "node": "42 passed",
+    "python": "3 passed",
+    "browser": "42 passed",
+    "independent_review": "PASS, capped arm geometry rereview PASS",
+    "robot_check": "byte-identical",
+    "robot_sync": "PASS",
+    "workflow_policy": "8 owner-only jobs PASS"
+  }
+}

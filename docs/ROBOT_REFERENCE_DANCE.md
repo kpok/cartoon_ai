@@ -1,3 +1,5 @@
+> Aktualne gesty „hej” są przy2.0s i5.5s, zgodnie ze wskazaniem użytkownika. [Aktualizacja głowy, mimiki i tła](ROBOT_HEAD_FACE_STAGE.md). Starsza orientacyjna tabela poniżej nie określa już czasu powitania.
+
 # Taniec według nagrania referencyjnego
 
 Publikacja40-sekundowego układu na podstawie nagrania przekazanego przez właściciela.
