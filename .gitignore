@@ -12,3 +12,5 @@ exports/
 robot-output/
 *.blend1
 __pycache__/
+
+/robot-video/

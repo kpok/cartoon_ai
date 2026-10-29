@@ -6,6 +6,8 @@ const canvas=document.querySelector('#robot-canvas'),preview=document.querySelec
 const buttons=[...document.querySelectorAll('.tools button')];
 let renderer,controls,model,homePosition,mixer,clock;
 let unavailable=false;
+const exporting=new URLSearchParams(location.search).get('export')==='1';
+if(exporting)document.documentElement.classList.add('robot-export');
 let cues=[];
 const timeline=document.querySelector("#dance-time"),readout=document.querySelector("#dance-readout");
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
@@ -18,7 +20,7 @@ function failed(){
 }
 try{
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
- renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.setPixelRatio(exporting?1:Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.01,100);
  scene.add(new THREE.HemisphereLight(0xdceeff,0x526083,3));
@@ -28,7 +30,7 @@ try{
  const panelGeometry=new THREE.PlaneGeometry(8,8);
  for(const [position,color] of [[[0,3,4],0xffffff],[[-4,1,0],0x87c9e8],[[4,1,0],0xe8a1d8],[[0,-4,0],0x1a2336]]){const panel=new THREE.Mesh(panelGeometry,new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide}));panel.position.set(...position);panel.lookAt(0,0,0);environment.add(panel);}
  const pmrem=new THREE.PMREMGenerator(renderer),target=pmrem.fromScene(environment,.1,.1,50);scene.environment=target.texture;pmrem.dispose();
- controls=new OrbitControls(camera,canvas);controls.enableDamping=true;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.92;controls.minPolarAngle=Math.PI*.08;
+ controls=new OrbitControls(camera,canvas);controls.enableDamping=!exporting;controls.enabled=!exporting;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.92;controls.minPolarAngle=Math.PI*.08;
  let frame=null;
  function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){mixer.setTime(clock.tick(now));syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
  controls.addEventListener('change',requestRender);
@@ -49,9 +51,24 @@ try{
   const floor=new THREE.Mesh(new THREE.CircleGeometry(2.15,64),new THREE.MeshBasicMaterial({color:0x30405e,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}));
   floor.rotation.x=-Math.PI/2;floor.position.y=box.min.y-center.y-.005;scene.add(floor);
   const radius=size.length()/2*1.18,distance=radius/Math.sin(THREE.MathUtils.degToRad(35/2))*1.05;
-  homePosition=new THREE.Vector3(distance*.10,radius*.12,distance);camera.position.copy(homePosition);camera.near=radius/100;camera.far=distance+radius*20;camera.updateProjectionMatrix();controls.target.set(0,0,0);controls.minDistance=radius*1.25;controls.maxDistance=distance*2;controls.update();
+  homePosition=new THREE.Vector3(distance*.10,radius*.12,distance);
+  if(exporting){
+   const bounds=manifest.animation.bounds;
+   const minimum=new THREE.Vector3(...bounds.min).sub(center),maximum=new THREE.Vector3(...bounds.max).sub(center);
+   const halfWidth=Math.max(Math.abs(minimum.x),Math.abs(maximum.x))*1.08,halfHeight=Math.max(Math.abs(minimum.y),Math.abs(maximum.y))*1.08;
+   const exportDistance=Math.max(halfHeight,halfWidth/camera.aspect)/Math.tan(THREE.MathUtils.degToRad(35/2))+maximum.z;
+   homePosition.set(0,0,exportDistance);
+  }camera.position.copy(homePosition);camera.near=radius/100;camera.far=distance+radius*20;camera.updateProjectionMatrix();controls.target.set(0,0,0);controls.minDistance=radius*1.25;controls.maxDistance=distance*2;controls.update();
   canvas.hidden=false;preview.hidden=true;status.hidden=true;canvas.dataset.ready='true';buttons.forEach(button=>{button.disabled=false;});
-  timeline.max=String(clock.duration);timeline.disabled=false;clock.setPlaying(!reducedMotion.matches);syncDance();requestRender();
+  timeline.max=String(clock.duration);timeline.disabled=false;clock.setPlaying(!exporting&&!reducedMotion.matches);syncDance();requestRender();
+  if(exporting){
+   window.renderRobotFrame=time=>{
+    if(unavailable||!Number.isFinite(time)||time<0||time>=clock.duration)throw new Error('Invalid robot export frame');
+    clock.seek(time);mixer.setTime(time);syncDance();controls.update();renderer.render(scene,camera);
+    return {time,width:canvas.width,height:canvas.height};
+   };
+   window.robotExportReady=true;
+  }
   }catch{failed();}
  },undefined,failed);
  timeline.addEventListener('input',()=>{if(!clock||unavailable)return;clock.seek(Number(timeline.value));mixer.setTime(clock.time);syncDance();requestRender();});

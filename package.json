@@ -15,7 +15,8 @@
     "pretest": "node scripts/vendor.mjs",
     "robot:retarget": "node experiments/dancing-robot/retarget.mjs",
     "robot:check": "node experiments/dancing-robot/retarget.mjs --check",
-    "robot:sync": "node scripts/audit-robot-sync.mjs"
+    "robot:sync": "node scripts/audit-robot-sync.mjs",
+    "robot:mp4": "node scripts/export-robot.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

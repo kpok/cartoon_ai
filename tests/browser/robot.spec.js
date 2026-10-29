@@ -52,3 +52,11 @@ test('timeline seeks to reference gestures while paused and orbit remains usable
  await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-time','22.500');
  await page.locator('#dance-restart').click();await expect(canvas).toHaveAttribute('data-time','0.000');await expect(page.locator('#dance-time')).toHaveValue('0');
 });
+test('robot export renders exact repeatable frames without player controls',async({page})=>{
+ await page.setViewportSize({width:360,height:640});await page.goto('/robot.html?export=1');
+ await page.waitForFunction(()=>window.robotExportReady===true);const canvas=page.locator('#robot-canvas');
+ expect(await page.evaluate(()=>window.renderRobotFrame(0))).toEqual({time:0,width:360,height:640});const first=await canvas.screenshot();
+ await page.evaluate(()=>window.renderRobotFrame(22.5));expect((await canvas.screenshot()).equals(first)).toBe(false);
+ await page.evaluate(()=>window.renderRobotFrame(0));expect((await canvas.screenshot()).equals(first)).toBe(true);
+ await expect(page.evaluate(()=>window.renderRobotFrame(-1))).rejects.toThrow('Invalid robot export frame');
+});

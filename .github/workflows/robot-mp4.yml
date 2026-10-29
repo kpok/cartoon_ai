@@ -1,0 +1,52 @@
+name: Export dancing robot MP4
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/robot-mp4.yml']
+  workflow_dispatch:
+permissions: {}
+jobs:
+  render:
+    if: >-
+      github.repository == 'kpok/cartoon_ai' &&
+      github.repository_id == '1433681495' &&
+      github.repository_owner_id == '10676481' &&
+      github.actor_id == '10676481' &&
+      github.actor == 'kpok' &&
+      github.triggering_actor == 'kpok' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    concurrency:
+      group: trusted-robot-video
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:workflows
+      - run: npm run robot:check
+      - run: npm run robot:sync
+      - run: python3 scripts/validate-robot.py published/robot --published
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Render and validate silent portrait MP4
+        run: npm run robot:mp4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: dancing-robot-mp4
+          path: |
+            robot-video/robot-dance.mp4
+            robot-video/robot-dance.json
+          if-no-files-found: error
+          retention-days: 7
