@@ -14,3 +14,7 @@ robot-output/
 __pycache__/
 
 /robot-video/
+
+/.agentic/tasks/head-face-stage/*.log
+/.agentic/tasks/head-face-stage/*.png
+/.agentic/tasks/head-face-stage/*.mp4

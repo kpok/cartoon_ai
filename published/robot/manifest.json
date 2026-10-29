@@ -22,8 +22,8 @@
   "attribution": "Neon Tinker by kpok",
   "files": {
     "robot.glb": {
-      "bytes": 2028016,
-      "sha256": "78c5686ff932a98cf1dfb0794a91945ce2295417f5d093d9ece48bb08df884ef"
+      "bytes": 2537636,
+      "sha256": "da4937c6996bb175f510c1506af686f73eb7a0ba42bba959106a98e6556487b1"
     },
     "preview.png": {
       "bytes": 798668,
@@ -39,6 +39,23 @@
     "fps": 24,
     "reference_timing": true,
     "music_synchronized": false,
+    "greeting": {
+      "peaks": [
+        2,
+        5.5
+      ],
+      "source": "user-confirmed reference playback timestamps",
+      "screen_hand": "left",
+      "open_palm": true,
+      "wrist_wave": true
+    },
+    "head_motion": {
+      "amplitude": 0.27,
+      "accentShape": 1.35,
+      "cyclesPerBeat": 1,
+      "cycle_seconds": 0.43793487803947007,
+      "adaptation": true
+    },
     "rhythm_alignment": {
       "period": 0.43793487803947007,
       "accent": 13.309488910485939,
@@ -48,18 +65,28 @@
     "cues": [
       [
         0,
-        5.8,
+        1.68,
         "Boczne ruchy głowy"
       ],
       [
-        5.8,
-        8.45,
-        "Gesty przy barkach"
+        1.68,
+        2.36,
+        "Powitanie — hej"
       ],
       [
-        8.45,
+        2.36,
+        5.18,
+        "Głowa i gesty przy barkach"
+      ],
+      [
+        5.18,
+        5.86,
+        "Powitanie — hej"
+      ],
+      [
+        5.86,
         9.6,
-        "Powitanie"
+        "Gesty przy barkach"
       ],
       [
         9.6,
@@ -99,22 +126,24 @@
     ],
     "bounds": {
       "min": [
-        -1.8456275748488988,
+        -1.9194831268571684,
         -0.9900000314478048,
-        -1.4442688877657122
+        -1.4499228650319895
       ],
       "max": [
-        1.8475937307195722,
-        4.282902198085306,
-        2.277890845467356
+        1.9870583400168869,
+        4.3304498290813855,
+        2.484465687339773
       ]
     }
   },
   "provenance_note": "Stage A geometry/preview metrics retained. ReferenceDance is deterministically retargeted from the archived approved rig. Hand-timed adaptation of supplied recording; no recording, audio or MP4 is published. Arms are segmented in-place; recessed joints added without rescaling.",
   "retarget": {
     "script": "experiments/dancing-robot/retarget.mjs",
-    "sha256": "d35875c26d65b3e9fa0a26bb0aae3afda9f703f404d2698ec8784749fc7aec95",
-    "choreography_sha256": "e67be9a5be6b12b026735d78ad621dac8aa322f8ec56f5c5a012b2aa197621c3",
-    "base_sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44"
+    "sha256": "b4e16f2d6c09e021510b712ed3f46f807fd49936d57818178d9b7566b33f6ce2",
+    "choreography_sha256": "083734042317664c7e734cd4ae6e24e84b56a8b5f80b010fca283de73fd0d6ae",
+    "base_sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44",
+    "face_sha256": "f2523dfdadc00d449e634f5961d46470036f1398f744245072e4c6b67d6e56f1",
+    "slices_sha256": "923dea9a21546a881ca08e48e19b16f039b834eb9e0e3cd8bc3208ca30930509"
   }
 }

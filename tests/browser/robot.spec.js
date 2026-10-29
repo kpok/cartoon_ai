@@ -46,7 +46,7 @@ test('reduced motion pauses autoplay and context loss stops rendering',async({pa
 test('timeline seeks to reference gestures while paused and orbit remains usable',async({page})=>{
  await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await page.locator('#dance-toggle').click();
  const seek=async time=>{await page.locator('#dance-time').evaluate((element,value)=>{element.value=value;element.dispatchEvent(new Event('input',{bubbles:true}));},time);};
- await seek(8.9);await expect(canvas).toHaveAttribute('data-time','8.900');await expect(page.locator('#dance-readout')).toContainText('Powitanie');
+ await seek(2);await expect(canvas).toHaveAttribute('data-time','2.000');await expect(page.locator('#dance-readout')).toContainText('Powitanie');
  const wave=await canvas.screenshot();await seek(22.5);await expect(page.locator('#dance-readout')).toContainText('przysiad');
  await expect.poll(async()=>!(await canvas.screenshot()).equals(wave)).toBe(true);
  await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-time','22.500');

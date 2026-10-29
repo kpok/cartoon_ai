@@ -1,10 +1,11 @@
 import * as THREE from '../vendor/three.module.js';
 import {GLTFLoader} from '../vendor/GLTFLoader.js';
+import {createRobotStage} from './robot-stage.js';
 import {DanceClock} from './robot-playback.js';
 import {OrbitControls} from '../vendor/OrbitControls.js';
 const canvas=document.querySelector('#robot-canvas'),preview=document.querySelector('#preview'),status=document.querySelector('#model-status'),viewport=document.querySelector('#viewport');
 const buttons=[...document.querySelectorAll('.tools button')];
-let renderer,controls,model,homePosition,mixer,clock;
+let renderer,controls,model,homePosition,mixer,clock,stage;
 let unavailable=false;
 const exporting=new URLSearchParams(location.search).get('export')==='1';
 if(exporting)document.documentElement.classList.add('robot-export');
@@ -22,7 +23,7 @@ try{
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
  renderer.setPixelRatio(exporting?1:Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
- const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.01,100);
+ const scene=new THREE.Scene();scene.background=new THREE.Color(0x050d18);scene.fog=new THREE.Fog(0x071524,20,65);const camera=new THREE.PerspectiveCamera(35,1,.01,100);
  scene.add(new THREE.HemisphereLight(0xdceeff,0x526083,3));
  for(const [color,intensity,position] of [[0xffffff,5,[3,5,5]],[0x48d8ee,3,[-4,2,2]],[0xff71da,4,[3,2,-3]]]){const light=new THREE.DirectionalLight(color,intensity);light.position.set(...position);scene.add(light);}
  // A procedural studio reflection avoids external HDRI files and image decoders.
@@ -32,24 +33,23 @@ try{
  const pmrem=new THREE.PMREMGenerator(renderer),target=pmrem.fromScene(environment,.1,.1,50);scene.environment=target.texture;pmrem.dispose();
  controls=new OrbitControls(camera,canvas);controls.enableDamping=!exporting;controls.enabled=!exporting;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.92;controls.minPolarAngle=Math.PI*.08;
  let frame=null;
- function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){mixer.setTime(clock.tick(now));syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
+ function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){mixer.setTime(clock.tick(now));stage?.update(clock.time);syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
  controls.addEventListener('change',requestRender);
  document.addEventListener('visibilitychange',()=>{clock?.suspend();if(document.hidden){if(frame!==null)cancelAnimationFrame(frame);frame=null;}else requestRender();});
  function resize(){renderer.setSize(viewport.clientWidth,viewport.clientHeight,false);camera.aspect=viewport.clientWidth/viewport.clientHeight;camera.updateProjectionMatrix();requestRender();}
  new ResizeObserver(resize).observe(viewport);resize();
  canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();if(frame!==null)cancelAnimationFrame(frame);failed();});
  const loader=new GLTFLoader();
- loader.load(new URL('../published/robot/robot.glb?v=rhythm-v3',import.meta.url).href,async gltf=>{
+ loader.load(new URL('../published/robot/robot.glb?v=head-v4',import.meta.url).href,async gltf=>{
   try{
-  const response=await fetch(new URL("../published/robot/manifest.json?v=rhythm-v3",import.meta.url));if(!response.ok)throw new Error("Missing manifest");const manifest=await response.json();cues=manifest.animation.cues;
+  const response=await fetch(new URL("../published/robot/manifest.json?v=head-v4",import.meta.url));if(!response.ok)throw new Error("Missing manifest");const manifest=await response.json();cues=manifest.animation.cues;
   if(unavailable)return;
   if(gltf.animations.length!==1||gltf.animations[0].name!=='ReferenceDance'||Math.abs(gltf.animations[0].duration-40)>.01||manifest.animation.duration!==40||!Array.isArray(cues)){failed();return;}
   model=gltf.scene;mixer=new THREE.AnimationMixer(model);mixer.clipAction(gltf.animations[0]).play();mixer.setTime(0);clock=new DanceClock(gltf.animations[0].duration);
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
   if(!Number.isFinite(size.length())||size.length()===0){failed();return;}
   model.position.sub(center);scene.add(model);
-  const floor=new THREE.Mesh(new THREE.CircleGeometry(2.15,64),new THREE.MeshBasicMaterial({color:0x30405e,transparent:true,opacity:.28,depthWrite:false,side:THREE.DoubleSide}));
-  floor.rotation.x=-Math.PI/2;floor.position.y=box.min.y-center.y-.005;scene.add(floor);
+  stage=createRobotStage(THREE,box.min.y-center.y);scene.add(stage.group);stage.update(0);
   const radius=size.length()/2*1.18,distance=radius/Math.sin(THREE.MathUtils.degToRad(35/2))*1.05;
   homePosition=new THREE.Vector3(distance*.10,radius*.12,distance);
   if(exporting){
@@ -64,16 +64,16 @@ try{
   if(exporting){
    window.renderRobotFrame=time=>{
     if(unavailable||!Number.isFinite(time)||time<0||time>=clock.duration)throw new Error('Invalid robot export frame');
-    clock.seek(time);mixer.setTime(time);syncDance();controls.update();renderer.render(scene,camera);
+    clock.seek(time);mixer.setTime(time);stage.update(time);syncDance();controls.update();renderer.render(scene,camera);
     return {time,width:canvas.width,height:canvas.height};
    };
    window.robotExportReady=true;
   }
   }catch{failed();}
  },undefined,failed);
- timeline.addEventListener('input',()=>{if(!clock||unavailable)return;clock.seek(Number(timeline.value));mixer.setTime(clock.time);syncDance();requestRender();});
+ timeline.addEventListener('input',()=>{if(!clock||unavailable)return;clock.seek(Number(timeline.value));mixer.setTime(clock.time);stage?.update(clock.time);syncDance();requestRender();});
  danceButton.addEventListener('click',()=>{if(!clock||unavailable)return;clock.setPlaying(!clock.playing);syncDance();requestRender();});
- document.querySelector('#dance-restart').addEventListener('click',()=>{if(!clock||unavailable)return;clock.restart();mixer.setTime(0);syncDance();requestRender();});
+ document.querySelector('#dance-restart').addEventListener('click',()=>{if(!clock||unavailable)return;clock.restart();mixer.setTime(0);stage?.update(0);syncDance();requestRender();});
  reducedMotion.addEventListener('change',event=>{if(event.matches&&clock){clock.setPlaying(false);syncDance();requestRender();}});
  document.querySelector('#rotate-left').addEventListener('click',()=>{if(model){model.rotation.y-=Math.PI/8;requestRender();}});
  document.querySelector('#zoom-in').addEventListener('click',()=>{camera.position.multiplyScalar(.85);controls.update();});

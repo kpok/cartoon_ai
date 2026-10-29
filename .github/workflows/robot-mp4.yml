@@ -40,7 +40,7 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - name: Render and validate silent portrait MP4
+      - name: Render revised head motion and validate silent portrait MP4
         run: npm run robot:mp4
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:

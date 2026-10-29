@@ -117,8 +117,9 @@ def validate_glb(path, animated=False):
         duration=40 if animations[0]['name']=='ReferenceDance' else 8
         max_keys=duration*24+1
         clip=animations[0];samplers=clip.get('samplers',[]);channels=clip.get('channels',[])
-        require(1<=len(samplers)<=45 and 1<=len(channels)<=45,'Unbounded animation')
-        allowed={'DanceRoot','TorsoPivot','HeadPivot'}|{side+part+'Pivot' for side in ['Left','Right'] for part in ['Arm','Elbow','Wrist','Hip','Knee','Foot']}
+        require(1<=len(samplers)<=66 and 1<=len(channels)<=66,'Unbounded animation')
+        lids={'LeftLidPivot','RightLidPivot'}
+        allowed={'DanceRoot','TorsoPivot','HeadPivot','SmilePivot','LeftGazePivot','RightGazePivot','LeftBrowPivot','RightBrowPivot'}|lids|{side+part+'Pivot' for side in ['Left','Right'] for part in ['Arm','Elbow','Wrist','Palm','Hip','Knee','Foot']}
         def read_accessor(index, kind):
             require(isinstance(index,int) and 0<=index<len(accessors),'Invalid animation accessor')
             a=accessors[index];require(a['componentType']==5126 and a['type']==kind,'Invalid motion accessor type')
@@ -130,7 +131,7 @@ def validate_glb(path, animated=False):
         for channel in channels:
             target=channel.get('target',{});node=target.get('node');path=target.get('path')
             require(isinstance(node,int) and 0<=node<len(gltf['nodes']) and gltf['nodes'][node].get('name') in allowed,'Unexpected motion target')
-            require(path in {'translation','rotation'} and (node,path) not in seen,'Invalid or duplicate motion channel');seen.add((node,path))
+            require((path in {'translation','rotation'} or (path=='scale' and gltf['nodes'][node].get('name') in lids)) and (node,path) not in seen,'Invalid or duplicate motion channel');seen.add((node,path))
             index=channel.get('sampler');require(isinstance(index,int) and 0<=index<len(samplers),'Invalid motion sampler')
             sampler=samplers[index];interpolation=sampler.get('interpolation','LINEAR')
             require(interpolation in {'LINEAR','STEP'},'Unsupported interpolation')
@@ -139,6 +140,7 @@ def validate_glb(path, animated=False):
             require(len(times)==len(values) and abs(times[0])<1e-5 and abs(times[-1]-duration)<1e-4 and all(a<b for a,b in zip(times,times[1:])),'Invalid dance timeline')
             require(max(abs(a-b) for a,b in zip(values[0],values[-1]))<1e-4,'Dance loop is open')
             if interpolation=='STEP': require(all(max(abs(a-b) for a,b in zip(v,values[0]))<1e-5 for v in values),'Only constant STEP is allowed')
+            if path=='scale': require(all(abs(v[0]-1)<1e-5 and abs(v[2]-1)<1e-5 and .014<=v[1]<=1.001 for v in values),'Only bounded mechanical eyelid scaling is allowed')
             if path=='rotation': require(all(abs(sum(v*v for v in q)-1)<1e-3 for q in values),'Invalid rotation')
         require(len({node for node,_ in seen})>=9,'Missing articulated joints')
     return {'bytes': len(data), 'triangles': triangles, 'meshes': len(meshes)}
