@@ -16,8 +16,7 @@
     "closed arm segment surfaces"
   ],
   "remaining": [
-    "merge main",
-    "Actions MP4 regeneration"
+    "verify Pages deployment"
   ],
   "authorization": "User asks to checkpoint partial work on a separate GitHub branch, then merge automatically once ready.",
   "checks": {
@@ -28,5 +27,6 @@
     "robot_check": "byte-identical",
     "robot_sync": "PASS",
     "workflow_policy": "8 owner-only jobs PASS"
-  }
+  },
+  "mp4": "Deferred by user; workflow is manual-only. Previously auto-triggered run40888063307 cannot be canceled with current connector; user informed."
 }

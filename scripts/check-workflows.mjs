@@ -32,9 +32,8 @@ export function checkPolicy(workflows,pins){
  for(const [file,workflow] of Object.entries(workflows)){
   assert.deepEqual(workflow.permissions,{},`${file}: default token must have no permissions`);
   assert.equal(workflow.concurrency,undefined,'Authorization must happen before concurrency allocation');
-  assert.deepEqual(Object.keys(workflow.on).sort(),(file==='ci.yml'||file==='robot-mp4.yml')?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
+  assert.deepEqual(Object.keys(workflow.on).sort(),file==='ci.yml'?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
   if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main'],'paths-ignore':['**/*.md','docs/**']});
-  if(file==='robot-mp4.yml')assert.deepEqual(workflow.on.push,{branches:['main'],paths:['.github/workflows/robot-mp4.yml']},'Robot export push must be restricted to its own workflow');
   assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','regression','test']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:file==='robot-model.yml'?['generate']:file==='robot-mp4.yml'?['render']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
    const label=`${file}/${name}`;jobs.push({file,name,job});
@@ -57,7 +56,7 @@ export function checkPolicy(workflows,pins){
     }
    }
    for(const event_name of ['push','workflow_dispatch']){
-    assert.equal(evaluateGate(job.if,ownerContext({event_name})),file==='ci.yml'||file==='robot-mp4.yml'||event_name==='workflow_dispatch',`${label}: trusted owner event`);
+    assert.equal(evaluateGate(job.if,ownerContext({event_name})),file==='ci.yml'||event_name==='workflow_dispatch',`${label}: trusted owner event`);
    }
    const denied=[{repository:'attacker/cartoon_ai'},{repository_id:'999'},{repository_owner_id:'999'},{actor_id:'999'},{actor:'collaborator'},{triggering_actor:'collaborator'},{actor:'dependabot[bot]',actor_id:'49699333'},{ref:'refs/heads/feature'},{ref:'refs/tags/main'}];
    for(const event_name of ['pull_request','pull_request_target','issue_comment','workflow_run','workflow_call','repository_dispatch','schedule','release'])denied.push({event_name});

@@ -1,9 +1,9 @@
 # MP4 tańczącego robota
 
 Workflow **Export dancing robot MP4**, plik `.github/workflows/robot-mp4.yml`.
-Pierwszy eksport uruchamia push zmieniający ten konkretny plik na main. Po aktualizacji
-samej animacji można uruchomić **Actions → Export dancing robot MP4 → Run workflow**,
-wybierając main. Zwykłe commity kodu lub dokumentacji nie renderują automatycznie filmu.
+Eksport jest wyłącznie ręczny: **Actions → Export dancing robot MP4 → Run workflow**,
+wybierając main. Użytkownik najpierw ocenia wynik na Pages. Żaden push, nawet zmiana
+tego workflow, nie rozpoczyna automatycznie renderowania filmu.
 Wymagany jest właściciel kpok; bramki konta/repo/ref i token read-only pozostają aktywne.
 
 Wynik: artefakt **dancing-robot-mp4**, dostępny przez7 dni od udanego uruchomienia.

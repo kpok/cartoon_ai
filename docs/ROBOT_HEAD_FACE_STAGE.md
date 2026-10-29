@@ -33,6 +33,6 @@ Nie dołączono nagrania referencyjnego ani jego dźwięku. MP4 nadal jest niemy
 ## Stan dostarczania
 
 Częściowe checkpointy trafiają od razu na gałąź `robot/head-face-ai-ruins`, zgodnie
-z preferencją właściciela. Po sprawdzeniu gałąź jest scalana do main, a zmiana pliku
-workflow robot-mp4.yml uruchamia pełny nowy eksport. Artefakty wcześniejszego workflow
+z preferencją właściciela. Po sprawdzeniu gałąź jest scalana do main. Wynik jest najpierw oceniany na Pages;
+MP4 uruchamiany jest ręcznie dopiero po osobnym poleceniu użytkownika. Artefakty wcześniejszego workflow
 nie aktualizują się: nowy film należy pobrać z nowego uruchomienia.

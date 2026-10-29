@@ -7,8 +7,8 @@ const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',impor
 test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),8);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
-  w=>{w['robot-mp4.yml'].on.push.paths=['**'];},
-  w=>{w['robot-mp4.yml'].on.push.branches=['**'];},
+  w=>{w['robot-mp4.yml'].on.push={branches:['main'],paths:['**']};},
+  w=>{w['robot-mp4.yml'].on.push={branches:['**']};},
   w=>{w['robot-mp4.yml'].jobs.render.if=w['robot-mp4.yml'].jobs.render.if.replace("github.actor_id == '10676481' &&",'');},
   w=>{w['ci.yml'].on.push['paths-ignore'].push('src/**');},
   w=>{w['repo-diagnostics.yml'].on.push={branches:['main']};},

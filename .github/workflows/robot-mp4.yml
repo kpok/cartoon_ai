@@ -1,8 +1,5 @@
 name: Export dancing robot MP4
 on:
-  push:
-    branches: [main]
-    paths: ['.github/workflows/robot-mp4.yml']
   workflow_dispatch:
 permissions: {}
 jobs:
@@ -15,7 +12,7 @@ jobs:
       github.actor == 'kpok' &&
       github.triggering_actor == 'kpok' &&
       github.ref == 'refs/heads/main' &&
-      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+      github.event_name == 'workflow_dispatch'
     permissions:
       contents: read
     concurrency:
