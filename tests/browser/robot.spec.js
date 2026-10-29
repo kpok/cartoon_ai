@@ -12,7 +12,7 @@ test('robot loads locally with orbit controls and preserves story navigation',as
  const binary=await (await page.request.get('/published/robot/robot.glb')).body();
  const jsonLength=binary.readUInt32LE(12),gltf=JSON.parse(binary.subarray(20,20+jsonLength).toString('utf8'));
  const names=gltf.nodes.map(node=>node.name);
- for(const side of ['Left','Right'])for(const part of ['short thigh','knee joint','short shin','rounded foot'])expect(names).toContain(`${side} ${part}`);
+ for(const side of ['Left','Right'])for(const part of ['short thigh','knee joint','short shin','rounded foot'])expect(names).toContain(`${side} ${part}`.replaceAll(" ","_"));
 
  await page.getByRole('button',{name:'Wstrzymaj taniec'}).click();await page.waitForTimeout(300);
  const canvas=page.locator('#robot-canvas'),initial=await canvas.screenshot();
@@ -41,4 +41,14 @@ test('reduced motion pauses autoplay and context loss stops rendering',async({pa
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await expect(canvas).toHaveAttribute('data-playing','false');
  await canvas.evaluate(element=>element.dispatchEvent(new Event('webglcontextlost',{cancelable:true})));
  await expect(canvas).toBeHidden();await expect(page.locator('#preview')).toBeVisible();await expect(page.locator('#dance-toggle')).toBeDisabled();
+});
+
+test('timeline seeks to reference gestures while paused and orbit remains usable',async({page})=>{
+ await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await page.locator('#dance-toggle').click();
+ const seek=async time=>{await page.locator('#dance-time').evaluate((element,value)=>{element.value=value;element.dispatchEvent(new Event('input',{bubbles:true}));},time);};
+ await seek(9.5);await expect(canvas).toHaveAttribute('data-time','9.500');await expect(page.locator('#dance-readout')).toContainText('Powitanie');
+ const wave=await canvas.screenshot();await seek(22.5);await expect(page.locator('#dance-readout')).toContainText('przysiad');
+ await expect.poll(async()=>!(await canvas.screenshot()).equals(wave)).toBe(true);
+ await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-time','22.500');
+ await page.locator('#dance-restart').click();await expect(canvas).toHaveAttribute('data-time','0.000');await expect(page.locator('#dance-time')).toHaveValue('0');
 });

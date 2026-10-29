@@ -113,14 +113,16 @@ def validate_glb(path, animated=False):
     require(0 < triangles <= MAX_TRIANGLES, 'GLB exceeds 100000 triangle budget')
     if animated:
         animations=gltf.get('animations',[])
-        require(len(animations)==1 and animations[0].get('name')=='NeonDance','Expected one NeonDance clip')
+        require(len(animations)==1 and animations[0].get('name') in {'NeonDance','ReferenceDance'},'Expected one supported dance clip')
+        duration=40 if animations[0]['name']=='ReferenceDance' else 8
+        max_keys=duration*24+1
         clip=animations[0];samplers=clip.get('samplers',[]);channels=clip.get('channels',[])
-        require(1<=len(samplers)<=33 and 1<=len(channels)<=33,'Unbounded animation')
-        allowed={'DanceRoot','TorsoPivot','HeadPivot'}|{side+part+'Pivot' for side in ['Left','Right'] for part in ['Arm','Hip','Knee','Foot']}
+        require(1<=len(samplers)<=45 and 1<=len(channels)<=45,'Unbounded animation')
+        allowed={'DanceRoot','TorsoPivot','HeadPivot'}|{side+part+'Pivot' for side in ['Left','Right'] for part in ['Arm','Elbow','Wrist','Hip','Knee','Foot']}
         def read_accessor(index, kind):
             require(isinstance(index,int) and 0<=index<len(accessors),'Invalid animation accessor')
             a=accessors[index];require(a['componentType']==5126 and a['type']==kind,'Invalid motion accessor type')
-            require(2<=a['count']<=193,'Unbounded motion keys')
+            require(2<=a['count']<=max_keys,'Unbounded motion keys')
             view=views[a['bufferView']];width=widths[kind];stride=view.get('byteStride',width*4)
             start=view.get('byteOffset',0)+a.get('byteOffset',0)
             return [struct.unpack_from('<'+'f'*width,binary,start+i*stride) for i in range(a['count'])]
@@ -134,7 +136,7 @@ def validate_glb(path, animated=False):
             require(interpolation in {'LINEAR','STEP'},'Unsupported interpolation')
             times=[t[0] for t in read_accessor(sampler.get('input'),'SCALAR')]
             values=read_accessor(sampler.get('output'),'VEC4' if path=='rotation' else 'VEC3')
-            require(len(times)==len(values) and abs(times[0])<1e-5 and abs(times[-1]-8)<1e-4 and all(a<b for a,b in zip(times,times[1:])),'Invalid dance timeline')
+            require(len(times)==len(values) and abs(times[0])<1e-5 and abs(times[-1]-duration)<1e-4 and all(a<b for a,b in zip(times,times[1:])),'Invalid dance timeline')
             require(max(abs(a-b) for a,b in zip(values[0],values[-1]))<1e-4,'Dance loop is open')
             if interpolation=='STEP': require(all(max(abs(a-b) for a,b in zip(v,values[0]))<1e-5 for v in values),'Only constant STEP is allowed')
             if path=='rotation': require(all(abs(sum(v*v for v in q)-1)<1e-3 for q in values),'Invalid rotation')
@@ -179,7 +181,7 @@ def validate(directory, require_blend=False, published=False):
     require(report.get('license') == 'CC-BY-4.0', 'Missing output license')
     result = {'glb':validate_glb(root/'robot.glb',animated=report['stage']=='B'), 'png':validate_png(root/('preview.png' if published else 'robot.png'))}
     if report['stage']=='B':
-        require(report.get('animation',{}).get('duration')==8 and report['animation'].get('fps')==24,'Invalid dance metadata')
+        require(report.get('animation',{}).get('duration')==40 and report['animation'].get('name')=='ReferenceDance' and report['animation'].get('fps')==24,'Invalid dance metadata')
     if published:
         require(set(report.get('files',{}))=={'robot.glb','preview.png'},'Incomplete asset manifest')
         for name,identity in report['files'].items():

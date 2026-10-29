@@ -12,7 +12,9 @@
     "export:mp4": "node scripts/export-film.mjs",
     "test:export": "node scripts/test-export.mjs",
     "check:workflows": "node scripts/check-workflows.mjs",
-    "pretest": "node scripts/vendor.mjs"
+    "pretest": "node scripts/vendor.mjs",
+    "robot:retarget": "node experiments/dancing-robot/retarget.mjs",
+    "robot:check": "node experiments/dancing-robot/retarget.mjs --check"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

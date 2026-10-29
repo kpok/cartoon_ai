@@ -22,8 +22,8 @@
   "attribution": "Neon Tinker by kpok",
   "files": {
     "robot.glb": {
-      "bytes": 1396220,
-      "sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44"
+      "bytes": 2028012,
+      "sha256": "e92a2ab0ca7d16a7ee0ea1ab1b67ae8b42e51a94f13ce35dd28d6a8d56a1ff8d"
     },
     "preview.png": {
       "bytes": 798668,
@@ -34,11 +34,81 @@
   "source_commit": "193b22b1e5820fcf130d4dbc82e84b962e16f050",
   "source_dirty": true,
   "animation": {
-    "name": "NeonDance",
-    "duration": 8,
+    "name": "ReferenceDance",
+    "duration": 40,
     "fps": 24,
-    "bpm": 120,
-    "music_synchronized": false
+    "reference_timing": true,
+    "music_synchronized": false,
+    "cues": [
+      [
+        0,
+        5.8,
+        "Boczne ruchy głowy"
+      ],
+      [
+        5.8,
+        8.5,
+        "Gesty przy barkach"
+      ],
+      [
+        8.5,
+        11.3,
+        "Powitanie"
+      ],
+      [
+        11.3,
+        17.4,
+        "Kołysanie i zmiana podparcia"
+      ],
+      [
+        17.4,
+        21.6,
+        "Niewidzialna gitara"
+      ],
+      [
+        21.6,
+        23.8,
+        "Sprężysty przysiad"
+      ],
+      [
+        23.8,
+        28.2,
+        "Otwarte dłonie i zbliżenie rąk"
+      ],
+      [
+        28.2,
+        32.2,
+        "Pochylenie i otwarcie ramion"
+      ],
+      [
+        32.2,
+        36.8,
+        "Dłoń na piersi"
+      ],
+      [
+        36.8,
+        40,
+        "Gesty przy twarzy i powrót"
+      ]
+    ],
+    "bounds": {
+      "min": [
+        -1.8455964743314348,
+        -0.9900000314526509,
+        -1.3775397283137676
+      ],
+      "max": [
+        1.8488697658409787,
+        4.282935313926825,
+        1.995595096212392
+      ]
+    }
   },
-  "provenance_note": "Original Stage A geometry/preview metrics retained. Animated GLB recovered byte-for-byte from the previously exported uncommitted dance draft; full motion generator source recovery remains separate. No MP4 is published."
+  "provenance_note": "Stage A geometry/preview metrics retained. ReferenceDance is deterministically retargeted from the archived approved rig. Hand-timed adaptation of supplied recording; no recording, audio or MP4 is published. Arms are segmented in-place; recessed joints added without rescaling.",
+  "retarget": {
+    "script": "experiments/dancing-robot/retarget.mjs",
+    "sha256": "2493c9598d707a3651851833860ab2e136c0b5a1e4218d45c181f38a0934a73d",
+    "choreography_sha256": "aed04062ec2bb103603f37b3406b57604aa4aa602e3d7803975a753e33f8474e",
+    "base_sha256": "a35a7e42fedd1afc78e07a6e2c4d23f5dfee7942a2cc5afdbffcb5ee6945ff44"
+  }
 }
