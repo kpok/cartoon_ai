@@ -90,6 +90,14 @@ def scan(terms=()):
             tagger=re.search(r'^tagger (.*?) <([^>]+)> ',tag,re.M)
             if not tagger or tuple(tagger.groups()) not in IDENTITIES:
                 raise ValueError('unexpected tag identity')
+    # Annotated tags can point to other tags; inspect every reachable tag object.
+    for oid in git('rev-list','--objects','--all','--no-object-names').splitlines():
+        if git('cat-file','-t',oid.decode()).strip()==b'tag':
+            tag=git('cat-file','tag',oid.decode()).decode('utf-8')
+            check_text(tag,terms)
+            tagger=re.search(r'^tagger (.*?) <([^>]+)> ',tag,re.M)
+            if not tagger or tuple(tagger.groups()) not in IDENTITIES:
+                raise ValueError('unexpected nested tag identity')
     commits=git('rev-list','--all').splitlines()
     for commit in commits:
         raw=git('show','-s','--format=%an%x00%ae%x00%cn%x00%ce%x00%B',commit.decode()).decode('utf-8')

@@ -7,7 +7,7 @@ Local additional checkpoint commits increase subsequent scan counts.
 
 Checks on the final implementation working tree:
 - `npm test`:42 passed.
-- Python audit tests with verified Gitleaks:23 passed. Cases include deleted
+- Python audit tests with verified Gitleaks:25 passed. Cases include deleted
   historical content, other branch, annotated tag, shallow clone, unknown identity,
   encoded private terms/emails, GLB/PNG metadata, redacted failure messages,
   merge-only secret, ignorefile bypass, unknown license, modified/new asset and
@@ -31,7 +31,20 @@ branch protection was inaccessible to the integration (403); no claim that branc
 protection is absent. No administrative settings were changed. Required checks and
 optional PRIVATE_TERMS secret must be configured by the owner.
 
-No fresh local browser/MP4 render was run: this change alters audit/docs/notices and
-PNG metadata, not rendering logic. Existing main CI will run the browser/export
-regression after merge. Original reference recording, private audit attachment,
+A fresh local browser run passed all42 tests (1.6m) at original rendering quality.
+CI functional software-WebGL workers are serialized after an initial remote run
+had3 screenshot/navigation timeouts. The assertions and30s timeouts are unchanged.
+No new full-length MP4 was generated for this audit. Original reference recording, private audit attachment,
 private-term inputs and raw scanner findings are excluded from commits.
+
+## Remote delivery
+
+Implementation1642226ea028a92da4b1c741773f7ff716d136a2 fast-forwarded to main.
+Main audit40930005702 succeeded. Film checks/Pages run40930005796: test and deploy
+succeeded. Live served robot manifest equals the audited source. Branch audit
+40929884412 succeeded before merge. Remaining owner actions are administrative
+required-check enforcement and optional PRIVATE_TERMS; no history rewrite performed.
+
+Supplemental coverage: raw reachable commit/tag messages and historical filenames
+are piped privately to a third Gitleaks stdin scan; nested annotated tag metadata
+is also inspected. Commit-message-only secret and nested-tag regressions passed.

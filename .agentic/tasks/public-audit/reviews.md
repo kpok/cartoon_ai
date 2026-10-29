@@ -16,3 +16,14 @@ file, decoded-text checks including encoded emails. Bounded re-review PASS with
 Root subsequently added five license failure tests, merge-only secret coverage,
 and an actual ignored-secret bypass regression. Root verification covers these
 extra tests; they are not represented as independently reviewed tests.
+
+New runtime evidence:3 remote browser timeouts led to a focused independent
+`/root/viewer_timeout_review`. PASS conditional on a full green run; measurements
+showed costly SwiftShader screenshots and no infinite RAF after pause. Root
+reverted the speculative DPR change; only CI worker count changed. Full local42
+browser tests then passed at original quality.
+
+Supplemental scanner review for newly tested metadata-only secrets:
+`/root/audit_code_review` PASS.25 adversarial tests, actual secret wrapper and
+full privacy scan passed; no new blocker and no reviewer edits. This bounded extra
+pass followed a new concrete coverage test, not a reset of AUD01–05 review rounds.

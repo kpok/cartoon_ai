@@ -8,12 +8,17 @@
     "baseline_gitleaks": "passed; no findings",
     "baseline_npm_audit": "0 vulnerabilities",
     "npm_test": "42 passed",
-    "adversarial_audit_tests": "23 passed, verified Gitleaks binary",
+    "adversarial_audit_tests": "25 passed; includes commit-message secret and nested tag",
     "public_audit": "full local pipeline passed including private-term filter, dependency registry and build",
     "robot_checks": "byte-identical GLB; validator and rhythm audit passed",
     "png_cleanup": "both compressed pixel payloads unchanged",
     "branch_ci": "checkpoint7d738a2 public audit success",
-    "admin_read": "rulesets returned empty; branch protection unavailable to integration (403)"
+    "admin_read": "rulesets returned empty; branch protection unavailable to integration (403)",
+    "remote_main_audit": "success:40930005702",
+    "remote_main_unit_and_pages": "test/deploy success:40930005796",
+    "live_pages": "served manifest equals audited source manifest",
+    "local_browser": "42 passed, original rendering quality, CI single worker, 1.6m",
+    "remote_main_regression": "initial run had3 software-rendering timeouts; CI resource fix awaiting fresh main run"
   },
   "limitations": [
     "private text filter requires optional PRIVATE_TERMS repository secret",
@@ -21,5 +26,11 @@
     "no admin settings mutation",
     "no initial-push prevention"
   ],
-  "next_step": "publish final branch; verify remote audit; fast-forward main and verify CI/Pages"
+  "next_step": "merge final scan coverage/CI resource fixes after branch audit; verify fresh main regression",
+  "current_revision": "1642226ea028a92da4b1c741773f7ff716d136a2",
+  "stage_round_counts": {
+    "plan": 1,
+    "implementation_review": 3
+  },
+  "updated_at": "2026-10-29"
 }

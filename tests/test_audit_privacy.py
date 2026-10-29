@@ -39,6 +39,11 @@ class PrivacyTests(unittest.TestCase):
         with self.assertRaises(ValueError):privacy.scan(['SideBranchMarker'])
         self.git('tag','-a','test-tag','-m','PrivateTagMarker')
         with self.assertRaises(ValueError):privacy.scan(['PrivateTagMarker'])
+    def test_nested_tag_message_is_scanned(self):
+        self.git('tag','-a','inner','-m','NestedPrivateMarker')
+        self.git('tag','-a','outer','inner','-m','Public outer tag')
+        self.git('tag','-d','inner')
+        with self.assertRaises(ValueError):privacy.scan(['NestedPrivateMarker'])
     def test_unexpected_identity_and_email_fail(self):
         self.git('config','user.name','Synthetic Person');(self.path/'note.md').write_text('Changed.');self.commit()
         with self.assertRaises(ValueError):privacy.scan()
@@ -114,5 +119,13 @@ class SecretTests(unittest.TestCase):
             wrapped=subprocess.run(['python3',str(ROOT/'scripts/audit-secrets.py')],capture_output=True,text=True)
             self.assertEqual(wrapped.returncode,1);self.assertNotIn(token,wrapped.stdout+wrapped.stderr)
         finally:report.unlink(missing_ok=True)
+
+    @unittest.skipUnless(os.environ.get('GITLEAKS_PATH'),'Run with the verified Gitleaks binary')
+    def test_secret_in_commit_message_is_detected_by_wrapper(self):
+        token='ghp_'+''.join(chr(65+(i*7)%26) for i in range(36))
+        self.git('commit','--allow-empty','-qm','token = "'+token+'"')
+        (self.path/'.security').mkdir();shutil.copyfile(ROOT/'.security/gitleaks.toml',self.path/'.security/gitleaks.toml')
+        run=subprocess.run(['python3',str(ROOT/'scripts/audit-secrets.py')],capture_output=True,text=True)
+        self.assertEqual(run.returncode,1);self.assertNotIn(token,run.stdout+run.stderr)
 
 if __name__=='__main__':unittest.main()
