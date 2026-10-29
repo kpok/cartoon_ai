@@ -26,5 +26,12 @@
     "attribution": "Neon Tinker by kpok",
     "origin": "Procedural project robot; AI-generated visual reference supplied by project owner",
     "review": "technical-provenance-only; animation reference rights not independently cleared"
+  },
+  "docs/images/robot-concept.jpg": {
+    "sha256": "76af87e719ea05b7f708d105ba31e398c0506aa924daee8850b6348d3561c53e",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Concept image generated with ChatGPT; supplied by kpok",
+    "origin": "Owner-supplied ChatGPT-generated concept image used as a visual reference for the procedural robot",
+    "review": "Original supplied image inspected; JPEG with ICC/JFIF, no EXIF. Documentation reference only; no additional reuse license granted or ownership/exclusivity certification."
   }
 }
