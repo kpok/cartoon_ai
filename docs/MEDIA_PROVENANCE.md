@@ -11,7 +11,10 @@
   A source link is attribution/provenance, not a license or proof of permission.
   The link does not imply endorsement or rights clearance for choreography.
 - Robot MP4: silent. No reference music is bundled or downloaded by the exporter.
-- Facebook Reels: the owner reports selecting music in Facebook's Reels editor.
+- Facebook Reels: the owner selected music in Facebook's Reels editor. The audio
+  label shown in the supplied screenshot is **DIGIDI DIGIDI**, credited to
+  **DJ.ILHAM, DJ MIRO**. This records the platform's displayed credit; the exact
+  recording/remix and rights ownership have not been independently verified.
   That platform selection does not establish permission to redistribute the audio
   in this repository, on Pages or in a standalone MP4. Check the particular track,
   account, territory and use (including advertising) under Meta's current terms.
