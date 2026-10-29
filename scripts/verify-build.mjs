@@ -26,7 +26,7 @@ export async function verifyBuild(directory='dist'){
   const references=name.endsWith('.html')?[...text.matchAll(/\b(?:src|href)="([^"]+)"/g)].map(m=>m[1]):name.endsWith('.js')?[...text.matchAll(/\b(?:import|export)\s+(?:[^'";]*?\s+from\s*)?['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]/g)].map(m=>m[1]||m[2]):[...text.matchAll(/url\(\s*['"]?([^'"\s)]+)/g)].map(m=>m[1]);
   for(const reference of references){
    assert.ok(reference.startsWith('./')||reference.startsWith('../'),`${name}: external or absolute dependency ${reference}`);
-   const target=relative(resolve(directory),resolve(directory,dirname(name),reference));
+   const target=relative(resolve(directory),resolve(directory,dirname(name),reference.split(/[?#]/)[0]));
    assert.ok(files.includes(target||'index.html'),`${name}: missing or escaping dependency ${reference}`);
   }
  }
