@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Headless MPFB anatomical pilot. Invoke with Blender --background --python."""
 import argparse
+import hashlib
+import shutil
 import importlib
 import json
 import math
@@ -101,6 +103,16 @@ bpy.ops.object.select_all(action='DESELECT')
 for obj in characters:
     obj.select_set(True)
 rig.select_set(True)
+source_vertices = len(base.data.vertices)
+rig_bones = len(rig.data.bones)
 bpy.ops.export_scene.gltf(filepath=str(out / 'makehuman-pilot.glb'), export_format='GLB', use_selection=True, export_animations=False)
-manifest = {'pilot': 'Single MPFB male; not a reconstruction of the reference couple', 'blender': bpy.app.version_string, 'sourceVertices': len(base.data.vertices), 'rigBones': len(rig.data.bones), 'meshCount': len(characters), 'assets': [skin] + selected, 'seconds': round(time.monotonic() - started, 2), 'device': 'CPU', 'samples': args.samples, 'views': ['front', 'three-quarter', 'side', 'back']}
+# Verify the exported file opens in a fresh scene rather than trusting export alone.
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False)
+bpy.ops.import_scene.gltf(filepath=str(out / 'makehuman-pilot.glb'))
+if len([obj for obj in bpy.context.scene.objects if obj.type == 'MESH']) < 6:
+    raise RuntimeError('GLB roundtrip lost character meshes')
+shutil.copyfile(Path(__file__).with_name('README.md'), out / 'README.md')
+shutil.copyfile(Path(__file__).with_name('inputs.lock.json'), out / 'inputs.lock.json')
+manifest = {'pilot': 'Single MPFB male; not a reconstruction of the reference couple', 'blender': bpy.app.version_string, 'sourceVertices': source_vertices, 'rigBones': rig_bones, 'meshCount': len(characters), 'assets': [skin] + selected, 'assetHashes': {relative: hashlib.sha256((assets / relative).read_bytes()).hexdigest() for relative in [skin] + selected}, 'glbRoundtrip': True, 'seconds': round(time.monotonic() - started, 2), 'device': 'CPU', 'samples': args.samples, 'views': ['front', 'three-quarter', 'side', 'back']}
 (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')

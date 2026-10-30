@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {readWorkflows,checkPolicy,evaluateGate,ownerContext} from '../scripts/check-workflows.mjs';
 const workflows=await readWorkflows();
 const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',import.meta.url),'utf8'));
-test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),10);});
+test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),11);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
   w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='compare')['continue-on-error']=true;},
