@@ -18,7 +18,7 @@ export async function auditLicenses(){
  }
  const assets=await json('.security/assets.json');
  for(const [path,entry] of Object.entries(assets)){
-  assert.ok(!(await lstat(path)).isSymbolicLink());const background=path==='assets/kalinka/red-square-ai.png';const reference=background||path==='docs/images/robot-concept.jpg';
+  assert.ok(!(await lstat(path)).isSymbolicLink());const background=path==='assets/kalinka/red-square-ai.png';const reference=background||path==='docs/images/robot-concept.jpg'||path==='experiments/salsa-human-models/reference/concept.png';
   assert.equal(entry.license,reference?'LicenseRef-All-Rights-Reserved':'CC-BY-4.0');assert.equal(entry.attribution,background?'Kalinka background generated with ChatGPT; supplied by kpok':reference?'Concept image generated with ChatGPT; supplied by kpok':'Neon Tinker by kpok');assert.ok(entry.origin&&entry.review);
   assert.equal(createHash('sha256').update(await readFile(path)).digest('hex'),entry.sha256,'Asset changed; review provenance and metadata');
  }

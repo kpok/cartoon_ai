@@ -40,5 +40,12 @@
     "attribution": "Kalinka background generated with ChatGPT; supplied by kpok",
     "origin": "Generated with ChatGPT image generation on 2026-10-29 for the owner-requested Kalinka background; no source photograph used",
     "review": "Synthetic photorealistic depiction, not a documentary photograph; no additional reuse license or exclusivity certification."
+  },
+  "experiments/salsa-human-models/reference/concept.png": {
+    "sha256": "e6b04a00a361b7f4403e6da51e9e1263acfed2d1e765e23aff201df2acb03205",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Concept image generated with ChatGPT; supplied by kpok",
+    "origin": "Original generated image approved by user in this conversation",
+    "review": "Synthetic fictional adults; original PNG preserved. Documentation/model reference only; no additional reuse license or exclusivity certification."
   }
 }
