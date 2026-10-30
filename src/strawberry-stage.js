@@ -3,8 +3,10 @@ import * as THREE from '../vendor/three.module.js';
 // Original low-poly garden and characters, built from reusable primitive geometry.
 export function createStrawberryStage(canvas) {
  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});
+ if(renderer.getContext().isContextLost()){renderer.dispose();throw new Error('WebGL context is lost');}
  renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,1.5));
  renderer.setClearColor(0xc3e8ef);renderer.outputColorSpace=THREE.SRGBColorSpace;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
  const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xc3e8ef,18,36);
  const camera=new THREE.OrthographicCamera(-3,3,5,-5,.1,60);
