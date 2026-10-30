@@ -44,3 +44,17 @@ Original generated renders: CC BY 4.0, Salsa procedural reconstruction by kpok. 
 - Palette occupancy is a coarse lit-pixel heuristic, not a calibrated source/render color difference. Silhouette comparison to the source is still missing.
 - GLB includes the model only; lighting and floor belong to the viewer.
 - No experiment-specific CI job has been added. Existing main-only workflow restrictions and deployment remain unchanged. Keep PR draft until visual reconstruction and full diagnostics are reviewed.
+
+## GitHub Actions snapshot — stage 1
+
+`Salsa fixed-camera snapshot` runs on owner pushes to this experiment branch and main. It runs the existing repository audit, starts the isolated scene with a fixed 34° camera, captures a **1024×1536 PNG**, and uploads `salsa-fixed-camera-snapshot` for **1 day**. Open the run Summary → Download PNG and camera settings, or download it in the Artifacts section. The ZIP contains `render.png` and `capture.json`.
+
+The upload uses `always()` after a successful audit and capture, so a later validation failure cannot suppress an existing screenshot. A failed audit or failed capture does not publish an artifact. There is no deployment and no similarity gate in stage 1. Stage 2 will add the source/render/difference panel, an explicitly defined percentage metric and a failing threshold of 80%, while retaining the snapshot even when that gate fails.
+
+Local snapshot command, after `prepare.mjs` and Playwright installation:
+
+```sh
+node experiments/salsa-human-models/capture.mjs
+```
+
+The camera is centralized in `camera.js`. It is an approximate reference viewpoint inferred from one image; the original image has no recoverable camera calibration. Snapshot mode changes only page layout, not model geometry or the camera preset.
