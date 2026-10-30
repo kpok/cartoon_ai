@@ -75,3 +75,11 @@ Poniższe wpisy zachowują historyczny przebieg pierwszej wersji (PR #2).
 - Na polecenie użytkownika pominięto kontrolę wizualną w przeglądarce.
 - Uzupełniono wymagany rejestr zasobów o tło AI i hash; brak dodatkowej licencji na ponowne wykorzystanie.
 - Do wykonania: zielony audyt, scalenie PR #2 i potwierdzenie wdrożenia Pages.
+
+## Eksport MP4
+
+W Actions uruchom **Export dancing robot MP4**, wybierz branch `main` i pole
+`dance`: `kalinka` (24 s) albo `original` (40 s). Wynik 720×1280, 24 fps,
+H.264 bez dźwięku jest w artefakcie `dancing-robot-<dance>-mp4` (retencja 1 dzień).
+Kalinka zachowuje automatyczną kamerę. Workflow nadal uruchamia wyłącznie właściciel.
+Lokalnie: `npm run build` oraz `npm run robot:mp4 -- --dance kalinka`.
