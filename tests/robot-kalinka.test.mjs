@@ -25,7 +25,7 @@ test('actual GLB soles and all lower leg geometry stay above the world floor, in
  for(let frame=0;frame<24*60;frame++){
   const t=frame/60,p=v.update(t);v.model.updateMatrixWorld(true);
   for(const mesh of meshes){const min=minimumY(mesh);assert.ok(min>=-1e-6,`${mesh.name} below floor at ${t}: ${min}`);}
-  for(let i=0;i<2;i++){const footBox=new THREE.Box3().setFromObject(v.limbs[i].foot);if(p.legs[i].stance){assert.ok(footBox.min.y<.035,`support floats at ${t}`);contacts++;}
+  for(let i=0;i<2;i++){const actual=v.limbs[i].foot.getWorldPosition(new THREE.Vector3()),target=p.legs[i].world;assert.ok(actual.distanceTo(new THREE.Vector3(target.x,target.y,target.z))<.003,`ankle misses physical target at ${t}`);const footBox=new THREE.Box3().setFromObject(v.limbs[i].foot);if(p.legs[i].stance){assert.ok(footBox.min.y<.035,`support floats at ${t}`);contacts++;}
    if(p.flight>.9)maxFlight=Math.max(maxFlight,footBox.min.y);
   }
  }assert.ok(contacts>200);assert.ok(maxFlight>1);

@@ -19,3 +19,8 @@ anchoredstances, nearstraightactualknees, costume/backcoverage, all4facingdirect
 longer20.7-unitroute and invisiblemovementbounds. Removedallnearstageposts/lamps so no
 props suggest a movementenclosure. Tightenedthe kickendpointto1.675 for clear nearfullreach.
 Finalsnapshot/checkpoint awaitingbrowser and independentreview evidence.
+
+
+Contactpolish: raised deep-squat hipheight by.07 so the widecoats/slime do not force a
+visible2.6cmrootcorrection. Measuredactualankle-targeterror now<.00153, with an independent
+worldspace test asserting<.003 over the wholeloop. Groundtolerance itself is unchanged.
