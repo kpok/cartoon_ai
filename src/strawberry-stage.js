@@ -22,7 +22,7 @@ export function createStrawberryStage(canvas) {
  const block=(p,c,x,y,z,sx,sy,sz)=>mesh(p,box,c,[x,y,z],[sx,sy,sz]);
  const group=(parent)=>{const g=new THREE.Group();parent.add(g);return g;};
  function curve(parent,points,color,radius=.025){const geometry=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),20,radius,6,false);return mesh(parent,geometry,color,[0,0,0],[1,1,1]);}
- const ground=block(scene,0x8fbe83,0,-.2,0,80,.38,80);ground.receiveShadow=true;
+ const ground=block(scene,0x8fbe83,0,-.2,10,80,.38,30);ground.receiveShadow=true;
  const lawn=ball(scene,0xabcf8c,0,-.1,0,4,.18,3.8);lawn.receiveShadow=true;
  // A quiet garden backdrop frames the action without imported textures.
  for(let i=0;i<15;i++){const x=(i-7)*.55;block(scene,0xf9e3bd,x,.65,-3.7,.43,1.5,.13);ball(scene,0xf9e3bd,x,1.42,-3.7,.215,.18,.065);}
