@@ -84,3 +84,13 @@ python3 -m venv /tmp/salsa-image-comparison
 ```
 
 A below-threshold result intentionally returns exit code 1. Blank, malformed, absent or wrong-size inputs also fail; they write error JSON and Summary when the output directory is writable. If capture or audit itself fails, there is no valid new snapshot to publish.
+
+## Detailed geometry checkpoint
+
+The second model iteration adds continuous curved limbs and trouser profiles, fitted cloth surfaces with fine folds, shaped faces and facial features, curved wavy/curl hair strands, dress ruffles and straps, shirt collars/buttons/placket, bent fingers with nails, and detailed shoes/sandals. These are mesh surfaces, not image textures. Frenet frames prevent ring twisting; bend-radius limits prevent inside-out elbow surfaces. Every interior sweep ring is checked for outward normals, and every transformed vertex is checked against the frozen capture camera.
+
+Geometry positions are inferred from manually measured reference image coordinates at selected depths. Those coordinates are unprojected through the **unchanged** camera. The separate manual landmark report now largely reports construction targets; it must not be presented as independent accuracy validation. The actual source/render pixel comparison remains independent of those target constants.
+
+The revised model occupies about2.18 world units vertically versus the original prototype's roughly1.85, matching more of the source frame. The old arbitrary `<2` geometry bound was replaced by `<2.3` plus a stricter actual-vertex no-clipping test; camera parameters were not changed. Lighting, reference image, metric weights, regions and threshold are unchanged.
+
+Known limitations: stylized facial anatomy and hair, imperfect clothing joins and silhouette, inferred depth/back surfaces, and plain studio background. This iteration is not a finished realistic reconstruction. The three-view golden-render baseline and review PNGs were intentionally refreshed after visual inspection; the reference-comparison test itself is unchanged.

@@ -62,6 +62,8 @@ jobs:
         run: |
           printf '## Salsa fixed-camera snapshot\n\n[Download PNG and camera settings](%s)\n\n1024 × 1536 PNG; static front camera; Chromium / SwiftShader.\n\nThe PNG remains available even when the separate 80%% reference-comparison gate fails.\n\nArtifact retention: 1 day.\n' "$SNAPSHOT_URL" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Validate detailed model geometry
+        run: node --test tests/salsa-model.test.mjs
       - name: Install isolated image-comparison dependency
         run: |
           python3 -m venv "$RUNNER_TEMP/salsa-image-comparison"

@@ -44,3 +44,9 @@ One reference cannot reveal occluded anatomy or back surfaces. These must be inf
 - Reports: source/render/difference triptych, differencePNG, metricsJSON with hashes/camera and Markdown summary. One-day artifact uploads even after compare failure; original snapshot already uploaded independently.
 
 - Review follow-up: full-frame-only score could exceed80% after erasing one test subject (80.18%). Added fixed full/left/right regions, using the minimum component score and the same80 threshold. No image alignment, trained detector, hand-tuned subject mask or weight change. Regression test now asserts missing-subject failure. Metric remains spatial/technical and cannot guarantee semantic completeness.
+
+## Detail iteration after user request
+- Added continuous swept limb/leg geometry, rotation-minimizing transported frames, curvature-limited radius, fitted torso/cloth surfaces, shaped capped faces, detailed facial features, curved hair, skirt layers, bent fingers/nails and footwear details.
+- Reference placement uses measured image-coordinate landmarks at inferred depths through unchanged camera. The landmark-offset report is therefore a construction diagnostic, not independent validation. Actual image-comparison algorithm/weights/regions/reference/camera/lighting remain unchanged.
+- Independent review found false-positive AABB framing check and7 locally inverted normals in tight bends. Replaced AABB check with projection of every actual world vertex; transport and bend-radius fixes are covered across every interior ring/side. Detailed-geometry check also added to Actions after snapshot publication, preserving artifact on subsequent failure.
+- Browser front/side/rear inspection, mobile layout and GLB export rerun. Review PNGs and golden coarse-render baseline deliberately refreshed for this geometry; provenance hashes updated. Source similarity gate remains fixed80 and is expected to fail until reconstruction improves further.
