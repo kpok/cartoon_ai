@@ -24,3 +24,11 @@ Finalsnapshot/checkpoint awaitingbrowser and independentreview evidence.
 Contactpolish: raised deep-squat hipheight by.07 so the widecoats/slime do not force a
 visible2.6cmrootcorrection. Measuredactualankle-targeterror now<.00153, with an independent
 worldspace test asserting<.003 over the wholeloop. Groundtolerance itself is unchanged.
+
+
+Finalruntime271367b: independentreviewPASS;9targetedgeometrytests independentlyrerun;
+dense1mssweepcontinuous andrepeatableseeking; maxankle-targeterror.00149.
+All55Node tests,26auditregressions(withGitleaks), build37-fileinventory, licensegate,
+owner-onlyworkflowpolicy, publishedrobotvalidation andoriginaldancechecks PASS.
+Full58-case desktop/mobilebrowserregressionPASS (3.3min). UIprose/docs-onlychanges afterruntime review;
+no behaviorchanges. BranchpublicauditPASS at271367b.

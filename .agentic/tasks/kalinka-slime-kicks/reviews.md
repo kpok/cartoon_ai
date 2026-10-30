@@ -7,4 +7,5 @@ independently rerun; dense1mssampling showedcontinuousposes andexactbackwardseek
 Maximumankle/targeterror.02632 fromfloorcorrection was optional, notblocking.
 Finalcontactrefinementraisesminimumhipheight by.07 toclearbulkybootsinsquats;
 measuredworsterrorreducedto.00153. Added<.003actualtargetregressiontest.
-Finalboundedreviewandbroadbrowserverificationpending.
+FinalboundedindependentreviewPASS at271367b:9/9tests, dense1mssweepcontinuous,
+maxankle-targeterror.00149. No requiredfindings. Full58-casebrowserverificationPASS.

@@ -1,5 +1,18 @@
 # Eksperyment Kalinka — stan prac
 
+## Najnowsza korekta — szlam, wyprostowane wykopy i obroty (PR #7)
+
+- Najpierw dodano różowy i niebieski szlam na tył głowy, plecy, tułów i kończyny.
+- Cholewki mają widoczną skórzaną osłonę; zastąpione metalowe golenie są ukryte w wariancie.
+- Podciągnięcie kolana i wyprost do przodu są osobnymi fazami; test mierzy rzeczywisty kąt kolana.
+- Kroki przyspieszono o 50%; nieregularna trasa ma 16 punktów i około 20,7 jednostki długości.
+- Postać pokazuje przód, oba boki i plecy; kamera nie niweluje obrotów robota.
+- Ograniczenie ruchu istnieje wyłącznie w matematyce. Bruk jest ciągły, bez słupków i oznaczeń.
+- Kontrola rzeczywistych wierzchołków butów zastępuje nadmiernie duże obrócone obwiednie.
+- Szczegóły postępu i testów: `.agentic/tasks/kalinka-slime-kicks/`.
+
+Poniżej zachowano poprzednie etapy.
+
 ## Aktualny etap — energiczna choreografia i plac 3D (PR #6)
 
 - Branch: `fix/kalinka-energy-stage`; częste checkpointy kodu i postępu.
