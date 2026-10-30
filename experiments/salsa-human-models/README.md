@@ -14,7 +14,7 @@ node experiments/salsa-human-models/prepare.mjs
 node experiments/salsa-human-models/serve.mjs
 ```
 
-Open http://127.0.0.1:3001/ — redirects to the isolated experiment. Drag to orbit, use reference/side/rear camera buttons, or download the static GLB. No production build or Pages changes are required. Exporter code is derived locally from the locked MIT Three.js package; upstream notice remains in vendor/THREE-LICENSE.txt.
+Open http://127.0.0.1:3001/ — redirects to the isolated experiment. Drag to orbit, use reference/side/rear camera buttons, or download the static GLB. No production build or Pages changes are required. Exporter and MarchingCubes code are derived locally from the locked MIT Three.js package; upstream notice remains in vendor/THREE-LICENSE.txt.
 
 ## Verify
 
@@ -107,4 +107,14 @@ The comparison artifact now also includes full-resolution `reference-cropped.png
 
 This geometry iteration improves cascading dress layers, neckline/slit closure, wavy hair volume and tousled curls, shirt proportions and button/placket alignment, trouser material color, waist/pocket/seam details and knee folds. These remain stylized modeled surfaces; no reference pixels are used on the models and the plain background/lighting are unchanged.
 
-Latest local results for this iteration: **v2 paired crop33.4162% →34.5677%** (+1.1515 percentage points), and the separate **v1 full-image37.5126% →38.4419%**. Both comparisons use their own consistent frame before/after. Neither meets80%, and neither is a percent-likeness claim. New materials were calibrated against fixed clothing patches in the reference, not by changing scene lighting or using reference textures.
+Earlier framing iteration (b4ffce4): **v2 paired crop33.4162% →34.5677%** (+1.1515 percentage points), and the separate **v1 full-image37.5126% →38.4419%**. Both comparisons use their own consistent frame before/after. Neither meets80%, and neither is a percent-likeness claim. New materials were calibrated against fixed clothing patches in the reference, not by changing scene lighting or using reference textures.
+
+## Visual continuity correction from owner preview
+
+The latest iteration targets the visible assembly seams rather than chasing image-score percentages: one continuous skin mesh for head/neck; smooth torso radii; sleeves copied from the exact arm surface with thin cuff rims; smaller hands; finer hair strands over modeled hair volume; tucked upper-thigh starts; and a single continuous trouser surface instead of overlapping capped pelvis/leg lofts. Shoe proportions and visible laces were corrected as well.
+
+Trousers are built once from a bounded64³ field using the existing locked MIT Three.js MarchingCubes addon. Only the used result is copied to an ordinary indexed BufferGeometry, welded, stripped of collapsed triangles and tiny disconnected internal shells, and given fresh normals. The field and construction meshes are discarded before export. Tests require one connected component, closed edges, outward volume, no zero-area triangles, unit normals, both calves present, and every vertex inside the frozen crop. Garment stitching is attached by ray intersection to the final surface. No photograph texture or camera/metric change is used.
+
+**Honest result:** the immediate previous PR model scored34.5677%; this continuity-focused iteration scores34.1109% (a regression of0.4568 percentage points). It improves visible assembly defects but does not improve the pixel-similarity gate. The report now explicitly includes the immediate previous iteration from `reference/iteration-baseline.json`, separately from the older initial crop baseline33.4162%; the latter must not conceal this regression. Threshold80% remains unchanged, so this is still a draft prototype.
+
+`npm test` now runs the experiment preparation first to generate the ignored local MarchingCubes module from the installed locked package. Production build contents remain unchanged. The separate-head/neck and intersecting-trouser approach was replaced, but stylized faces, hair, clothing and pose inaccuracies remain; this is not a finished realistic reconstruction.

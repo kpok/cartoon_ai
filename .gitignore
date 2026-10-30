@@ -22,3 +22,5 @@ __pycache__/
 # Generated local salsa experiment dependencies and diagnostics
 experiments/salsa-human-models/exporter.js
 experiments/salsa-human-models/output/
+
+experiments/salsa-human-models/marching.js

@@ -103,6 +103,21 @@ class ComparisonTests(unittest.TestCase):
             result = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_report_discloses_regression_from_immediate_previous_model(self):
+        with tempfile.TemporaryDirectory() as directory:
+            directory = Path(directory)
+            render = Image.new('RGB', (1024, 1536), 'white')
+            draw = ImageDraw.Draw(render)
+            for y in range(0, 1536, 24):
+                draw.rectangle((0, y, 1023, y+11), fill='black')
+            render.save(directory/'render.png')
+            result = subprocess.run([sys.executable, str(SCRIPT), '--render', str(directory/'render.png'), '--output', str(directory)], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1)
+            metrics = json.loads((directory/'metrics.json').read_text())
+            self.assertLess(metrics['previousIteration']['deltaPercentagePoints'], 0)
+            self.assertEqual(metrics['previousIteration']['modelCommit'], 'b4ffce409a68b6e7c675512ca730381842580fad')
+            self.assertIn('Immediate previous PR model', (directory/'summary.md').read_text())
+
     def test_cli_invalid_input_reports_error(self):
         with tempfile.TemporaryDirectory() as directory:
             directory = Path(directory)

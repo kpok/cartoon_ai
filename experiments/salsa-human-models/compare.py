@@ -106,6 +106,14 @@ def main():
             result['sceneViewerSha256'] = hashlib.sha256((ROOT/'viewer.js').read_bytes()).hexdigest()
             result['cropBaseline'] = {'modelCommit': baseline['modelCommit'], 'scorePercent': baseline['scorePercent'], 'deltaPercentagePoints': result['scorePercent']-baseline['scorePercent']}
             baseline_note = f"Same-crop previous geometry: {baseline['scorePercent']:.4f}%; geometry delta: {result['scorePercent']-baseline['scorePercent']:+.4f} percentage points.\n\n"
+        iteration_path = ROOT/'reference/iteration-baseline.json'
+        if result['sha256']['reference'] == FRAMING['sourceSha256'] and iteration_path.exists():
+            previous = json.loads(iteration_path.read_text())
+            if previous['framing'] != FRAMING:
+                raise ValueError('Previous-iteration framing mismatch')
+            delta = result['scorePercent']-previous['scorePercent']
+            result['previousIteration'] = {'modelCommit': previous['modelCommit'], 'scorePercent': previous['scorePercent'], 'deltaPercentagePoints': delta}
+            baseline_note += f"Immediate previous PR model: {previous['scorePercent']:.4f}%; current iteration delta: {delta:+.4f} percentage points.\n\n"
         capture = args.render.parent/'capture.json'
         if capture.exists():
             result['capture'] = json.loads(capture.read_text())

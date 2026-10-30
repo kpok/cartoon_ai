@@ -49,21 +49,21 @@
     "review": "Synthetic fictional adults; original PNG preserved. Documentation/model reference only; no additional reuse license or exclusivity certification."
   },
   "experiments/salsa-human-models/review/front.png": {
-    "sha256": "c8828b67c29555c10b9c68fdbfaadd5b119bbb05e50db13bb73e4c36b6e9a05a",
+    "sha256": "6b887dfffc6335a012bff21c847ed0489b0367b79440d106c8a4ddaf53bfa896",
     "license": "CC-BY-4.0",
     "attribution": "Salsa procedural reconstruction by kpok",
     "origin": "Screenshot of original code-generated Three.js geometry; no image textures or third-party model assets",
     "review": "Stylized prototype, not photographic likeness. Generated locally with Chromium/SwiftShader."
   },
   "experiments/salsa-human-models/review/side.png": {
-    "sha256": "12c794713f239d2209c456eac9432f22c381528bfbe707f8633ad80ef66af80a",
+    "sha256": "f6d92388d82e4d07944189732e4613e4524842796a7d9344d17e1a814432195c",
     "license": "CC-BY-4.0",
     "attribution": "Salsa procedural reconstruction by kpok",
     "origin": "Screenshot of original code-generated Three.js geometry; no image textures or third-party model assets",
     "review": "Stylized prototype, not photographic likeness. Generated locally with Chromium/SwiftShader."
   },
   "experiments/salsa-human-models/review/rear.png": {
-    "sha256": "4aba9348e22678618d4f53133198cc66b87589b45ff40fb9de20b0eb0c7d7b26",
+    "sha256": "8f5f6868328fdadd0e00d76b7a7731306e224a211d6549a13a0620fbc86e25f2",
     "license": "CC-BY-4.0",
     "attribution": "Salsa procedural reconstruction by kpok",
     "origin": "Screenshot of original code-generated Three.js geometry; no image textures or third-party model assets",
