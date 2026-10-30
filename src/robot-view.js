@@ -33,10 +33,10 @@ function failed(){
 try{
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
  renderer.setPixelRatio(exporting?1:Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
- renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=kalinka?1.05:1.25;
  const scene=new THREE.Scene();scene.background=new THREE.Color(0x083d27);scene.fog=new THREE.Fog(0x0b4c30,24,75);const camera=new THREE.PerspectiveCamera(35,1,.01,100);
  if(kalinka){scene.background=new THREE.Color(0x9fc3dc);scene.fog=null;renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;}
- scene.add(new THREE.HemisphereLight(0xdceeff,0x526083,3));
+ scene.add(new THREE.HemisphereLight(0xdceeff,0x526083,kalinka?1.8:3));
  for(const [color,intensity,position] of [[0xffffff,5,[3,5,5]],[0x48d8ee,3,[-4,2,2]],[0xff71da,4,[3,2,-3]]]){const light=new THREE.DirectionalLight(color,kalinka?intensity*.55:intensity);light.position.set(...position);if(kalinka&&color===0xffffff){light.position.set(-4,9,7);light.castShadow=true;light.shadow.mapSize.set(1024,1024);Object.assign(light.shadow.camera,{left:-7,right:7,top:9,bottom:-5,near:.1,far:30});light.shadow.normalBias=.015;}scene.add(light);}
  // A procedural studio reflection avoids external HDRI files and image decoders.
  const environment=new THREE.Scene();environment.background=new THREE.Color('#6c7c9b');

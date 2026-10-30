@@ -28,8 +28,8 @@ export function kalinkaPose(time){
   let x=ax+(bx-ax)*u+Math.sin(root.yaw)*kick*.98,z=az+(bz-az)*u+Math.cos(root.yaw)*kick*.98;
   let y=KALINKA_SOLE+jump+lift*(.22+.22*clamp(squat));
   // At the jump apex both legs open sideways, with soles level in world space.
-  const sx=root.x+side*(.33+1.05*split)*Math.cos(root.yaw),sz=root.z-side*(.33+1.05*split)*Math.sin(root.yaw)-.04;
-  x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+.65*split,flight);
+  const sx=root.x+side*(.33+1.63*split)*Math.cos(root.yaw),sz=root.z-side*(.33+1.63*split)*Math.sin(root.yaw)-.04;
+  x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+1.26*split,flight);
   const dx=x-root.x,dz=z-root.z;
   return {x:Math.cos(root.yaw)*dx-Math.sin(root.yaw)*dz-side*.33,
    y:y-(height+KALINKA_SOLE+jump),z:Math.sin(root.yaw)*dx+Math.cos(root.yaw)*dz+.04,
@@ -76,6 +76,7 @@ export function createKalinka(model,THREE){
  const box=new THREE.Box3();
  function update(time){
   const pose=kalinkaPose(time);root.position.set(pose.root.x,pose.height+KALINKA_SOLE+pose.jump+.1,pose.root.z);root.rotation.set(0,pose.root.yaw,0);
+  for(const side of ['Left','Right']){const lid=model.getObjectByName(side+'LidPivot');if(lid)lid.scale.y=.015+.95*Math.max(0,1-Math.abs((pose.time%4.8)-4.2)/.12);}
   torso.rotation.set(.025*Math.sin(pose.time*Math.PI*2),0,pose.lean);head.rotation.set(0,.025*Math.sin(pose.time*Math.PI),-pose.lean*.6);
   limbs.forEach(({hip,knee,foot,arm,elbow,wrist},i)=>{
    const {x,y,z}=pose.legs[i],a=.858,b=.832,d=clamp(Math.hypot(x,y,z),.15,a+b-.001),radial=Math.hypot(x,y);

@@ -2,7 +2,7 @@ import {kalinkaPose} from './robot-kalinka.js';
 
 export function kalinkaCameraPose(time,aspect=1){
  const p=kalinkaPose(time),phase=p.time*Math.PI/12;
- const distance=Math.max(13.8,5.2/Math.max(.4,aspect));
+ const distance=Math.max(13.8,7.9/Math.max(.4,aspect));
  const yaw=.10*Math.sin(phase)+.035*Math.sin(phase*3);
  const target={x:p.root.x*.50,y:3.05+p.flight*.15,z:p.root.z*.5};
  return {target,position:{x:target.x+Math.sin(yaw)*distance,y:target.y+1.65+.35*Math.sin(phase),z:target.z+Math.cos(yaw)*distance}};
@@ -16,8 +16,8 @@ export async function createKalinkaStage(THREE){
  function mesh(name,g,m,x,y,z){const o=new THREE.Mesh(g,m);o.name=name;o.position.set(x,y,z);group.add(o);o.castShadow=true;o.receiveShadow=true;return o;}
  const base=material(new THREE.MeshStandardMaterial({color:0x777572,roughness:1}));
  const floor=mesh('Kalinka_Ground',geometry(new THREE.PlaneGeometry(100,100)),base,0,-.04,0);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
- const stone=material(new THREE.MeshStandardMaterial({color:0xc5bdb0,roughness:.92}));
- const rows=66,columns=48,paving=new THREE.InstancedMesh(geometry(new THREE.BoxGeometry(.43,.035,.28)),stone,rows*columns);
+ const stone=material(new THREE.MeshStandardMaterial({color:0x98958f,roughness:.92}));
+ const rows=176,columns=88,paving=new THREE.InstancedMesh(geometry(new THREE.BoxGeometry(.43,.035,.28)),stone,rows*columns);
  paving.name='Kalinka_Individual_Paving_Stones';paving.receiveShadow=true;
  const matrix=new THREE.Matrix4(),color=new THREE.Color();let seed=97531,index=0;
  const random=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};

@@ -28,7 +28,8 @@ test('actual GLB soles and all lower leg geometry stay above the world floor, in
    if(p.flight>.9)maxFlight=Math.max(maxFlight,footBox.min.y);
   }
  }assert.ok(contacts>200);assert.ok(maxFlight>1);
- v.update(11);for(const l of v.limbs){const b=new THREE.Box3().setFromObject(l.foot);assert.ok(b.min.y>1.5,'split must clearly clear the ground');}
+ v.update(11);assert.ok(Math.abs(v.limbs[0].foot.getWorldPosition(new THREE.Vector3()).x-v.limbs[1].foot.getWorldPosition(new THREE.Vector3()).x)>3.7,'aerial split must open almost horizontally');for(const l of v.limbs){const b=new THREE.Box3().setFromObject(l.foot);assert.ok(b.min.y>1.5,'split must clearly clear the ground');}
+ assert.ok(v.model.getObjectByName('LeftLidPivot').scale.y<.02,'eyes must remain open outside blinks');
  assert.notEqual(v.model.getObjectByName('Kalinka_Ushanka_Crown').geometry.type,'BoxGeometry');
  v.dispose();
 });
@@ -45,4 +46,12 @@ test('planted feet remain anchored while the robot travels and rotates; seeking 
 
 test('camera movement is gentle, loops and preserves room on narrow screens',()=>{
  for(const aspect of [.5,.85,1.57]){let previous=kalinkaCameraPose(0,aspect);for(let t=.01;t<24;t+=.01){const p=kalinkaCameraPose(t,aspect);for(const k of ['x','y','z'])assert.ok(Math.abs(p.position[k]-previous.position[k])<.03);previous=p;}assert.deepEqual(kalinkaCameraPose(0,aspect),kalinkaCameraPose(24,aspect));}
+});
+
+
+test('actual visible robot fits drone frames across travel, kicks and split jumps',async()=>{
+ const v=await variant(),bounds=new THREE.Box3(),part=new THREE.Box3(),point=new THREE.Vector3();
+ for(const aspect of [.5625,.85,1.57])for(let t=0;t<24;t+=.25){v.update(t);bounds.makeEmpty();v.model.traverseVisible(o=>{if(o.isMesh)bounds.union(part.setFromObject(o));});const p=kalinkaCameraPose(t,aspect),camera=new THREE.PerspectiveCamera(40,aspect,.05,150);camera.position.set(p.position.x,p.position.y,p.position.z);camera.lookAt(p.target.x,p.target.y,p.target.z);camera.updateMatrixWorld(true);
+  for(const x of [bounds.min.x,bounds.max.x])for(const y of [bounds.min.y,bounds.max.y])for(const z of [bounds.min.z,bounds.max.z]){point.set(x,y,z).project(camera);assert.ok(Math.abs(point.x)<.97&&Math.abs(point.y)<.97,`clipped at ${t}, aspect ${aspect}: ${point.x}, ${point.y}`);}
+ }v.dispose();
 });
