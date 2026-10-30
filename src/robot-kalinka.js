@@ -45,7 +45,7 @@ export function kalinkaPose(time){
    y+=(height+KALINKA_SOLE+jump-drop-y)*weight;
   }
   // First tuck the ankle under the raised knee, then unfold to near full leg reach.
-  kickTarget(.25,.35,fold);kickTarget(1.66,.20,extension);
+  kickTarget(.25,.35,fold);kickTarget(1.675,.20,extension);
   const sx=root.x+side*(.33+1.63*split)*Math.cos(root.yaw),sz=root.z-side*(.33+1.63*split)*Math.sin(root.yaw)-.04;
   x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+1.16*split,flight);
   const dx=x-root.x,dz=z-root.z;

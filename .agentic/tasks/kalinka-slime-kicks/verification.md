@@ -12,3 +12,10 @@ carry glossycyan/pink drips; high leatherbootshafts are visible with old shin sk
 No originalGLB, dependencies, externalimages, workflowpermissions or otheranimations changed.
 Next: actual knee/contact/reach/loop/turn/framing tests -> focusedbrowser -> independentreview
 -> fullregression -> finalevidence checkpoint -> merge -> mainCI/Pages/liveverification.
+
+
+Current physical validation: all9targetedtests PASS, including truevertexfloorcontacts,
+anchoredstances, nearstraightactualknees, costume/backcoverage, all4facingdirections,
+longer20.7-unitroute and invisiblemovementbounds. Removedallnearstageposts/lamps so no
+props suggest a movementenclosure. Tightenedthe kickendpointto1.675 for clear nearfullreach.
+Finalsnapshot/checkpoint awaitingbrowser and independentreview evidence.
