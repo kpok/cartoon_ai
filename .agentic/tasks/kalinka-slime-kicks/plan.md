@@ -22,4 +22,4 @@ AC-008 unit/actualgeometry/browser tests, independentreview, branch/mainCI andli
 Plan: costume+boots checkpoint -> movement/turns/kicks checkpoint -> focusedphysicaltests and
 visualQA -> review/fixes -> fullregression -> finalcheckpointevidence -> merge -> Pages/livecheck.
 Assumption: fixedseed irregularmovement and24srepeatabletimeline remain; userjudgesvisualstyle.
-Status: analysisREADY, independentplanreviewrunning, startingcostumefirst.
+Status: analysisREADY, independentplanreviewPASS with actualknee/contact/framing conditions. Costume-first slice implemented; movement unchanged in this checkpoint.

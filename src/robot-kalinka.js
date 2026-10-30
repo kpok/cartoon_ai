@@ -1,3 +1,4 @@
+import {decorateKalinkaSlime} from './kalinka-costume.js';
 // Deterministic travelling dance. One scene unit is one nominal metre on the square.
 export const KALINKA_DURATION=24;
 export const KALINKA_SOLE=.24;
@@ -65,12 +66,16 @@ export function createKalinka(model,THREE){
   const hip=model.getObjectByName(side+'HipPivot'),knee=model.getObjectByName(side+'KneePivot'),foot=model.getObjectByName(side+'FootPivot');
   for(const [pivot,next] of [[hip,knee],[knee,foot]])for(const child of pivot.children){child.position.y*=2.6;if(child!==next&&child.isMesh)child.scale.y*=2.6;}
   knee.position.set(0,-.858,0);foot.position.set(0,-.832,0);
-  piece(knee,side+'_Kalinka_Boot_Shaft',new THREE.CylinderGeometry(.19,.225,.65,24),leather,0,-.47,0);
-  piece(knee,side+'_Kalinka_Boot_Cuff',new THREE.TorusGeometry(.195,.035,8,24),leather,0,-.15,0).rotation.x=Math.PI/2;
-  piece(knee,side+'_Kalinka_Boot_Buckle',new THREE.BoxGeometry(.10,.07,.035),stitch,0,-.36,.22);
+  for(const child of knee.children)if(child.isMesh&&/short_shin|shin_candy_inset/.test(child.name))child.visible=false;
+  piece(knee,side+'_Kalinka_Boot_Shaft',new THREE.CylinderGeometry(.265,.25,.74,28),leather,0,-.43,0);
+  piece(knee,side+'_Kalinka_Boot_Seam',new THREE.CylinderGeometry(.012,.012,.61,8),stitch,.25,-.43,0);
+  piece(knee,side+'_Kalinka_Boot_Cuff',new THREE.TorusGeometry(.267,.045,8,28),stitch,0,-.08,0).rotation.x=Math.PI/2;
+  piece(knee,side+'_Kalinka_Boot_Buckle',new THREE.BoxGeometry(.12,.085,.045),stitch,0,-.30,.265);
   for(const child of foot.children)if(child.isMesh)child.material=leather;
   return {hip,knee,foot,arm:model.getObjectByName(side+'ArmPivot'),elbow:model.getObjectByName(side+'ElbowPivot'),wrist:model.getObjectByName(side+'WristPivot')};
  });
+ model.updateMatrixWorld(true);
+ const slime=decorateKalinkaSlime(model,THREE);
  const qz=new THREE.Quaternion(),qx=new THREE.Quaternion(),axisX=new THREE.Vector3(1,0,0),axisY=new THREE.Vector3(0,1,0),axisZ=new THREE.Vector3(0,0,1),desired=new THREE.Quaternion();
  const bootMeshes=[];for(const limb of limbs)limb.hip.traverse(o=>{if(o.isMesh)bootMeshes.push(o);});
  const box=new THREE.Box3();
@@ -93,5 +98,5 @@ export function createKalinka(model,THREE){
   return pose;
  }
  update(0);
- return {update,root,limbs,dispose(){geometries.forEach(g=>g.dispose());for(const m of [leather,felt,fur,stitch])m.dispose();}};
+ return {update,root,limbs,slime,dispose(){slime.dispose();geometries.forEach(g=>g.dispose());for(const m of [leather,felt,fur,stitch])m.dispose();}};
 }
