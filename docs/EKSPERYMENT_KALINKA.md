@@ -1,5 +1,21 @@
 # Eksperyment Kalinka — stan prac
 
+## Aktualny etap — energiczna choreografia i plac 3D (PR #6)
+
+- Branch: `fix/kalinka-energy-stage`; częste checkpointy kodu i postępu.
+- Dopasowana, zaokrąglona uszatka z podszyciem i szwem; otwarte oczy z mruganiem.
+- Skoczne kroki od początku, sprężyste wykopy, ruch rąk i dwa szybkie skoki ze szpagatem.
+- Powtarzalna, nieregularna trasa środka postaci w obszarze około 3×3 jednostki sceny.
+- Prawdziwy bruk 3D, cienie kontaktowe, latarnie i słupki; daleki obraz AI jako scenografia.
+- Delikatna kamera automatyczna; przeciągnięcie lub przyciski widoku przełączają na ręczną.
+- Przycisk „Kamera: ręczna/automatyczna” ponownie włącza ruch. Ograniczenie ruchu wyłącza autoplay.
+- Testy obejmują rzeczywistą geometrię butów i nóg, podparcie bez poślizgu, pełny kadr i pętlę.
+- Oryginalny robot, pobierany GLB i pozostałe cztery kafelki zostają zachowane. Bez nowego MP4.
+- Szczegóły kontroli i dalsze kroki: `.agentic/tasks/kalinka-energy/` oraz PR #6.
+
+Poniższe wpisy zachowują historyczny przebieg pierwszej wersji (PR #2).
+
+
 ## Cel i kryteria
 - Osobny wariant tego samego robota z dłuższymi nogami.
 - Przysiady i naprzemienne wykopy; podgląd GitHub Pages.

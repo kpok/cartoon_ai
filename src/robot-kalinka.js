@@ -15,7 +15,7 @@ export function kalinkaPose(time){
  const t=wrap(Number.isFinite(time)?time:0),root=kalinkaTravel(t),beat=t*2,beatPhase=beat-Math.floor(beat);
  const squat=window(t,2.5,3.2,9.2,10)+window(t,12.5,13.2,17.2,18);
  let flight=0,split=0;
- for(const start of [10,18]){const u=(t-start)/2;if(u>=0&&u<=1){flight=Math.sin(Math.PI*u)**2;split=window(u,0,.35,.65,1);}}
+ for(const start of [10,18]){const u=(t-start-.4)/1.2;if(u>=0&&u<=1){flight=Math.sin(Math.PI*u)**2;split=window(u,0,.35,.65,1);}}
  const hop=(1-clamp(squat))*.18*Math.sin(Math.PI*beatPhase)**2;
  const jump=flight*1.05+hop*(1-flight);
  const height=1.46-.60*clamp(squat)+.055*Math.sin(Math.PI*beatPhase)**2;
