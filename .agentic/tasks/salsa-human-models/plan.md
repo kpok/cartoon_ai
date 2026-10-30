@@ -23,3 +23,10 @@ One reference cannot reveal occluded anatomy or back surfaces. These must be inf
 ## Progress / resume
 - Branch created; approved original copied locally. Models and checks not yet implemented.
 - Next: preserve provenance, publish first checkpoint and open PR.
+
+## 2026-10-30 continuation checkpoint
+- Implemented procedural static couple, isolated browser viewer, camera presets, GLB download, bounded local preview validation, finite-geometry test, coarse render regression baseline and palette occupancy diagnostics.
+- AC-001 preserved; AC-002 partial (stylized geometry, substantial anatomical/clothing/reference deviations); AC-003 implemented; AC-004 partial (three landmark offsets and render regression, source silhouette comparison still missing); AC-005 updated.
+- Evidence: 57/57 Node tests, production build (37-file inventory) and license gate passed locally. Browser validation passed desktop captures, GLB download and mobile overflow. Full pre-existing browser suite not rerun. No CI/deployment success claimed for this branch.
+- Independent implementation review identified root URL dependency resolution and unbounded preview startup/cleanup defects; both repaired. Review also correctly identified incomplete reference fidelity and diagnostic coverage; these remain explicitly open.
+- Next: replace primitive anatomical/clothing surfaces with continuous shaped meshes, align actual reference landmarks and silhouette, inspect new renders, extend diagnostic comparisons, then review experiment CI integration without changing trusted main-only deployment restrictions. Do not merge merely to preview.

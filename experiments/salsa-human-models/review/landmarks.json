@@ -1,0 +1,38 @@
+{
+  "purpose": "Manual reference landmark diagnostic, not likeness or identity score",
+  "metrics": {
+    "womanHead": {
+      "reference": [
+        0.347,
+        0.143
+      ],
+      "projected": [
+        0.22458413002229455,
+        0.25927136102277937
+      ],
+      "normalizedDistance": 0.16883327461282027
+    },
+    "manHead": {
+      "reference": [
+        0.579,
+        0.096
+      ],
+      "projected": [
+        0.7413823588867955,
+        0.20146838787428417
+      ],
+      "normalizedDistance": 0.19362750661628764
+    },
+    "joinedHands": {
+      "reference": [
+        0.576,
+        0.297
+      ],
+      "projected": [
+        0.5498637869502783,
+        0.42393366003525257
+      ],
+      "normalizedDistance": 0.12959651107389242
+    }
+  }
+}
