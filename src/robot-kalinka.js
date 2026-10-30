@@ -1,3 +1,4 @@
+import {decorateKalinkaSlime} from './kalinka-costume.js';
 // Deterministic travelling dance. One scene unit is one nominal metre on the square.
 export const KALINKA_DURATION=24;
 export const KALINKA_SOLE=.24;
@@ -9,34 +10,52 @@ const window=(t,a,b,c,d)=>smooth((t-a)/(b-a))*(1-smooth((t-c)/(d-c)));
 // Seeded once, never randomized during rendering or seeking.
 let seed=48271;
 const random=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
-export const KALINKA_ROUTE=Array.from({length:8},()=>({x:(random()*2-1)*1.2,z:(random()*2-1)*1.2}));
-export function kalinkaTravel(time){const t=wrap(time),i=Math.floor(t/3),u=(t%3)/3,a=KALINKA_ROUTE[i],b=KALINKA_ROUTE[(i+1)%8];return {x:blend(a.x,b.x,u),z:blend(a.z,b.z,u),yaw:.26*Math.sin(t*Math.PI/12)+.08*Math.sin(t*Math.PI/4)};}
+export const KALINKA_ROUTE=[];
+for(let i=0;i<16;i++){
+ let point;for(let attempt=0;attempt<100;attempt++){
+  point={x:(random()*2-1)*1.28,z:(random()*2-1)*1.28};
+  const previous=KALINKA_ROUTE.at(-1),distance=previous?Math.hypot(point.x-previous.x,point.z-previous.z):1;
+  if(distance>.75&&distance<1.75)break;
+ }KALINKA_ROUTE.push(point);
+}
+export function kalinkaTravel(time){
+ const t=wrap(time),i=Math.floor(t/1.5),u=(t%1.5)/1.5,a=KALINKA_ROUTE[i],b=KALINKA_ROUTE[(i+1)%16],phase=t*Math.PI/12;
+ return {x:blend(a.x,b.x,u),z:blend(a.z,b.z,u),yaw:Math.PI*(1-Math.cos(phase))+.10*Math.sin(phase*3)};
+}
+const angleMix=(a,b,u)=>a+Math.atan2(Math.sin(b-a),Math.cos(b-a))*smooth(u);
 export function kalinkaPose(time){
- const t=wrap(Number.isFinite(time)?time:0),root=kalinkaTravel(t),beat=t*2,beatPhase=beat-Math.floor(beat);
+ const t=wrap(Number.isFinite(time)?time:0),root=kalinkaTravel(t),speed=1.5,beat=t*3,beatPhase=beat-Math.floor(beat);
  const squat=window(t,2.5,3.2,9.2,10)+window(t,12.5,13.2,17.2,18);
  let flight=0,split=0;
  for(const start of [10,18]){const u=(t-start-.4)/1.2;if(u>=0&&u<=1){flight=Math.sin(Math.PI*u)**2;split=window(u,0,.35,.65,1);}}
- const hop=(1-clamp(squat))*.18*Math.sin(Math.PI*beatPhase)**2;
+ const hop=(1-clamp(squat))*.22*Math.sin(Math.PI*beatPhase)**2;
  const jump=flight*1.05+hop*(1-flight);
- const height=1.46-.60*clamp(squat)+.055*Math.sin(Math.PI*beatPhase)**2;
+ const height=1.35-.45*clamp(squat)+.07*Math.sin(Math.PI*beatPhase)**2;
  const legs=[0,1].map(i=>{
-  const side=i===0?-1:1,cycle=t+i*.5,start=Math.floor(cycle)-i*.5,phase=cycle-Math.floor(cycle),swing=clamp((phase-.5)*2);
-  const a=kalinkaTravel(start),b=kalinkaTravel(start+1),u=smooth(swing);
+  const side=i===0?-1:1,cycle=t*speed+i*.5,start=(Math.floor(cycle)-i*.5)/speed,phase=cycle-Math.floor(cycle),swing=clamp((phase-.5)*2);
+  const a=kalinkaTravel(start),b=kalinkaTravel(start+1/speed),u=smooth(swing);
   const ax=a.x+side*.33*Math.cos(a.yaw)-.04*Math.sin(a.yaw),az=a.z-side*.33*Math.sin(a.yaw)-.04*Math.cos(a.yaw);
   const bx=b.x+side*.33*Math.cos(b.yaw)-.04*Math.sin(b.yaw),bz=b.z-side*.33*Math.sin(b.yaw)-.04*Math.cos(b.yaw);
-  const lift=Math.sin(Math.PI*swing),kick=clamp(squat)*lift*lift;
-  let x=ax+(bx-ax)*u+Math.sin(root.yaw)*kick*.98,z=az+(bz-az)*u+Math.cos(root.yaw)*kick*.98;
-  let y=KALINKA_SOLE+jump+lift*(.22+.22*clamp(squat));
-  // At the jump apex both legs open sideways, with soles level in world space.
+  const lift=Math.sin(Math.PI*swing),fold=clamp(squat)*window(swing,0,.14,.26,.42),extension=clamp(squat)*window(swing,.28,.54,.65,1);
+  let x=ax+(bx-ax)*u,z=az+(bz-az)*u,y=KALINKA_SOLE+jump+lift*.28;
+  function kickTarget(forward,drop,weight){
+   const lx=side*.33,lz=forward-.04;
+   x+=(root.x+lx*Math.cos(root.yaw)+lz*Math.sin(root.yaw)-x)*weight;
+   z+=(root.z-lx*Math.sin(root.yaw)+lz*Math.cos(root.yaw)-z)*weight;
+   y+=(height+KALINKA_SOLE+jump-drop-y)*weight;
+  }
+  // First tuck the ankle under the raised knee, then unfold to near full leg reach.
+  kickTarget(.25,.35,fold);kickTarget(1.675,.20,extension);
   const sx=root.x+side*(.33+1.63*split)*Math.cos(root.yaw),sz=root.z-side*(.33+1.63*split)*Math.sin(root.yaw)-.04;
-  x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+1.26*split,flight);
+  x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+1.16*split,flight);
   const dx=x-root.x,dz=z-root.z;
   return {x:Math.cos(root.yaw)*dx-Math.sin(root.yaw)*dz-side*.33,
    y:y-(height+KALINKA_SOLE+jump),z:Math.sin(root.yaw)*dx+Math.cos(root.yaw)*dz+.04,
-   world:{x,y,z},yaw:blend(a.yaw,b.yaw,swing),stance:phase<=.5&&jump<.025&&flight<.01};
+   world:{x,y,z},yaw:angleMix(angleMix(a.yaw,b.yaw,swing),root.yaw,extension),
+   stance:phase<=.5&&jump<.025&&flight<.01,fold,extension};
  });
- return {time:t,root,height,jump,flight,split,squat:clamp(squat),legs,lean:.035*Math.sin(t*Math.PI*2),
-  armSpread:.65+.35*Math.sin(t*Math.PI*2)+1.15*flight,armSwing:.45*Math.sin(t*Math.PI*2),
+ return {time:t,root,height,jump,flight,split,squat:clamp(squat),legs,lean:.045*Math.sin(t*Math.PI*3),
+  armSpread:.7+.4*Math.sin(t*Math.PI*3)+1.15*flight,armSwing:.6*Math.sin(t*Math.PI*3),
   mode:flight>.15?'split':squat>.5?'kicks':'hops'};
 }
 
@@ -65,15 +84,19 @@ export function createKalinka(model,THREE){
   const hip=model.getObjectByName(side+'HipPivot'),knee=model.getObjectByName(side+'KneePivot'),foot=model.getObjectByName(side+'FootPivot');
   for(const [pivot,next] of [[hip,knee],[knee,foot]])for(const child of pivot.children){child.position.y*=2.6;if(child!==next&&child.isMesh)child.scale.y*=2.6;}
   knee.position.set(0,-.858,0);foot.position.set(0,-.832,0);
-  piece(knee,side+'_Kalinka_Boot_Shaft',new THREE.CylinderGeometry(.19,.225,.65,24),leather,0,-.47,0);
-  piece(knee,side+'_Kalinka_Boot_Cuff',new THREE.TorusGeometry(.195,.035,8,24),leather,0,-.15,0).rotation.x=Math.PI/2;
-  piece(knee,side+'_Kalinka_Boot_Buckle',new THREE.BoxGeometry(.10,.07,.035),stitch,0,-.36,.22);
+  for(const child of knee.children)if(child.isMesh&&/short_shin|shin_candy_inset/.test(child.name))child.visible=false;
+  piece(knee,side+'_Kalinka_Boot_Shaft',new THREE.CylinderGeometry(.265,.25,.74,28),leather,0,-.43,0);
+  piece(knee,side+'_Kalinka_Boot_Seam',new THREE.CylinderGeometry(.012,.012,.61,8),stitch,.25,-.43,0);
+  piece(knee,side+'_Kalinka_Boot_Cuff',new THREE.TorusGeometry(.267,.045,8,28),stitch,0,-.08,0).rotation.x=Math.PI/2;
+  piece(knee,side+'_Kalinka_Boot_Buckle',new THREE.BoxGeometry(.12,.085,.045),stitch,0,-.30,.265);
   for(const child of foot.children)if(child.isMesh)child.material=leather;
   return {hip,knee,foot,arm:model.getObjectByName(side+'ArmPivot'),elbow:model.getObjectByName(side+'ElbowPivot'),wrist:model.getObjectByName(side+'WristPivot')};
  });
+ model.updateMatrixWorld(true);
+ const slime=decorateKalinkaSlime(model,THREE);
  const qz=new THREE.Quaternion(),qx=new THREE.Quaternion(),axisX=new THREE.Vector3(1,0,0),axisY=new THREE.Vector3(0,1,0),axisZ=new THREE.Vector3(0,0,1),desired=new THREE.Quaternion();
- const bootMeshes=[];for(const limb of limbs)limb.hip.traverse(o=>{if(o.isMesh)bootMeshes.push(o);});
- const box=new THREE.Box3();
+ const bootMeshes=[];for(const limb of limbs)limb.hip.traverse(o=>{if(o.isMesh&&o.visible)bootMeshes.push(o);});
+
  function update(time){
   const pose=kalinkaPose(time);root.position.set(pose.root.x,pose.height+KALINKA_SOLE+pose.jump+.1,pose.root.z);root.rotation.set(0,pose.root.yaw,0);
   for(const side of ['Left','Right']){const lid=model.getObjectByName(side+'LidPivot');if(lid)lid.scale.y=.015+.95*Math.max(0,1-Math.abs((pose.time%4.8)-4.2)/.12);}
@@ -87,11 +110,11 @@ export function createKalinka(model,THREE){
    foot.quaternion.copy(hip.quaternion).multiply(knee.quaternion).invert().multiply(desired);
    const side=i===0?-1:1;arm.rotation.set(-.45+side*pose.armSwing,0,side*(pose.armSpread));elbow.rotation.set(-.55-.3*(1-pose.flight),0,0);wrist.rotation.set(.1,0,side*.15*Math.sin(pose.time*Math.PI*2));
   });
-  // The targets use the sole offset, but validate real geometry as the final floor guard.
-  model.updateMatrixWorld(true);let min=Infinity;for(const mesh of bootMeshes){box.setFromObject(mesh);min=Math.min(min,box.min.y);}
+  // Measure rendered vertices: rotated bounding boxes overestimate curved boot volume.
+  model.updateMatrixWorld(true);let min=Infinity;for(const mesh of bootMeshes){const points=mesh.geometry.attributes.position,e=mesh.matrixWorld.elements;for(let j=0;j<points.count;j++)min=Math.min(min,e[1]*points.getX(j)+e[5]*points.getY(j)+e[9]*points.getZ(j)+e[13]);}
   if(min<0){root.position.y-=min;model.updateMatrixWorld(true);}
   return pose;
  }
  update(0);
- return {update,root,limbs,dispose(){geometries.forEach(g=>g.dispose());for(const m of [leather,felt,fur,stitch])m.dispose();}};
+ return {update,root,limbs,slime,dispose(){slime.dispose();geometries.forEach(g=>g.dispose());for(const m of [leather,felt,fur,stitch])m.dispose();}};
 }

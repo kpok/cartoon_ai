@@ -4,7 +4,8 @@ import {readFile} from 'node:fs/promises';
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {kalinkaPose,kalinkaTravel,createKalinka,KALINKA_DURATION} from '../src/robot-kalinka.js';
-import {kalinkaCameraPose} from '../src/kalinka-stage.js';
+import {createKalinkaStage,kalinkaCameraPose} from '../src/kalinka-stage.js';
+function minimumY(mesh){const point=new THREE.Vector3(),positions=mesh.geometry.attributes.position;let min=Infinity;for(let i=0;i<positions.count;i++)min=Math.min(min,point.fromBufferAttribute(positions,i).applyMatrix4(mesh.matrixWorld).y);return min;}
 async function variant(){const d=await readFile(new URL('../published/robot/robot.glb',import.meta.url)),g=await new GLTFLoader().parseAsync(d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength),'');const m=new THREE.AnimationMixer(g.scene);m.clipAction(g.animations[0]).play();m.setTime(0);m.stopAllAction();return {model:g.scene,...createKalinka(g.scene,THREE)};}
 
 test('Kalinka follows a bounded irregular loop with reachable legs, kicks, hops and two aerial splits',()=>{
@@ -20,11 +21,11 @@ test('Kalinka follows a bounded irregular loop with reachable legs, kicks, hops 
 
 test('actual GLB soles and all lower leg geometry stay above the world floor, including split and landing',async()=>{
  const v=await variant(),box=new THREE.Box3();let maxFlight=0,contacts=0;
- const meshes=[];for(const l of v.limbs)l.hip.traverse(o=>{if(o.isMesh)meshes.push(o);});
+ const meshes=[];for(const l of v.limbs)l.hip.traverse(o=>{if(o.isMesh&&o.visible)meshes.push(o);});
  for(let frame=0;frame<24*60;frame++){
   const t=frame/60,p=v.update(t);v.model.updateMatrixWorld(true);
-  for(const mesh of meshes){box.setFromObject(mesh);assert.ok(box.min.y>=-1e-6,`${mesh.name} below floor at ${t}: ${box.min.y}`);}
-  for(let i=0;i<2;i++){const footBox=new THREE.Box3().setFromObject(v.limbs[i].foot);if(p.legs[i].stance){assert.ok(footBox.min.y<.035,`support floats at ${t}`);contacts++;}
+  for(const mesh of meshes){const min=minimumY(mesh);assert.ok(min>=-1e-6,`${mesh.name} below floor at ${t}: ${min}`);}
+  for(let i=0;i<2;i++){const actual=v.limbs[i].foot.getWorldPosition(new THREE.Vector3()),target=p.legs[i].world;assert.ok(actual.distanceTo(new THREE.Vector3(target.x,target.y,target.z))<.003,`ankle misses physical target at ${t}`);const footBox=new THREE.Box3().setFromObject(v.limbs[i].foot);if(p.legs[i].stance){assert.ok(footBox.min.y<.035,`support floats at ${t}`);contacts++;}
    if(p.flight>.9)maxFlight=Math.max(maxFlight,footBox.min.y);
   }
  }assert.ok(contacts>200);assert.ok(maxFlight>1);
@@ -36,8 +37,8 @@ test('actual GLB soles and all lower leg geometry stay above the world floor, in
 
 test('planted feet remain anchored while the robot travels and rotates; seeking restores skeleton',async()=>{
  const v=await variant(),point=new THREE.Vector3();
- for(const [a,b,index] of [[4.02,4.24,0],[4.52,4.74,1],[14.02,14.24,0]]){
-  v.update(a);const first=v.limbs[index].foot.getWorldPosition(point).clone();v.update(b);const second=v.limbs[index].foot.getWorldPosition(point).clone();
+ for(const [a,b,index] of [[4.02,4.24,0],[4.36,4.56,1],[14.02,14.24,0]]){
+  assert.ok(kalinkaPose(a).legs[index].stance&&kalinkaPose(b).legs[index].stance,'sample only the planted interval');v.update(a);const first=v.limbs[index].foot.getWorldPosition(point).clone();v.update(b);const second=v.limbs[index].foot.getWorldPosition(point).clone();
   assert.ok(first.distanceTo(second)<.002,`planted foot slides ${first.distanceTo(second)}`);
  }
  const snapshot=t=>{v.update(t);return v.limbs.map(l=>[...l.hip.quaternion.toArray(),...l.foot.getWorldPosition(new THREE.Vector3()).toArray()]);};
@@ -54,4 +55,29 @@ test('actual visible robot fits drone frames across travel, kicks and split jump
  for(const aspect of [.5625,.85,1.57])for(let t=0;t<24;t+=.25){v.update(t);bounds.makeEmpty();v.model.traverseVisible(o=>{if(o.isMesh)bounds.union(part.setFromObject(o));});const p=kalinkaCameraPose(t,aspect),camera=new THREE.PerspectiveCamera(40,aspect,.05,150);camera.position.set(p.position.x,p.position.y,p.position.z);camera.lookAt(p.target.x,p.target.y,p.target.z);camera.updateMatrixWorld(true);
   for(const x of [bounds.min.x,bounds.max.x])for(const y of [bounds.min.y,bounds.max.y])for(const z of [bounds.min.z,bounds.max.z]){point.set(x,y,z).project(camera);assert.ok(Math.abs(point.x)<.97&&Math.abs(point.y)<.97,`clipped at ${t}, aspect ${aspect}: ${point.x}, ${point.y}`);}
  }v.dispose();
+});
+
+
+test('each forward kick raises a folded knee then straightens nearly fully in the robot frame',async()=>{
+ const v=await variant(),fold=[0,0],straight=[0,0];
+ for(let t=3.3;t<9;t+=1/120){const p=v.update(t);for(let i=0;i<2;i++){
+  if(p.legs[i].fold>.95){assert.ok(v.limbs[i].knee.rotation.x>2.2,'tucked knee must visibly fold');fold[i]++;}
+  if(p.legs[i].extension>.99){assert.ok(v.limbs[i].knee.rotation.x<.36,'extended knee must nearly straighten');assert.ok(p.legs[i].z>1.6&&Math.abs(p.legs[i].y)<.25,'whole leg reaches forward');straight[i]++;}
+ }}assert.ok(fold.every(n=>n>10)&&straight.every(n=>n>10));v.dispose();
+});
+
+test('costume covers back and limbs with both glossy slime colors and high unobscured boots',async()=>{
+ const v=await variant();for(const region of ['Head_Back','Torso_All_Sides','Left_Upper_Arm','Right_Upper_Arm','Left_Forearm','Right_Forearm','Left_Thigh','Right_Thigh','Waist'])for(const color of ['Cyan','Pink']){const mesh=v.model.getObjectByName(`Kalinka_Slime_${region}_${color}`);assert.ok(mesh?.visible);assert.ok(mesh.material.clearcoat>.9&&mesh.material.roughness<.25);}
+ for(const side of ['Left','Right']){const shaft=v.model.getObjectByName(side+'_Kalinka_Boot_Shaft');assert.ok(shaft.visible&&shaft.geometry.parameters.height>.7&&shaft.geometry.parameters.radiusTop>.25);assert.equal(v.model.getObjectByName(side+'_short_shin').visible,false);}
+ v.dispose();
+});
+
+test('travel covers more ground and presents front, both sides and back without visible movement bounds',()=>{
+ let length=0,last=kalinkaTravel(0);const directions=new Set();for(let t=.01;t<24;t+=.01){const p=kalinkaTravel(t);length+=Math.hypot(p.x-last.x,p.z-last.z);directions.add(((Math.round(p.yaw/(Math.PI/2))%4)+4)%4);last=p;}assert.ok(length>16,'run over a substantially longer irregular route');assert.equal(directions.size,4);
+});
+
+
+test('movement limits have no rendered markers or small floor edge',async()=>{
+ const stage=await createKalinkaStage(THREE);const names=[];stage.group.traverse(o=>{names.push(o.name);assert.ok(!o.isBoxHelper&&!o.isGridHelper&&!o.isLine,'no rendered movement boundary');});
+ assert.ok(!names.some(n=>/Bollard|Boundary|Limit|Fence/.test(n)));const ground=stage.group.getObjectByName('Kalinka_Ground');assert.ok(ground.geometry.parameters.width>=100&&ground.geometry.parameters.height>=100);stage.dispose();
 });

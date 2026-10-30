@@ -27,3 +27,11 @@ test('Kalinka export frames remain deterministic with their own camera and durat
  const canvas=page.locator('#robot-canvas');await page.evaluate(()=>window.renderRobotFrame(11));const split=await canvas.screenshot();await page.evaluate(()=>window.renderRobotFrame(4));expect((await canvas.screenshot()).equals(split)).toBe(false);await page.evaluate(()=>window.renderRobotFrame(11));expect((await canvas.screenshot()).equals(split)).toBe(true);
  await expect(page.evaluate(()=>window.renderRobotFrame(24))).rejects.toThrow('Invalid robot export frame');
 });
+
+
+test('faster turning dance renders distinct front, straight-kick and slime-covered back views',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('/robot.html?dance=kalinka&export=1');await page.waitForFunction(()=>window.robotExportReady===true);const canvas=page.locator('#robot-canvas');
+ const render=async t=>{await page.evaluate(t=>window.renderRobotFrame(t),t);return canvas.screenshot();};
+ const front=await render(0),kick=await render(3.52),back=await render(6),otherSide=await render(8);
+ expect(front.equals(kick)).toBe(false);expect(back.equals(front)).toBe(false);expect(otherSide.equals(back)).toBe(false);expect((await render(6)).equals(back)).toBe(true);
+});

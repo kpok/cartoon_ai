@@ -1,0 +1,39 @@
+{
+  "task_id": "kalinka-slime-kicks",
+  "repository": "kpok/cartoon_ai",
+  "baseline_revision": "77e15858dd4f671f34c54d7b9a3967730bd8e4a0",
+  "runtime_revision": "271367bcec6cd8c5dac0040510c69a605ebcf81b",
+  "phase": "VERIFY",
+  "status": "in_progress",
+  "branch": "fix/kalinka-slime-kicks",
+  "pr": 7,
+  "acceptance_criteria": [
+    "AC-001",
+    "AC-002",
+    "AC-003",
+    "AC-004",
+    "AC-005",
+    "AC-006",
+    "AC-007",
+    "AC-008"
+  ],
+  "checks": {
+    "node": 55,
+    "targeted_geometry": 9,
+    "audit_regressions": 26,
+    "browser_full": "PASS, 58/58 desktop/mobile cases (3.3min)",
+    "independent_review": "PASS including final contact refinement",
+    "branch_audit": "PASS at271367b"
+  },
+  "next_step": "Wait evidence-checkpoint audit; merge PR7; verify mainCI and live Pages.",
+  "authorized_actions": [
+    "checkpoint",
+    "pull_request",
+    "merge",
+    "pages_deployment"
+  ],
+  "limitations": [
+    "No new MP4",
+    "Far AI matte remains flat; movement area has no rendered markers"
+  ]
+}

@@ -223,3 +223,9 @@ Stopy są zakotwiczone podczas podparcia; buty sprawdzamy względem podłogi na 
 Automatyczna kamera porusza się delikatnie nad brukiem 3D. Przeciągnięcie obrazu wyłącza ją;
 przycisk kamery włącza ponownie. Daleka architektura pozostaje pojedynczym obrazem AI,
 a nie odtworzonym otoczeniem 360°. Preferencja ograniczenia ruchu wyłącza autoplay.
+
+
+Aktualizacja „Kalinki”: różowy i niebieski szlam obejmuje też plecy i kończyny,
+wysokie cholewki są wyraźne, a wykop rozwija się od podciągniętego kolana do niemal
+prostej nogi skierowanej do przodu. Szybsze kroki, dłuższa nieregularna trasa i obroty
+pokazują wszystkie strony robota. Obszar ruchu nie ma widocznych granic ani słupków.
