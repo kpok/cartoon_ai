@@ -12,5 +12,11 @@
     "sha256": "b50c69cea33cce250ca49d838079904da7fb84a21943f3cb7fc5a9bb3e0165f8",
     "codeLicense": "GPL-3.0-or-later",
     "coreAssetsLicense": "CC0-1.0"
+  },
+  "systemAssets": {
+    "url": "https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+    "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+    "license": "CC0-1.0",
+    "source": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html"
   }
 }
