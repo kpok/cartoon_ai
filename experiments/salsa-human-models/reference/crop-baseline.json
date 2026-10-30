@@ -1,0 +1,65 @@
+{
+  "regions": {
+    "fullFrame": {
+      "ssim": 0.3549596735953389,
+      "edgeF1": 0.3975568117132339,
+      "scorePercent": 36.77388150307074
+    },
+    "leftHalf": {
+      "ssim": 0.3929186326342266,
+      "edgeF1": 0.4194375300059373,
+      "scorePercent": 40.08743018457398
+    },
+    "rightHalf": {
+      "ssim": 0.31700071455645124,
+      "edgeF1": 0.37420469066785605,
+      "scorePercent": 33.41619073898727
+    }
+  },
+  "scorePercent": 33.41619073898727,
+  "modelCommit": "5824beee7bdf329eba9ef49df8aa5109a0384286",
+  "framing": {
+    "version": "subject-frame-v1",
+    "sourceSize": [
+      1024,
+      1536
+    ],
+    "sourceSha256": "e6b04a00a361b7f4403e6da51e9e1263acfed2d1e765e23aff201df2acb03205",
+    "cropBox": [
+      80,
+      24,
+      912,
+      1368
+    ],
+    "analysisSize": [
+      208,
+      336
+    ],
+    "selection": "Fixed manual rectangle around both complete reference figures, including hair and shoes, with a small margin. No per-render alignment or score-driven crop selection.",
+    "coordinateSemantics": "[left, top, rightExclusive, bottomExclusive] in original image pixels"
+  },
+  "renderSha256": "5d84807dfa2c10807be9b27e863cfb18bb976c3c409462c5f6ec65293890de7d",
+  "note": "Previous geometry evaluated under the new fixed crop BEFORE geometry changes; not an improvement claim.",
+  "algorithm": "salsa-reference-v2-paired-crop",
+  "camera": {
+    "fov": 34,
+    "aspect": 0.6666666666666666,
+    "near": 0.01,
+    "far": 30,
+    "position": [
+      0,
+      1.12,
+      4.3
+    ],
+    "target": [
+      0,
+      0.92,
+      0
+    ],
+    "width": 1024,
+    "height": 1536
+  },
+  "sceneSourceCommit": "5824beee7bdf329eba9ef49df8aa5109a0384286",
+  "lightingNote": "Unchanged viewer.js hemisphere/directional settings and floor from sceneSourceCommit; no lighting or camera changes in this iteration.",
+  "sceneViewerSha256": "a93c9ff4759f4890c2a339e496ac2461dd245ba9f1f63d9b4ca031aaee61cf9f"
+}

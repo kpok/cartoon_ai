@@ -80,7 +80,7 @@ export function checkPolicy(workflows,pins){
     const report=job.steps.find(step=>step.id==='comparison_artifact');
     assert.equal(report?.if,"always() && steps.audit.outcome == 'success' && steps.capture.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')");
     assert.equal(report.with.name,'salsa-reference-comparison');assert.equal(report.with['retention-days'],1);
-    assert.deepEqual(report.with.path.trim().split('\n'),['reference-comparison.png','difference.png','metrics.json','summary.md'].map(p=>'experiments/salsa-human-models/output/'+p));
+    assert.deepEqual(report.with.path.trim().split('\n'),['reference-comparison.png','reference-cropped.png','render-cropped.png','difference.png','metrics.json','summary.md'].map(p=>'experiments/salsa-human-models/output/'+p));
     assert.ok(job.steps.indexOf(upload)<job.steps.indexOf(compare),'Snapshot must publish before comparison can fail');
     for(const step of job.steps.filter(step=>step.run?.includes('salsa-image-comparison')))assert.ok(job.steps.indexOf(upload)<job.steps.indexOf(step),'Snapshot must precede all metric prerequisites');
     assert.ok(job.steps.indexOf(report)>job.steps.indexOf(compare),'Comparison report must follow the gate');

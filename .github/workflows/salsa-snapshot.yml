@@ -81,6 +81,8 @@ jobs:
           name: salsa-reference-comparison
           path: |
             experiments/salsa-human-models/output/reference-comparison.png
+            experiments/salsa-human-models/output/reference-cropped.png
+            experiments/salsa-human-models/output/render-cropped.png
             experiments/salsa-human-models/output/difference.png
             experiments/salsa-human-models/output/metrics.json
             experiments/salsa-human-models/output/summary.md

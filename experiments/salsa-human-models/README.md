@@ -2,7 +2,7 @@
 
 **Status: functioning stylized prototype; reference reconstruction is not complete.**
 
-The source reference is synthetic. Every visible model surface is geometry, not a photograph billboard. No animation or generated video is used. Back surfaces are inferred.
+The source reference is synthetic. The viewer now displays its fixed cropped derivative, with both complete figures and smaller background margins; the full original is preserved. Every visible model surface is geometry, not a photograph billboard. No animation or generated video is used. Back surfaces are inferred.
 
 ## Run locally
 
@@ -66,7 +66,7 @@ After the snapshot artifact is uploaded, the same workflow installs pinned Pillo
 **Algorithm v1:** compute `100 × (0.7 × RGB block SSIM + 0.3 × tolerant edge F1)` for the full frame, its left half and its right half. The **final score is the minimum** of these three scores; every region must reach 80%. Halves are fixed spatial checks, not detected person masks.
 
 - Region crops are taken after the common resize, preserving pixel shape. This conservative minimum reduces background or one-sided dominance; it still does not guarantee semantic completeness of a person.
-- Both input PNGs must be exactly 1024×1536. Analysis resizes both to 256×384 with Lanczos, without image registration, recropping or deformation.
+- Both input PNGs must be exactly 1024×1536. Version 2 applies the fixed paired subject crop documented below, then resizes both crops to208×336 with Lanczos, without independent registration, auto-cropping or deformation. Legacy v1 full-image analysis256×384 remains a separate diagnostic.
 - SSIM is averaged over RGB channels and non-overlapping 8×8 blocks; population variance/covariance, standard 8-bit constants C1=6.5025, C2=58.5225; aggregate clamped to [0,1]. This explicit block implementation differs from Gaussian sliding-window SSIM in some libraries.
 - Edge F1 uses grayscale FIND_EDGES, threshold 40/255 and a 1-pixel matching tolerance at analysis resolution. The spurious filter border is excluded. Empty edge sets earn 0. Near-flat inputs fail with an error.
 - This is a full-frame technical similarity score, **not percent likeness, identity or perceptual realism**. Background, lighting and framing contribute. The approximate camera is shared with the viewer; the source image does not provide a calibrated camera.
@@ -94,3 +94,17 @@ Geometry positions are inferred from manually measured reference image coordinat
 The revised model occupies about2.18 world units vertically versus the original prototype's roughly1.85, matching more of the source frame. The old arbitrary `<2` geometry bound was replaced by `<2.3` plus a stricter actual-vertex no-clipping test; camera parameters were not changed. Lighting, reference image, metric weights, regions and threshold are unchanged.
 
 Known limitations: stylized facial anatomy and hair, imperfect clothing joins and silhouette, inferred depth/back surfaces, and plain studio background. This iteration is not a finished realistic reconstruction. The three-view golden-render baseline and review PNGs were intentionally refreshed after visual inspection; the reference-comparison test itself is unchanged.
+
+## Fixed subject framing — comparison v2
+
+[View the cropped reference](reference/concept-cropped.png). The original `reference/concept.png` remains byte-for-byte unchanged. The derivative is an exact pixel crop832×1344, with **no generative editing or rescaling**, preserving both full figures including hair, fingertips, skirt and footwear.
+
+`reference/framing.json` freezes the crop `[80,24,912,1368]` in original1024×1536 pixels, with right/bottom exclusive. The exact same crop is applied to the full fixed-camera render. Analysis208×336 preserves this aspect ratio; half-frame regions104×336 still contain complete8×8 SSIM windows. The source crop was chosen visually before new model edits, not optimized against a score. Every actual model vertex must project inside this crop, so later geometry cannot silently lose shoes/hair at the edges.
+
+This changes the scoring frame. **Do not compare v1 scores with v2 as evidence of geometry improvement.** The previous geometry5824bee scored **33.4162% under v2**, recorded before editing in `reference/crop-baseline.json`, alongside render hash, camera and scene revision. The report includes the new v2 score, delta versus that baseline, and a separate legacy v1 diagnostic. The weights70/30, three-region minimum and threshold80% remain fixed.
+
+The comparison artifact now also includes full-resolution `reference-cropped.png` and `render-cropped.png`, in addition to the triptych, difference map, raw hashes/camera metadata and summary. The unchanged full render is still in the separate snapshot artifact. The triptych is1248×720 including its header.
+
+This geometry iteration improves cascading dress layers, neckline/slit closure, wavy hair volume and tousled curls, shirt proportions and button/placket alignment, trouser material color, waist/pocket/seam details and knee folds. These remain stylized modeled surfaces; no reference pixels are used on the models and the plain background/lighting are unchanged.
+
+Latest local results for this iteration: **v2 paired crop33.4162% →34.5677%** (+1.1515 percentage points), and the separate **v1 full-image37.5126% →38.4419%**. Both comparisons use their own consistent frame before/after. Neither meets80%, and neither is a percent-likeness claim. New materials were calibrated against fixed clothing patches in the reference, not by changing scene lighting or using reference textures.

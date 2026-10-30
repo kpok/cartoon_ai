@@ -43,6 +43,13 @@ class ComparisonTests(unittest.TestCase):
         self.assertLess(comparison.similarity(source, shifted)['scorePercent'], 80)
         self.assertLess(comparison.similarity(source, missing)['scorePercent'], 80)
 
+    def test_missing_subject_fails_after_fixed_crop(self):
+        source = fixture().resize((1024, 1536))
+        missing = fixture()
+        ImageDraw.Draw(missing).rectangle((35, 50, 100, 340), fill='#aa9988')
+        a, b = comparison.framed_images(source, missing.resize((1024, 1536)))
+        self.assertLess(comparison.similarity(a, b, (208, 336))['scorePercent'], 80)
+
     def test_unrelated_image_fails(self):
         other = Image.new('RGB', (256, 384), 'white')
         draw = ImageDraw.Draw(other)
@@ -56,6 +63,14 @@ class ComparisonTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             comparison.similarity(fixture(), fixture().resize((256, 256)))
         self.assertEqual(comparison.edge_f1(Image.new('RGB', (256, 384)), Image.new('RGB', (256, 384))), 0)
+
+    def test_fixed_crop_preserves_pixels_and_aspect(self):
+        with Image.open(ROOT/'experiments/salsa-human-models/reference/concept.png') as source, Image.open(ROOT/'experiments/salsa-human-models/reference/concept-cropped.png') as saved:
+            a, b = comparison.framed_images(source.convert('RGB'), source.convert('RGB'))
+            self.assertEqual(a.size, (832, 1344))
+            self.assertEqual(comparison.FRAMING['analysisSize'], [208, 336])
+            self.assertIsNone(ImageChops.difference(a, saved.convert('RGB')).getbbox())
+            self.assertAlmostEqual(comparison.similarity(a, b, (208, 336))['scorePercent'], 100)
 
     def test_exact_threshold_is_inclusive(self):
         self.assertFalse(comparison.passes_threshold(79.999))
@@ -76,9 +91,13 @@ class ComparisonTests(unittest.TestCase):
             self.assertFalse(metrics['passed'])
             self.assertLess(metrics['scorePercent'], 80)
             self.assertIn('sha256', metrics)
+            self.assertEqual(metrics['framing']['cropBox'], [80, 24, 912, 1368])
+            with Image.open(directory/'render-cropped.png') as cropped:
+                self.assertEqual(cropped.size, (832, 1344))
+            self.assertIn('legacyFullImageV1', metrics)
             self.assertTrue((directory/'summary.md').is_file())
             with Image.open(directory/'reference-comparison.png') as panel:
-                self.assertEqual(panel.size, (1536, 816))
+                self.assertEqual(panel.size, (1248, 720))
             self.assertTrue((directory/'difference.png').is_file())
             fixture().resize((1024, 1536)).save(render)
             result = subprocess.run(command, capture_output=True, text=True)

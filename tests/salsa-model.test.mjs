@@ -1,4 +1,6 @@
 import {test} from 'node:test';
+import {readFile} from 'node:fs/promises';
+const framing=JSON.parse(await readFile(new URL('../experiments/salsa-human-models/reference/framing.json',import.meta.url),'utf8'));
 import assert from 'node:assert/strict';
 import * as THREE from '../vendor/three.module.js';
 import {referenceCamera} from '../experiments/salsa-human-models/camera.js';
@@ -24,5 +26,5 @@ test('reference camera keeps detailed geometry inside the capture frame',()=>{
  const c=new THREE.PerspectiveCamera(referenceCamera.fov,referenceCamera.aspect,referenceCamera.near,referenceCamera.far);c.position.set(...referenceCamera.position);c.lookAt(...referenceCamera.target);c.updateMatrixWorld();
  const model=createCouple();model.updateMatrixWorld(true);
  // Project real vertices: a world AABB combines unrelated front-depth/head-height extremes.
- model.traverse(o=>{if(!o.isMesh)return;const positions=o.geometry.attributes.position;for(let i=0;i<positions.count;i++){const projected=new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(o.matrixWorld).project(c);assert.ok(Math.abs(projected.x)<1&&Math.abs(projected.y)<1,`${o.name}: geometry clipped by fixed camera`);}});
+ model.traverse(o=>{if(!o.isMesh)return;const positions=o.geometry.attributes.position;for(let i=0;i<positions.count;i++){const projected=new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(o.matrixWorld).project(c);const px=(projected.x+1)*referenceCamera.width/2,py=(1-projected.y)*referenceCamera.height/2;const [left,top,right,bottom]=framing.cropBox;assert.ok(px>=left&&px<right&&py>=top&&py<bottom,`${o.name}: geometry clipped by fixed subject crop (${px.toFixed(1)},${py.toFixed(1)})`);}});
 });

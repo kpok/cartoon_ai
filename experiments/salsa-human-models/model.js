@@ -1,6 +1,6 @@
 import * as THREE from '../../vendor/three.module.js';
 import {referenceCamera} from './camera.js';
-export const palette={dress:0x00624e,shirt:0x18253e,trousers:0x85858a};
+export const palette={dress:0x00624e,shirt:0x0e172f,trousers:0x9397af};
 const camera=new THREE.PerspectiveCamera(referenceCamera.fov,referenceCamera.aspect,referenceCamera.near,referenceCamera.far);
 camera.position.set(...referenceCamera.position);camera.lookAt(...referenceCamera.target);camera.updateMatrixWorld();
 // Measured reference landmarks set geometry placement, never camera or image pixels.
@@ -18,19 +18,19 @@ export function createCouple(){
  function sweep(name,knots,m,depth=1,sides=28){
   const path=new THREE.CatmullRomCurve3(knots.map(k=>vec(k[0]))),rows=(knots.length-1)*10,frames=path.computeFrenetFrames((knots.length-1)*10,false),vertices=[],indices=[];
   for(let j=0;j<=rows;j++){const t=j/rows,c=path.getPoint(t);const u=t*(knots.length-1),i=Math.min(knots.length-2,Math.floor(u)),f=u-i,requestedRadius=THREE.MathUtils.lerp(knots[i][1],knots[i+1][1],f),before=Math.max(0,t-1/rows),after=Math.min(1,t+1/rows),turn=path.getTangent(before).angleTo(path.getTangent(after)),bendLimit=turn>1e-5?.5*path.getPoint(before).distanceTo(path.getPoint(after))/turn:Infinity,r=Math.min(requestedRadius,bendLimit);
-   for(let k=0;k<=sides;k++){const a=k/sides*Math.PI*2,fold=name.includes('trouser')?1+.018*Math.cos(a*8+t*22):1;const v=frames.normals[j].clone().multiplyScalar(Math.cos(a)*r*fold).addScaledVector(frames.binormals[j],-Math.sin(a)*r*depth).add(c);vertices.push(v.x,v.y,v.z);}}
+   for(let k=0;k<=sides;k++){const a=k/sides*Math.PI*2,fold=name.includes('trouser')?1+.018*Math.cos(a*8+t*22)+.055*Math.exp(-(((t-.36)/.16)**2))*Math.cos(a*2+t*65):1;const v=frames.normals[j].clone().multiplyScalar(Math.cos(a)*r*fold).addScaledVector(frames.binormals[j],-Math.sin(a)*r*depth).add(c);vertices.push(v.x,v.y,v.z);}}
   for(let j=0;j<rows;j++)for(let k=0;k<sides;k++){const i=j*(sides+1)+k;indices.push(i,i+sides+1,i+1,i+1,i+sides+1,i+sides+2);}
   // End caps are fans, not separate spheres with coplanar joint seams.
   for(const j of [0,rows]){const c=path.getPoint(j/rows),center=vertices.length/3;vertices.push(c.x,c.y,c.z);for(let k=0;k<sides;k++){const i=j*(sides+1)+k;if(j===0)indices.push(center,i,i+1);else indices.push(center,i+1,i);}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();const o=mesh(name,g,m);o.userData={surface:'sweep',rows,sides};return o;
  }
  function torso(name,anchors,m){const v=[],ix=[],sides=48,rings=[];const path=new THREE.CatmullRomCurve3(anchors.map(r=>r[0]));for(let j=0;j<=60;j++){const u=j/60*(anchors.length-1),i=Math.min(anchors.length-2,Math.floor(u)),f=u-i;rings.push([path.getPoint(j/60),THREE.MathUtils.lerp(anchors[i][1],anchors[i+1][1],f),THREE.MathUtils.lerp(anchors[i][2],anchors[i+1][2],f)]);}
-  for(const [c,rx,rz] of rings)for(let i=0;i<=sides;i++){const a=i/sides*Math.PI*2;const fold=1+.012*Math.sin(a*9+c.y*38)+.009*Math.sin(a*5-c.y*51);v.push(c.x+Math.cos(a)*rx*fold,c.y,c.z+Math.sin(a)*rz*fold);}
+  for(const [row,[c,rx,rz]] of rings.entries())for(let i=0;i<=sides;i++){const a=i/sides*Math.PI*2;const fold=1+.012*Math.sin(a*9+c.y*38)+.009*Math.sin(a*5-c.y*51);const neckline=name==='Emerald fitted bodice'?.07*Math.max(0,Math.sin(a))**4*(row/60)**12:0;v.push(c.x+Math.cos(a)*rx*fold,c.y-neckline,c.z+Math.sin(a)*rz*fold);}
   for(let j=0;j<rings.length-1;j++)for(let i=0;i<sides;i++){const k=j*(sides+1)+i;ix.push(k,k+sides+1,k+1,k+1,k+sides+1,k+sides+2);}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));g.setIndex(ix);g.computeVertexNormals();const material=m.clone();material.side=THREE.DoubleSide;return mesh(name,g,material);
  }
  function head(name,p,skin,hairMaterial,female){
-  const g=new THREE.Group();g.name=name+' head';g.position.copy(p);g.rotation.set(0,female?.24:-.18,female?-.10:.12);root.add(g);
+  const g=new THREE.Group();g.name=name+' head';g.position.copy(p);g.rotation.set(0,female?.42:-.18,female?.22:.12);root.add(g);
   const rings=[[-.135,.025,.038],[-.117,.058,.060],[-.085,.079,.073],[-.04,.092,.083],[.01,.101,.086],[.06,.100,.084],[.105,.085,.071],[.13,.04,.04]];
   const v=[],ix=[],sides=56;
   for(const [y,rx,rz] of rings)for(let i=0;i<=sides;i++){const a=i/sides*Math.PI*2,cheek=1+.035*Math.cos(a*2);v.push(Math.cos(a)*rx*cheek,y,Math.sin(a)*rz);}
@@ -46,34 +46,34 @@ export function createCouple(){
   const lip=mat(female?0x9d4640:0xa06a59,.5);
   curve(name+' smile upper',[[-.035,-.064,.070],[0,-.07,.085],[.035,-.057,.069]],.004,lip,g);
   curve(name+' smile lower',[[-.032,-.066,.071],[0,-.079,.082],[.032,-.059,.07]],.004,lip,g);
-  oval(name+' visible teeth',[0,-.071,.080],[.025,.005,.003],mat(0xe7d8c2,.4),g);
+  oval(name+' visible teeth',[0,-.071,.080],[.029,.007,.003],mat(0xeadbc5,.4),g);
   oval(name+' scalp',[0,.104,-.017],[.103,.048,.081],hairMaterial,g);
   if(female)oval(name+' back hair volume',[0,-.10,-.07],[.107,.19,.067],hairMaterial,g);
   const count=female?70:60;
   for(let i=0;i<count;i++){const a=i*2.39996,seed=(Math.sin(i*7.13)+1)/2;
-   if(female){const side=Math.cos(a),back=Math.sin(a);if(back>.55&&Math.abs(side)<.75)continue;const points=[];for(let j=0;j<8;j++){const t=j/7;points.push([side*(.085+t*.055)+Math.sin(t*15+i)*.013,.12-t*(.38+seed*.08),-.025-Math.abs(back)*.045+Math.sin(t*13+i)*.018]);}curve(name+' wavy hair lock '+i,points,i%3===0?.010:.006,hairMaterial,g);}
-   else{const x=Math.cos(a)*.087,z=Math.sin(a)*.062;curve(name+' curled quiff '+i,[[x,.105,z-.02],[x-.025,.13+seed*.033,z+.009],[x+.004,.139+seed*.025,z+.026],[x+.017,.11+seed*.013,z+.017]],.007,maleHair,g);}}
+   if(female){const side=Math.cos(a),back=Math.sin(a);if(back>.55&&Math.abs(side)<.75)continue;const points=[];for(let j=0;j<8;j++){const t=j/7;points.push([side*(.085+t*(side<0?.15:.06))+Math.sin(t*15+i)*.019,.12-t*(.43+seed*.10),-.025-Math.abs(back)*.045+Math.sin(t*13+i)*.018]);}curve(name+' wavy hair lock '+i,points,i%3===0?.010:.006,hairMaterial,g);}
+   else{const x=Math.cos(a)*.087,z=Math.sin(a)*.062,points=[];for(let j=0;j<=8;j++){const t=j/8,angle=t*Math.PI*2*(.8+seed*.4)+i*.21;points.push([x-.025*t+.012*Math.cos(angle),.10+.055*Math.sin(Math.PI*t)+seed*.025,z-.02+.018*Math.sin(angle)+.02*t]);}curve(name+' tousled curl '+i,points,.005+seed*.004,i%5===0?mat(0x795435,.6):maleHair,g);}}
  }
  const wh=point(.347,.143),mh=point(.579,.096);head('Woman',wh,ws,hair,true);head('Man',mh,ms,maleHair,false);
  sweep('Woman neck',[[point(.353,.239),.044],[point(.350,.190),.038],[point(.347,.165),.043]],ws,.9);
  sweep('Man neck',[[point(.607,.218),.053],[point(.595,.167),.044],[point(.586,.133),.049]],ms,.9);
- torso('Fitted navy shirt',[[point(.665,.369,-.015),.205,.095],[point(.672,.334,-.02),.20,.103],[point(.669,.287,-.02),.22,.115],[point(.650,.23,-.02),.235,.11],[point(.621,.195,-.02),.17,.085],[point(.605,.185,-.015),.06,.05]],navy);
+ torso('Fitted navy shirt',[[point(.680,.369,-.015),.18,.095],[point(.690,.334,-.02),.185,.103],[point(.690,.287,-.02),.21,.115],[point(.650,.23,-.02),.235,.11],[point(.621,.195,-.02),.17,.085],[point(.605,.185,-.015),.06,.05]],navy);
  torso('Woman upper torso',[[point(.367,.282,-.01),.125,.08],[point(.349,.251,-.01),.12,.075],[point(.349,.230,-.01),.075,.055]],ws);
  torso('Emerald fitted bodice',[[point(.365,.39),.145,.09],[point(.395,.36),.13,.083],[point(.395,.315),.125,.09],[point(.376,.278),.16,.105],[point(.355,.255),.14,.09]],emerald);
  oval('Woman upper shoulder',point(.327,.239,-.01),[.07,.065,.06],ws);
  for(const [a,b,c] of [[point(.31,.223),point(.305,.25,.015),point(.333,.284,.09)],[point(.374,.235),point(.41,.269,.08),point(.435,.29,.095)]])curve('Dress shoulder strap',[a,b,c],.007,emerald);
  const shirtSeam=mat(0x28374c,.8);
- curve('Shirt front placket',[point(.616,.202,.10),point(.623,.28,.11),point(.626,.362,.092)],.008,shirtSeam);
- for(let i=0;i<6;i++)oval('Shirt button',point(.627,.235+i*.023,.116),[.004,.004,.002],mat(0xb9ad95));
+ curve('Shirt front placket',[point(.602,.202,.115),point(.604,.28,.12),point(.613,.362,.105)],.008,shirtSeam);
+ for(let i=0;i<6;i++)oval('Shirt button',point(.604+i*.0016,.235+i*.023,.13),[.004,.004,.002],mat(0xb9ad95));
  function patch(name,points,m){const shape=new THREE.Shape(points.map(p=>new THREE.Vector2(p[0],p[1])));const o=mesh(name,new THREE.ShapeGeometry(shape),m);return o;}
  for(const side of [-1,1]){const c=point(.605+side*.033,.196,.10);const collar=patch('Pointed shirt collar',[[-.055,.03],[.045,0],[.02,-.095],[-.028,-.025]],navy);collar.position.copy(c);collar.rotation.z=side*.5;}
  // Smooth anatomical leg profiles and contiguous trouser volumes.
  const legs=[
  ['Woman back',[[.335,.39,.00,.09],[.359,.59,.025,.07],[.300,.705,.04,.048],[.275,.767,.04,.029]],ws],
- ['Woman front',[[.405,.385,.10,.095],[.437,.585,.13,.075],[.430,.718,.15,.05],[.420,.802,.15,.029]],ws],
+ ['Woman front',[[.405,.385,.10,.095],[.447,.609,.13,.073],[.430,.718,.15,.05],[.420,.802,.15,.029]],ws],
  ['Man back trouser',[[.626,.397,-.035,.102],[.615,.526,-.015,.089],[.656,.66,-.01,.077],[.719,.786,.01,.065]],gray],
  ['Man front trouser',[[.711,.399,.025,.105],[.698,.546,.03,.093],[.746,.69,.04,.082],[.790,.811,.065,.067]],gray]];
- torso('Trouser pelvis',[[point(.672,.418),.18,.095],[point(.665,.382),.20,.097],[point(.664,.365),.20,.096]],gray);
+ torso('Trouser pelvis',[[point(.680,.438),.09,.07],[point(.680,.413),.15,.095],[point(.680,.382),.18,.097],[point(.680,.365),.18,.096]],gray);
  for(const [name,points,m] of legs){sweep(name,points.map(([x,y,z,r])=>[point(x,y,z),r]),m,.88);const last=points.at(-1),p=point(last[0],last[1],last[2]);
   if(name.startsWith('Man')){const shoe=oval(name+' leather derby',p.clone().add(new THREE.Vector3(-.035,-.030,.058)),[.11,.048,.18],black);shoe.rotation.y=-.65;const sole=oval(name+' layered sole',p.clone().add(new THREE.Vector3(-.035,-.062,.058)),[.113,.014,.183],mat(0x24201d));sole.rotation.y=-.65;
    for(let i=0;i<5;i++)curve(name+' lace '+i,[p.clone().add(new THREE.Vector3(-.035,-.005,.03+i*.015)),p.clone().add(new THREE.Vector3(.015,-.008,.04+i*.015))],.0025,mat(0x5a534b));
@@ -82,11 +82,17 @@ export function createCouple(){
    for(const dz of [-.035,.045,.085])curve(name+' sandal strap',[foot.clone().add(new THREE.Vector3(-.043,0,dz)),foot.clone().add(new THREE.Vector3(0,.035,dz+.012)),foot.clone().add(new THREE.Vector3(.043,0,dz+.024))],.004,bronze);
    for(let i=0;i<5;i++)oval(name+' toe '+i,foot.clone().add(new THREE.Vector3(-.027+i*.014,-.002,.118-i*.004)),[.008,.012,.019],ws);
   }}
+ const trouserThread=mat(0x747580,.85);
+ curve('Trouser waistband seam',[point(.579,.377,.085),point(.675,.374,.105),point(.778,.38,.08)],.002,trouserThread);
+ curve('Trouser fly seam',[point(.652,.38,.105),point(.650,.412,.105),point(.663,.438,.08)],.0018,trouserThread);
+ curve('Slanted trouser pocket',[point(.753,.383,.08),point(.744,.410,.09),point(.721,.428,.10)],.002,trouserThread);
+ for(const x of [.60,.677,.748])curve('Trouser belt loop',[point(x,.372,.112),point(x,.382,.115),point(x,.391,.11)],.004,gray);
+ oval('Waist fastener',point(.644,.377,.116),[.004,.004,.002],trouserThread);
  // Overlapping ruffle panels are real double-sided surfaces around the body.
  function skirt(name,top,bottom,spread,phase){const vertices=[],indices=[],rows=24,cols=96;
-  for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){const t=j/rows,a=1.20+i/cols*(Math.PI*2-.70),wave=Math.sin(a*7+t*8+phase),r=.15+t*spread+wave*.020*t;const center=point(.351-.015*t,top+(bottom-top)*t,-.01);vertices.push(center.x+Math.cos(a)*r,center.y+.023*wave*t,center.z+Math.sin(a)*r*.68);}
+  for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){const t=j/rows,gap=.70*THREE.MathUtils.clamp((t-.30)/.70,0,1),a=.85+gap/2+i/cols*(Math.PI*2-gap),wave=Math.sin(a*7+t*8+phase),r=.15+t*spread+wave*.020*t;const center=point(.351-.015*t,top+(bottom-top)*t,-.01);vertices.push(center.x+Math.cos(a)*r,center.y+.023*wave*t,center.z+Math.sin(a)*r*.68);}
   for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const k=j*(cols+1)+i;indices.push(k,k+cols+1,k+1,k+1,k+cols+1,k+cols+2);}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));g.setIndex(indices);g.computeVertexNormals();const silk=emerald.clone();silk.side=THREE.DoubleSide;mesh(name,g,silk);}
- skirt('Silk skirt body',.365,.588,.28,0);skirt('Upper cascading ruffle',.385,.477,.10,1);skirt('Middle cascading ruffle',.445,.544,.20,2);skirt('Lower cascading ruffle',.510,.601,.27,3);
+ skirt('Silk skirt body',.365,.588,.25,0);skirt('Upper cascading ruffle',.385,.477,.18,1);skirt('Middle cascading ruffle',.445,.544,.245,2);skirt('Lower cascading ruffle',.510,.601,.28,3);
  const arms=[
  ['Woman joined',[[.327,.239,.05,.061],[.359,.283,.09,.055],[.420,.333,.16,.044],[.500,.318,.23,.034],[.558,.304,.27,.025]],ws],
  ['Woman shoulder',[[.389,.253,-.03,.053],[.462,.265,-.02,.046],[.508,.219,.005,.035],[.563,.182,.015,.024]],ws],
@@ -98,5 +104,5 @@ export function createCouple(){
  for(const [name,pts,skin] of arms){sweep(name+' arm',pts.map(([x,y,z,r])=>[point(x,y,z),r]),skin,.9);hand(name,point(...pts.at(-1).slice(0,3)),skin,name==='Woman joined'?-.7:.65);
   if(name.startsWith('Man')){const portion=pts.slice(0,3).map(([x,y,z,r])=>[point(x,y,z),r+.006]);sweep(name+' rolled sleeve',portion,navy,.95);}}
  for(let i=0;i<6;i++){const y=.27+i*.013;curve('Bodice fabric gathering '+i,[point(.335,y,.073),point(.387,y+.01,.101),point(.435,y-.004,.071)],.0018,mat(0x085b49));}
- root.userData={landmarks,palette,static:true,revision:'continuous-anatomy-and-clothing-v2'};return root;
+ root.userData={landmarks,palette,static:true,revision:'reference-silhouette-and-ruffles-v3'};return root;
 }
