@@ -2,18 +2,35 @@ import {test,expect} from '@playwright/test';
 const seek=async(page,t)=>page.locator('#dance-time').evaluate((e,t)=>{e.value=t;e.dispatchEvent(new Event('input',{bubbles:true}));},t);
 async function load(page,path='/robot.html?dance=kalinka'){await page.goto(path);await expect(page.locator('#robot-canvas')).toHaveAttribute('data-ready','true',{timeout:30000});}
 
-test('Kalinka loads a spatial scene, energetic split and deterministic drone camera with manual override',async({page,baseURL})=>{
+async function monitored(page,baseURL){
  const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(baseURL).origin)external.push(r.url());});
  await page.addInitScript(()=>{window.violations=[];document.addEventListener('securitypolicyviolation',e=>window.violations.push(e.effectiveDirective));});
  await load(page);const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-background','photo');await expect(canvas).toHaveAttribute('data-camera','auto');await page.locator('#dance-toggle').click();
- await seek(page,4);const kicks=await canvas.screenshot(),camera=await canvas.getAttribute('data-camera-position');
- await seek(page,11);await expect(page.locator('#dance-readout')).toContainText('szpagat');const split=await canvas.screenshot();expect(split.equals(kicks)).toBe(false);expect(await canvas.getAttribute('data-camera-position')).not.toBe(camera);
- await seek(page,4);expect((await canvas.screenshot()).equals(kicks)).toBe(true);expect(await canvas.getAttribute('data-camera-position')).toBe(camera);
- await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-camera','manual');const manual=await canvas.screenshot();expect(manual.equals(kicks)).toBe(false);
- await page.locator('#camera-auto').click();await expect(canvas).toHaveAttribute('data-camera','auto');expect((await canvas.screenshot()).equals(kicks)).toBe(true);
- await page.locator('#dance-restart').click();await expect(canvas).toHaveAttribute('data-time','0.000');await expect(canvas).toHaveAttribute('data-playing','false');
- expect(await page.evaluate(()=>window.violations)).toEqual([]);expect(errors).toEqual([]);expect(external).toEqual([]);
- await page.locator('a[href="./robot.html"]').click();await expect(canvas).toHaveAttribute('data-ready','true');await expect(page.locator('#camera-auto')).toBeHidden();
+ return {canvas,async safe(){expect(await page.evaluate(()=>window.violations)).toEqual([]);expect(errors).toEqual([]);expect(external).toEqual([]);}};
+}
+
+// Each software-WebGL case keeps the default30s budget and tests one behavior.
+test('Kalinka loads the local spatial scene and renders a distinct split jump',async({page,baseURL})=>{
+ const {canvas,safe}=await monitored(page,baseURL);await seek(page,4);const kicks=await canvas.screenshot(),camera=await canvas.getAttribute('data-camera-position');
+ await seek(page,11);await expect(page.locator('#dance-readout')).toContainText('szpagat');expect((await canvas.screenshot()).equals(kicks)).toBe(false);expect(await canvas.getAttribute('data-camera-position')).not.toBe(camera);await safe();
+});
+
+test('Kalinka backward seeking restores the exact paused frame and drone pose',async({page,baseURL})=>{
+ const {canvas,safe}=await monitored(page,baseURL);await seek(page,4);const initial=await canvas.screenshot(),camera=await canvas.getAttribute('data-camera-position');
+ await seek(page,11);await seek(page,4);expect((await canvas.screenshot()).equals(initial)).toBe(true);expect(await canvas.getAttribute('data-camera-position')).toBe(camera);
+ await page.locator('#dance-restart').click();await expect(canvas).toHaveAttribute('data-time','0.000');await expect(canvas).toHaveAttribute('data-playing','false');await safe();
+});
+
+test('manual Kalinka camera changes the rendered view and original dance remains accessible',async({page,baseURL})=>{
+ const {canvas,safe}=await monitored(page,baseURL);await seek(page,4);const initial=await canvas.screenshot();
+ await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-camera','manual');expect((await canvas.screenshot()).equals(initial)).toBe(false);await safe();
+ await page.locator('a[href="./robot.html"]').click();await expect(canvas).toHaveAttribute('data-ready','true');await expect(page.locator('#camera-auto')).toBeHidden();await safe();
+});
+
+test('automatic Kalinka camera restores the exact image after manual rotation',async({page,baseURL})=>{
+ const {canvas,safe}=await monitored(page,baseURL);await seek(page,4);const initial=await canvas.screenshot(),camera=await canvas.getAttribute('data-camera-position');
+ await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-camera','manual');
+ await page.locator('#camera-auto').click();await expect(canvas).toHaveAttribute('data-camera','auto');expect((await canvas.screenshot()).equals(initial)).toBe(true);expect(await canvas.getAttribute('data-camera-position')).toBe(camera);await safe();
 });
 
 test('reduced motion disables camera autoplay and an unavailable backdrop retains real 3D foreground',async({page})=>{
