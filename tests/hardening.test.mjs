@@ -26,7 +26,7 @@ test('static server confines public files and rejects symlink escapes and writes
 test('build inventory rejects unexpected files, symlinks and unresolved module dependencies',async()=>{
  const dir=await temporary();
  try{
-  for(const file of ['index.html','export.html','robot.html'])await cp(new URL(`../${file}`,import.meta.url),join(dir,file));
+  for(const file of ['index.html','export.html','robot.html','strawberry.html'])await cp(new URL(`../${file}`,import.meta.url),join(dir,file));
   await cp(new URL('../src/',import.meta.url),join(dir,'src'),{recursive:true});await mkdir(join(dir,'vendor'));
   for(const file of ['three.module.js','three.core.js'])await cp(new URL(`../node_modules/three/build/${file}`,import.meta.url),join(dir,'vendor',file));
   await cp(new URL('../node_modules/three/LICENSE',import.meta.url),join(dir,'vendor','THREE-LICENSE.txt'));

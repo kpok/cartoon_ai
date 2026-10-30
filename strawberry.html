@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f1e6"><meta name="description" content="Ostatnia truskawka — niema komedia 3D o kotku, wiewiórce i dzieleniu się. 2 minuty 40 sekund.">
+<title>Ostatnia truskawka — małe historie</title><link rel="stylesheet" href="./src/strawberry.css">
+</head><body>
+<header><a href="./" id="home">✿ Małe historie</a><label><span id="language-label">Język</span> <select id="language"><option value="pl">Polski</option><option value="en">English</option></select></label></header>
+<main><div class="intro"><p class="eyebrow" id="eyebrow">MAŁA SPRZECZKA. WIELKA PRZYJAŹŃ.</p><h1 id="title">Ostatnia truskawka<span>.</span></h1><p id="description">Dwie łapki za dużo. Jedna truskawka za mało.</p><div class="badges"><span id="silent">BEZ DŹWIĘKU</span><span>3D · 2:40 · 9:16</span></div></div>
+<section class="player" aria-label="Ostatnia truskawka" id="player">
+<div class="picture"><canvas id="strawberry-canvas" role="img" aria-label="Kotek i wiewiórka gonią truskawkę w ogrodzie"></canvas>
+<div class="chapter-overlay" aria-hidden="true"><span id="chapter-number">01 / 11</span><span id="chapter-title">Dwie łapki, jedna truskawka</span></div>
+<div class="curtain" id="start"><span class="fruit" aria-hidden="true">🍓</span><button type="button" id="watch">▶ Obejrzyj bajkę</button><p id="start-note">Historia opowiedziana ruchem. Bez dźwięku i dialogów.</p></div>
+<div class="curtain" id="ended" hidden><span class="fruit" aria-hidden="true">♡</span><h2 id="ending">Razem smakuje lepiej.</h2><button type="button" id="again">Obejrzyj jeszcze raz</button></div>
+<div id="failure" role="status" hidden><p id="failure-message">Nie można wyświetlić animacji 3D na tym urządzeniu.</p><a href="./" id="fallback-link">Wróć do pozostałych bajek</a></div>
+</div>
+<div class="controls"><button type="button" id="play" aria-label="Odtwórz">▶</button><button type="button" id="restart" aria-label="Od początku">↺</button><output id="time">0:00 / 2:40</output><button type="button" id="fullscreen" aria-label="Pełny ekran">⛶</button></div>
+<input id="seek" aria-label="Pozycja w bajce" type="range" min="0" max="160" step="0.1" value="0">
+<p id="status" role="status">Przygotowujemy ogród 3D…</p>
+</section>
+<nav class="chapters" id="chapters" aria-label="Sceny bajki"></nav>
+<p class="footnote" id="footnote">Bez słów. Bez pośpiechu. Z odrobiną psot i dużą porcją przyjaźni.</p>
+</main><footer id="footer">Narysowane kodem, opowiedziane ruchem.</footer>
+<script type="module" src="./src/strawberry-player.js"></script>
+</body></html>

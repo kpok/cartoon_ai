@@ -60,6 +60,7 @@ function applyTranslations(){
   $('format').value=format;$('player').dataset.format=format;
   $('film').width=format==='portrait'?720:1280;$('film').height=format==='portrait'?1280:720;
   $('language').value=locale;$('seek').max=episode.duration;
+  document.querySelector('.strawberry-card').href=`./strawberry.html?lang=${locale}`;
   document.querySelectorAll('button[data-story]').forEach(button=>{
     const item=episodes[button.dataset.story];
     button.setAttribute('aria-pressed',String(item.id===episode.id));
