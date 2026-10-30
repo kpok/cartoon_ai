@@ -16,7 +16,7 @@ export const CHAPTERS = [
 export const clamp = (v,a=0,b=1) => Math.max(a,Math.min(b,v));
 const ease = v => {const x=clamp(v);return x*x*(3-2*x);};
 const mix = (a,b,u) => a+(b-a)*ease(u);
-export function sampleStory(value) {
+function rawStory(value) {
  const t=Number.isFinite(value)?clamp(value,0,DURATION):0;
  const chapter=CHAPTERS.find(c=>t<c.end)||CHAPTERS.at(-1),u=(t-chapter.start)/(chapter.end-chapter.start);
  const actor=(x,yaw)=>({x,y:0,z:0,yaw,lean:0,arm:0,otherArm:0,step:0,hop:0,look:0,squash:1,eyes:1,smile:0});
@@ -101,4 +101,16 @@ export class StoryClock {
  restart(){this.time=0;this.last=null;}
  suspend(){this.last=null;}
  tick(now){if(!Number.isFinite(now))return this.time;if(this.playing&&this.last!==null)this.time=clamp(this.time+Math.max(0,now-this.last)/1000,0,DURATION);this.last=this.playing?now:null;if(this.time===DURATION)this.pause();return this.time;}
+}
+
+// Blend brief chapter transitions so seeking and normal playback use identical poses.
+export function sampleStory(value) {
+ const current=rawStory(value),index=CHAPTERS.findIndex(c=>c.id===current.chapter),start=CHAPTERS[index].start;
+ if(index>0&&current.t-start<.75){
+  const before=rawStory(start-1e-6),weight=ease((current.t-start)/.75);
+  for(const key of ['cat','squirrel','pot','barrow','berry'])for(const field of Object.keys(current[key])){
+   if(typeof current[key][field]==='number')current[key][field]=before[key][field]+(current[key][field]-before[key][field])*weight;
+  }
+ }
+ return current;
 }

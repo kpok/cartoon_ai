@@ -202,3 +202,14 @@ The third card opens [the robot studio](https://kpok.github.io/cartoon_ai/robot.
 See [licensing map](LICENSING.md), [media provenance](docs/MEDIA_PROVENANCE.md) and [audit controls and limitations](docs/PUBLIC_AUDIT.md). No reference music is distributed with the robot. Public logs must never contain private scan matches.
 
 </details>
+
+
+## Ostatnia truskawka — niema komedia 3D
+
+Piąty kafelek otwiera [nową bajkę](https://kpok.github.io/cartoon_ai/strawberry.html):
+160 sekund w pionie 9:16, bez muzyki, dialogów i efektów dźwiękowych.
+Kotek i wiewiórka rywalizują o truskawkę, gonią ją przez ogród, jadą taczką,
+a na końcu odkrywają, że lepiej się podzielić. Postacie i ogród są oryginalną
+geometrią proceduralną Three.js, bez pobranych modeli i obrazów.
+Odtwarzacz ma pauzę, restart, przewijanie i skróty do 11 scen; interfejs PL/EN.
+Eksport MP4 nie jest częścią tego etapu. Poprzednie cztery animacje pozostają dostępne.

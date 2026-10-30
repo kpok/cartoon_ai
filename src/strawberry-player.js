@@ -25,4 +25,5 @@ function animate(now){if(disposed)return;frame=requestAnimationFrame(animate);if
 for(const id of ['play','restart','seek','watch','again','fullscreen'])$(id).disabled=true;
 setLocale();
 try{stage=createStrawberryStage(canvas);ready=true;canvas.dataset.ready='true';for(const id of ['play','restart','seek','watch','again','fullscreen'])$(id).disabled=false;setLocale();draw();frame=requestAnimationFrame(animate);}catch{fail();}
-window.addEventListener('pagehide',()=>{disposed=true;cancelAnimationFrame(frame);observer.disconnect();stage?.dispose();},{once:true});
+window.addEventListener('pagehide',event=>{clock.suspend();if(!event.persisted){disposed=true;cancelAnimationFrame(frame);observer.disconnect();stage?.dispose();}});
+window.addEventListener('pageshow',()=>clock.suspend());

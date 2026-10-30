@@ -37,3 +37,9 @@ Relevant primary references:
 https://www.facebook.com/legal/music_guidelines
 https://creativecommons.org/licenses/by/4.0/
 https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL
+
+
+- The Last Strawberry: original procedural Three.js garden, kitten, squirrel and fruit,
+  with project-authored silent choreography. No imported character models, textures,
+  audio or third-party cartoon footage. This describes technical provenance, not a
+  certification of legal exclusivity. No new asset-specific reuse license is granted.

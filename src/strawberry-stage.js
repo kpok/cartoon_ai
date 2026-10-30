@@ -11,8 +11,8 @@ export function createStrawberryStage(canvas) {
  const scene=new THREE.Scene();scene.fog=new THREE.Fog(0xc3e8ef,18,36);
  const camera=new THREE.OrthographicCamera(-3,3,5,-5,.1,60);
  camera.position.set(0,5.3,10);camera.lookAt(0,.65,0);
- scene.add(new THREE.HemisphereLight(0xfff5df,0x8db787,2.8));
- const sun=new THREE.DirectionalLight(0xffebcb,3.2);sun.position.set(-3,8,5);sun.castShadow=true;
+ scene.add(new THREE.HemisphereLight(0xfff5df,0x8db787,1.8));
+ const sun=new THREE.DirectionalLight(0xffebcb,2.3);sun.position.set(-3,8,5);sun.castShadow=true;
  sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-5,right:5,top:5,bottom:-5,near:.1,far:20});sun.shadow.normalBias=.035;scene.add(sun);
  const sphere=new THREE.SphereGeometry(1,24,16),box=new THREE.BoxGeometry(1,1,1),cylinder=new THREE.CylinderGeometry(1,1,1,24);
  const materials=new Map();
@@ -22,7 +22,7 @@ export function createStrawberryStage(canvas) {
  const block=(p,c,x,y,z,sx,sy,sz)=>mesh(p,box,c,[x,y,z],[sx,sy,sz]);
  const group=(parent)=>{const g=new THREE.Group();parent.add(g);return g;};
  function curve(parent,points,color,radius=.025){const geometry=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points.map(p=>new THREE.Vector3(...p))),20,radius,6,false);return mesh(parent,geometry,color,[0,0,0],[1,1,1]);}
- const ground=block(scene,0x8fbe83,0,-.2,0,11,.38,11);ground.receiveShadow=true;
+ const ground=block(scene,0x8fbe83,0,-.2,0,80,.38,80);ground.receiveShadow=true;
  const lawn=ball(scene,0xabcf8c,0,-.1,0,4,.18,3.8);lawn.receiveShadow=true;
  // A quiet garden backdrop frames the action without imported textures.
  for(let i=0;i<15;i++){const x=(i-7)*.55;block(scene,0xf9e3bd,x,.65,-3.7,.43,1.5,.13);ball(scene,0xf9e3bd,x,1.42,-3.7,.215,.18,.065);}
@@ -60,7 +60,9 @@ export function createStrawberryStage(canvas) {
   for(let i=0;i<22;i++){const a=i*2.4,y=-.17+(i%6)*.066,r=Math.sqrt(Math.max(0,1-(y/.26)**2));ball(g,0xffe2a0,Math.sin(a)*.222*r,y,Math.cos(a)*.205*r,.012,.018,.009);}
   for(let i=0;i<5;i++){const l=ball(g,0x539963,Math.cos(i*1.257)*.09,.25,Math.sin(i*1.257)*.09,.105,.025,.045);l.rotation.y=-i*1.257;}
   return g;}
- const berry=fruit(scene),halfLeft=fruit(scene),halfRight=fruit(scene);halfLeft.scale.set(.65,.75,.75);halfRight.scale.set(.65,.75,.75);
+ const berry=fruit(scene),halfLeft=fruit(scene),halfRight=fruit(scene);halfLeft.scale.set(.5,.75,.75);halfRight.scale.set(.5,.75,.75);
+ for(const [half,side] of [[halfLeft,1],[halfRight,-1]]){const cut=ball(half,0xffe2cc,side*.16,0,0,.025,.22,.17);cut.castShadow=false;}
+ const cover=mesh(scene,cylinder,0xfff5dd,[0,.3,.8],[.15,.025,.15]);
  const apple=group(scene);ball(apple,0xefad69,-.11,0,0,.29,.32,.29);ball(apple,0xeaa161,.11,0,0,.29,.32,.29);
  mesh(apple,cylinder,0x886345,[0,.34,0],[.025,.17,.025]);const appleLeaf=ball(apple,0x6eaa66,.13,.37,0,.17,.035,.075);appleLeaf.rotation.z=.4;
  const stone=ball(scene,0xc9bda5,0,.13,1.05,.48,.13,.32);
@@ -100,7 +102,15 @@ export function createStrawberryStage(canvas) {
   pot.position.set(state.pot.x,state.pot.y,state.pot.z);pot.rotation.z=state.pot.tilt;plant.visible=state.t<34;
   barrow.position.set(state.barrow.x,state.barrow.y,state.barrow.z);barrow.rotation.z=state.barrow.tilt;wheel.rotation.x=state.barrow.roll;
   berry.position.set(state.berry.x,state.berry.y,state.berry.z);berry.rotation.z=state.berry.rotation;berry.visible=state.berry.visible&&state.berry.halves===0;
-  for(const [i,half] of [halfLeft,halfRight].entries()){half.visible=state.berry.visible&&state.berry.halves>0;half.position.set((i?1:-1)*state.berry.halves*.6,state.berry.y,state.berry.z);}
+  for(const [i,half] of [halfLeft,halfRight].entries()){
+   half.visible=state.berry.visible&&state.berry.halves>0;
+   const bite=state.chapter==='share'?Math.max(0,Math.min(1,(state.progress-.3)/.5)):0;
+   half.position.set((i?1:-1)*state.berry.halves*.6,state.berry.y+bite*.55,state.berry.z-bite*.1);
+   half.scale.set(.5*(1-bite*.5),.75*(1-bite*.5),.75*(1-bite*.5));
+  }
+  cover.visible=state.chapter==='plates'&&state.progress<.75;
+  cover.position.set(state.berry.x,.27+Math.abs(Math.sin(state.progress*Math.PI*4))*.09,.8);
+  cover.rotation.x=.2;
   plates.visible=state.plates;leafPile.scale.y=.45+state.leaves*.55;
   apple.visible=state.apple>0;apple.scale.setScalar(state.apple);apple.position.set(state.appleX,.34,state.appleZ);apple.rotation.x=state.progress*5;
   stone.visible=state.t>=145;
