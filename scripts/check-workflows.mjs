@@ -39,7 +39,7 @@ export function checkPolicy(workflows,pins){
   assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='salsa-snapshot.yml'?['snapshot']:file==='ci.yml'?['deploy','regression','test']:file==='public-audit.yml'?['audit']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:file==='robot-model.yml'?['generate']:file==='robot-mp4.yml'?['render']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
    const label=`${file}/${name}`;jobs.push({file,name,job});
-   assert.equal(job['runs-on'],'ubuntu-latest',`${label}: hosted runner required`);
+   assert.equal(job['runs-on'],file==='salsa-snapshot.yml'?'ubuntu-24.04':'ubuntu-latest',`${label}: hosted runner required`);
    assert.ok(Number.isInteger(job['timeout-minutes'])&&job['timeout-minutes']<=90,`${label}: bounded timeout required`);
    assert.equal(job.concurrency?.['cancel-in-progress'],false,`${label}: runs must not cancel trusted work`);
    assert.match(job.concurrency.group,/^[a-z-]+$/,`${label}: concurrency group must be fixed`);

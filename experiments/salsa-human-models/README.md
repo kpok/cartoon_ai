@@ -43,7 +43,7 @@ Original generated renders: CC BY 4.0, Salsa procedural reconstruction by kpok. 
 - Pose and spacing differ substantially from the concept. Three manually selected image landmarks expose offsets in `review/landmarks.json`; they are diagnostics, not acceptance thresholds.
 - Palette occupancy is a coarse lit-pixel heuristic, not a calibrated source/render color difference. Silhouette comparison to the source is still missing.
 - GLB includes the model only; lighting and floor belong to the viewer.
-- No experiment-specific CI job has been added. Existing main-only workflow restrictions and deployment remain unchanged. Keep PR draft until visual reconstruction and full diagnostics are reviewed.
+- Snapshot CI is implemented as described below. Source similarity CI remains pending. Existing production workflows and deployment retain their main-only restrictions. Keep PR draft until visual reconstruction and full diagnostics are reviewed.
 
 ## GitHub Actions snapshot — stage 1
 

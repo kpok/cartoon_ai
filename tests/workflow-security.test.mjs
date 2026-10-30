@@ -7,6 +7,7 @@ const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',impor
 test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),10);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot['runs-on']='ubuntu-latest';},
   w=>{w['salsa-snapshot.yml'].on.push.branches.push('**');},
   w=>{w['salsa-snapshot.yml'].on.pull_request_target={};},
   w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='artifact').if='always()';},
