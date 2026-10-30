@@ -14,3 +14,18 @@ Local first pass at d08b6d5:
   brief deterministic chapter blends and bfcache clock suspension. Reverification required.
 
 Next: code review, full unit/browser suite and license checks, branch audit, then merge and Pages.
+
+## Pre-merge verification
+
+Runtime revision bfac1d3: full desktop/mobile Playwright suite PASS, 50/50 (3.3 minutes).
+All 47 Node tests, 4 generator Python tests, robot validation/check/synchronization,
+workflow policy (9 owner-only jobs), license inventory and diff whitespace checks PASS.
+All 26 audit regression tests PASS with Gitleaks installed (none skipped).
+Branch public audit at bfac1d3 PASS on GitHub Actions.
+Independent implementation re-review PASS; STR-001/002/003 closed.
+
+Final runtime cb48d2f changes only the ground extent to preserve sky and remove the foreground edge.
+Focused 8-case desktop/mobile browser recheck PASS against final build (41.1 seconds); broad suite not repeated for framing only.
+Branch public audit at cb48d2f PASS.
+Existing MP4 regression will run in CI; no new story MP4 created.
+Next: final checkpoint audit -> merge PR #5 -> wait main test/regression/Pages -> live smoke.
