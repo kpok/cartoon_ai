@@ -60,4 +60,33 @@ jobs:
         env:
           SNAPSHOT_URL: ${{ steps.artifact.outputs.artifact-url }}
         run: |
-          printf '## Salsa fixed-camera snapshot\n\n[Download PNG and camera settings](%s)\n\n1024 × 1536 PNG; static front camera; Chromium / SwiftShader.\n\nStage 1: screenshot only. Similarity comparison and the 80%% gate are not enabled yet.\n\nArtifact retention: 1 day.\n' "$SNAPSHOT_URL" >> "$GITHUB_STEP_SUMMARY"
+          printf '## Salsa fixed-camera snapshot\n\n[Download PNG and camera settings](%s)\n\n1024 × 1536 PNG; static front camera; Chromium / SwiftShader.\n\nThe PNG remains available even when the separate 80%% reference-comparison gate fails.\n\nArtifact retention: 1 day.\n' "$SNAPSHOT_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Install isolated image-comparison dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/salsa-image-comparison"
+          "$RUNNER_TEMP/salsa-image-comparison/bin/python" -m pip install --only-binary=:all: -r experiments/salsa-human-models/requirements.txt
+      - name: Validate image metric behavior
+        run: '"$RUNNER_TEMP/salsa-image-comparison/bin/python" -m unittest discover -s tests -p test_salsa_comparison.py'
+      - name: Compare reference and render (minimum 80 percent)
+        id: compare
+        run: '"$RUNNER_TEMP/salsa-image-comparison/bin/python" experiments/salsa-human-models/compare.py'
+      - name: Publish comparison even below threshold
+        id: comparison_artifact
+        if: always() && steps.audit.outcome == 'success' && steps.capture.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: salsa-reference-comparison
+          path: |
+            experiments/salsa-human-models/output/reference-comparison.png
+            experiments/salsa-human-models/output/difference.png
+            experiments/salsa-human-models/output/metrics.json
+            experiments/salsa-human-models/output/summary.md
+          retention-days: 1
+          if-no-files-found: error
+      - name: Link comparison report in summary
+        if: always() && steps.comparison_artifact.outcome == 'success'
+        env:
+          REPORT_URL: ${{ steps.comparison_artifact.outputs.artifact-url }}
+        run: |
+          printf '\n[Download reference / render / difference panel and metrics](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"

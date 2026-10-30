@@ -74,6 +74,17 @@ export function checkPolicy(workflows,pins){
     assert.deepEqual(upload.with.path.trim().split('\n'),['experiments/salsa-human-models/output/render.png','experiments/salsa-human-models/output/capture.json']);
     assert.equal(job.steps.find(step=>step.id==='audit')?.run,'bash scripts/run-public-audit.sh');
     assert.equal(job.steps.find(step=>step.id==='capture')?.run,'node experiments/salsa-human-models/capture.mjs');
+    const compare=job.steps.find(step=>step.id==='compare');
+    assert.equal(compare?.run,'"$RUNNER_TEMP/salsa-image-comparison/bin/python" experiments/salsa-human-models/compare.py');
+    assert.equal(compare.if,undefined);assert.equal(compare['continue-on-error'],undefined);assert.equal(job['continue-on-error'],undefined);
+    const report=job.steps.find(step=>step.id==='comparison_artifact');
+    assert.equal(report?.if,"always() && steps.audit.outcome == 'success' && steps.capture.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')");
+    assert.equal(report.with.name,'salsa-reference-comparison');assert.equal(report.with['retention-days'],1);
+    assert.deepEqual(report.with.path.trim().split('\n'),['reference-comparison.png','difference.png','metrics.json','summary.md'].map(p=>'experiments/salsa-human-models/output/'+p));
+    assert.ok(job.steps.indexOf(upload)<job.steps.indexOf(compare),'Snapshot must publish before comparison can fail');
+    for(const step of job.steps.filter(step=>step.run?.includes('salsa-image-comparison')))assert.ok(job.steps.indexOf(upload)<job.steps.indexOf(step),'Snapshot must precede all metric prerequisites');
+    assert.ok(job.steps.indexOf(report)>job.steps.indexOf(compare),'Comparison report must follow the gate');
+
    }
    if(name==='deploy')for(const status of ['failure','cancelled','skipped','']){const c=ownerContext();c.needs.test.result=status;assert.equal(evaluateGate(job.if,c),false,`${label}: failed build must not deploy`);}
    if(name==='deploy')for(const flag of ['false','',undefined]){const c=ownerContext();c.vars.ENABLE_GITHUB_PAGES=flag;assert.equal(evaluateGate(job.if,c),false,`${label}: disabled Pages must not deploy`);}

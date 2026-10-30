@@ -36,3 +36,11 @@ One reference cannot reveal occluded anatomy or back surfaces. These must be inf
 - Stage 2, pending: source/render/difference panel and explicit technical image metric. Council recommendations: 70% RGB SSIM + 30% tolerant edge F1, report components and caveats, preserve artifacts on gate failure, do not tune threshold to force the current prototype to pass. Reviewers: metric_review and workflow_review, independent read-only proposals. Both accepted with conditions documented in README/workflow. No claim of identity similarity.
 
 - First Actions snapshot run 41118101885: full public audit passed; browser installation failed because ubuntu-latest resolved to Ubuntu 26.04, unsupported by locked Playwright 1.56.1. New snapshot job is pinned to ubuntu-24.04; existing workflows retain their current runner settings.
+
+## Stage 2 implementation checkpoint
+- User authorized reference comparison after successful stage-1 snapshot. Same owner-only workflow now publishes snapshot first, then installs isolated pinned Pillow, validates metric, compares fixed-camera PNG to preserved reference and fails below 80%.
+- Explicit algorithm salsa-reference-v1: 70% RGB block SSIM + 30% tolerant edge F1. Full-frame technical metric, not identity/likeness. Inputs fixed1024×1536, analysis256×384, no auto-registration or threshold tuning.
+- Local current prototype score32.4240735466%; expected failing gate. Local 7 behavioral tests cover identity, shift/color/missing subject, unrelated image, blank/aspect failures, threshold boundary, error reporting and report generation before failing exit.
+- Reports: source/render/difference triptych, differencePNG, metricsJSON with hashes/camera and Markdown summary. One-day artifact uploads even after compare failure; original snapshot already uploaded independently.
+
+- Review follow-up: full-frame-only score could exceed80% after erasing one test subject (80.18%). Added fixed full/left/right regions, using the minimum component score and the same80 threshold. No image alignment, trained detector, hand-tuned subject mask or weight change. Regression test now asserts missing-subject failure. Metric remains spatial/technical and cannot guarantee semantic completeness.

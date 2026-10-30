@@ -43,13 +43,13 @@ Original generated renders: CC BY 4.0, Salsa procedural reconstruction by kpok. 
 - Pose and spacing differ substantially from the concept. Three manually selected image landmarks expose offsets in `review/landmarks.json`; they are diagnostics, not acceptance thresholds.
 - Palette occupancy is a coarse lit-pixel heuristic, not a calibrated source/render color difference. Silhouette comparison to the source is still missing.
 - GLB includes the model only; lighting and floor belong to the viewer.
-- Snapshot CI is implemented as described below. Source similarity CI remains pending. Existing production workflows and deployment retain their main-only restrictions. Keep PR draft until visual reconstruction and full diagnostics are reviewed.
+- Snapshot CI is implemented as described below. Source similarity CI is implemented in stage 2 below. Existing production workflows and deployment retain their main-only restrictions. Keep PR draft until visual reconstruction and full diagnostics are reviewed.
 
 ## GitHub Actions snapshot — stage 1
 
 `Salsa fixed-camera snapshot` runs on owner pushes to this experiment branch and main. It runs the existing repository audit, starts the isolated scene with a fixed 34° camera, captures a **1024×1536 PNG**, and uploads `salsa-fixed-camera-snapshot` for **1 day**. Open the run Summary → Download PNG and camera settings, or download it in the Artifacts section. The ZIP contains `render.png` and `capture.json`.
 
-The upload uses `always()` after a successful audit and capture, so a later validation failure cannot suppress an existing screenshot. A failed audit or failed capture does not publish an artifact. There is no deployment and no similarity gate in stage 1. Stage 2 will add the source/render/difference panel, an explicitly defined percentage metric and a failing threshold of 80%, while retaining the snapshot even when that gate fails.
+The upload uses `always()` after a successful audit and capture, so a later validation failure cannot suppress an existing screenshot. A failed audit or failed capture does not publish an artifact. There is no deployment. Stage 2 below adds the source/render/difference panel and the 80% gate, after this snapshot has already been published.
 
 Local snapshot command, after `prepare.mjs` and Playwright installation:
 
@@ -58,3 +58,29 @@ node experiments/salsa-human-models/capture.mjs
 ```
 
 The camera is centralized in `camera.js`. It is an approximate reference viewpoint inferred from one image; the original image has no recoverable camera calibration. Snapshot mode changes only page layout, not model geometry or the camera preset.
+
+## Reference similarity — stage 2
+
+After the snapshot artifact is uploaded, the same workflow installs pinned Pillow into an isolated venv, runs the metric tests and compares the actual canvas screenshot with `reference/concept.png`. It fails when the **unrounded score is below 80%**. Comparison is not allowed to fail silently (`continue-on-error` is prohibited).
+
+**Algorithm v1:** compute `100 × (0.7 × RGB block SSIM + 0.3 × tolerant edge F1)` for the full frame, its left half and its right half. The **final score is the minimum** of these three scores; every region must reach 80%. Halves are fixed spatial checks, not detected person masks.
+
+- Region crops are taken after the common resize, preserving pixel shape. This conservative minimum reduces background or one-sided dominance; it still does not guarantee semantic completeness of a person.
+- Both input PNGs must be exactly 1024×1536. Analysis resizes both to 256×384 with Lanczos, without image registration, recropping or deformation.
+- SSIM is averaged over RGB channels and non-overlapping 8×8 blocks; population variance/covariance, standard 8-bit constants C1=6.5025, C2=58.5225; aggregate clamped to [0,1]. This explicit block implementation differs from Gaussian sliding-window SSIM in some libraries.
+- Edge F1 uses grayscale FIND_EDGES, threshold 40/255 and a 1-pixel matching tolerance at analysis resolution. The spurious filter border is excluded. Empty edge sets earn 0. Near-flat inputs fail with an error.
+- This is a full-frame technical similarity score, **not percent likeness, identity or perceptual realism**. Background, lighting and framing contribute. The approximate camera is shared with the viewer; the source image does not provide a calibrated camera.
+- Threshold and weights are fixed, not tuned to make this prototype pass. The initial full-frame-only diagnostic scored **32.42%**. Independent review reproduced a synthetic missing-subject case that still exceeded 80% globally; fixed left/right checks were added so that this regression now fails. The final minimum-region score is reported in each run. Golden-render regression remains a separate test.
+
+The Actions Summary includes the score, components, threshold and link to `salsa-reference-comparison`. That 1-day artifact contains `reference-comparison.png` (reference / rendered scene / absolute RGB difference), `difference.png`, `metrics.json` (raw score, verdict, SHA-256 hashes and camera capture metadata), and `summary.md`. Reports are written **before** returning failure. The separate `salsa-fixed-camera-snapshot` artifact has already been published, so metric dependency/test/gate failures do not remove the PNG. GitHub Summary links to artifact images; it does not embed local artifact paths as inline images.
+
+Local commands, after generating `output/render.png`:
+
+```sh
+python3 -m venv /tmp/salsa-image-comparison
+/tmp/salsa-image-comparison/bin/python -m pip install --only-binary=:all: -r experiments/salsa-human-models/requirements.txt
+/tmp/salsa-image-comparison/bin/python -m unittest discover -s tests -p test_salsa_comparison.py
+/tmp/salsa-image-comparison/bin/python experiments/salsa-human-models/compare.py
+```
+
+A below-threshold result intentionally returns exit code 1. Blank, malformed, absent or wrong-size inputs also fail; they write error JSON and Summary when the output directory is writable. If capture or audit itself fails, there is no valid new snapshot to publish.
