@@ -1,0 +1,43 @@
+{
+  "task_id": "kalinka-energy",
+  "repository": "kpok/cartoon_ai",
+  "baseline_revision": "dcfe4382b915f06805bdb209cc729f14364890db",
+  "runtime_revision": "48528e179e0fdc57b8434ac2be9a22bd7591ca79",
+  "phase": "VERIFY",
+  "status": "in_progress",
+  "branch": "fix/kalinka-energy-stage",
+  "pr": 6,
+  "authorized_actions": [
+    "implementation",
+    "frequent_checkpoint",
+    "pull_request",
+    "merge",
+    "pages_deployment"
+  ],
+  "acceptance_criteria": [
+    "AC-001",
+    "AC-002",
+    "AC-003",
+    "AC-004",
+    "AC-005",
+    "AC-006",
+    "AC-007",
+    "AC-008"
+  ],
+  "decisions": [
+    "DEC-K1 accepted: real foreground and distant existing matte, restrained camera"
+  ],
+  "review": "PASS including final timing refinement",
+  "checks": {
+    "node": 51,
+    "browser_full": 56,
+    "final_focused_browser": "PASS, 6/6",
+    "audit_regressions": "26 passed, no skips",
+    "branch_audit": "PASS at runtime48528e1"
+  },
+  "next_step": "Wait evidence-checkpoint audit; merge PR6; verify main jobs and live Pages.",
+  "limitations": [
+    "Distant architecture remains a flat AI matte, not a360-degree reconstruction",
+    "No new MP4 generated"
+  ]
+}

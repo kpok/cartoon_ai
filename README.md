@@ -213,3 +213,13 @@ a na końcu odkrywają, że lepiej się podzielić. Postacie i ogród są orygin
 geometrią proceduralną Three.js, bez pobranych modeli i obrazów.
 Odtwarzacz ma pauzę, restart, przewijanie i skróty do 11 scen; interfejs PL/EN.
 Eksport MP4 nie jest częścią tego etapu. Poprzednie cztery animacje pozostają dostępne.
+
+
+### Kalinka — wersja z przestrzennym placem
+
+[Czwarta animacja](https://kpok.github.io/cartoon_ai/robot.html?dance=kalinka) ma
+zaokrągloną uszatkę, skoczne wykopy, dwa szpagaty w powietrzu i nieregularną trasę.
+Stopy są zakotwiczone podczas podparcia; buty sprawdzamy względem podłogi na rzeczywistym modelu.
+Automatyczna kamera porusza się delikatnie nad brukiem 3D. Przeciągnięcie obrazu wyłącza ją;
+przycisk kamery włącza ponownie. Daleka architektura pozostaje pojedynczym obrazem AI,
+a nie odtworzonym otoczeniem 360°. Preferencja ograniczenia ruchu wyłącza autoplay.
