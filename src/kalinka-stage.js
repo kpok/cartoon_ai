@@ -26,17 +26,12 @@ export async function createKalinkaStage(THREE){
   paving.setMatrixAt(index,matrix);color.setHSL(.09+random()*.025,.06+random()*.07,.42+random()*.17);paving.setColorAt(index,color);index++;
  }group.add(paving);
  const metal=material(new THREE.MeshStandardMaterial({color:0x454c50,roughness:.65,metalness:.45}));
- const limestone=material(new THREE.MeshStandardMaterial({color:0xb9ac94,roughness:1}));
  const glass=material(new THREE.MeshStandardMaterial({color:0xffe5b4,roughness:.4,emissive:0xffcf7b,emissiveIntensity:.18}));
  for(const x of [-4.4,4.4]){
   mesh('Kalinka_Lamp_Base',geometry(new THREE.CylinderGeometry(.28,.4,.18,16)),metal,x,.09,-4.3);
   mesh('Kalinka_Lamp_Post',geometry(new THREE.CylinderGeometry(.055,.095,3.3,12)),metal,x,1.8,-4.3);
   mesh('Kalinka_Lantern',geometry(new THREE.SphereGeometry(.25,12,12)),glass,x,3.6,-4.3);
   mesh('Kalinka_Lantern_Cap',geometry(new THREE.ConeGeometry(.33,.24,8)),metal,x,3.9,-4.3);
- }
- for(const x of [-4.3,4.3])for(const z of [-1.5,2]){
-  mesh('Kalinka_Square_Bollard',geometry(new THREE.CylinderGeometry(.16,.22,.65,16)),limestone,x,.325,z);
-  mesh('Kalinka_Bollard_Top',geometry(new THREE.SphereGeometry(.19,12,8)),limestone,x,.67,z);
  }
  let backgroundReady=false;
  try{

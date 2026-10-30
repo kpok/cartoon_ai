@@ -10,34 +10,52 @@ const window=(t,a,b,c,d)=>smooth((t-a)/(b-a))*(1-smooth((t-c)/(d-c)));
 // Seeded once, never randomized during rendering or seeking.
 let seed=48271;
 const random=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
-export const KALINKA_ROUTE=Array.from({length:8},()=>({x:(random()*2-1)*1.2,z:(random()*2-1)*1.2}));
-export function kalinkaTravel(time){const t=wrap(time),i=Math.floor(t/3),u=(t%3)/3,a=KALINKA_ROUTE[i],b=KALINKA_ROUTE[(i+1)%8];return {x:blend(a.x,b.x,u),z:blend(a.z,b.z,u),yaw:.26*Math.sin(t*Math.PI/12)+.08*Math.sin(t*Math.PI/4)};}
+export const KALINKA_ROUTE=[];
+for(let i=0;i<16;i++){
+ let point;for(let attempt=0;attempt<100;attempt++){
+  point={x:(random()*2-1)*1.28,z:(random()*2-1)*1.28};
+  const previous=KALINKA_ROUTE.at(-1),distance=previous?Math.hypot(point.x-previous.x,point.z-previous.z):1;
+  if(distance>.75&&distance<1.75)break;
+ }KALINKA_ROUTE.push(point);
+}
+export function kalinkaTravel(time){
+ const t=wrap(time),i=Math.floor(t/1.5),u=(t%1.5)/1.5,a=KALINKA_ROUTE[i],b=KALINKA_ROUTE[(i+1)%16],phase=t*Math.PI/12;
+ return {x:blend(a.x,b.x,u),z:blend(a.z,b.z,u),yaw:Math.PI*(1-Math.cos(phase))+.10*Math.sin(phase*3)};
+}
+const angleMix=(a,b,u)=>a+Math.atan2(Math.sin(b-a),Math.cos(b-a))*smooth(u);
 export function kalinkaPose(time){
- const t=wrap(Number.isFinite(time)?time:0),root=kalinkaTravel(t),beat=t*2,beatPhase=beat-Math.floor(beat);
+ const t=wrap(Number.isFinite(time)?time:0),root=kalinkaTravel(t),speed=1.5,beat=t*3,beatPhase=beat-Math.floor(beat);
  const squat=window(t,2.5,3.2,9.2,10)+window(t,12.5,13.2,17.2,18);
  let flight=0,split=0;
  for(const start of [10,18]){const u=(t-start-.4)/1.2;if(u>=0&&u<=1){flight=Math.sin(Math.PI*u)**2;split=window(u,0,.35,.65,1);}}
- const hop=(1-clamp(squat))*.18*Math.sin(Math.PI*beatPhase)**2;
+ const hop=(1-clamp(squat))*.22*Math.sin(Math.PI*beatPhase)**2;
  const jump=flight*1.05+hop*(1-flight);
- const height=1.46-.60*clamp(squat)+.055*Math.sin(Math.PI*beatPhase)**2;
+ const height=1.35-.52*clamp(squat)+.07*Math.sin(Math.PI*beatPhase)**2;
  const legs=[0,1].map(i=>{
-  const side=i===0?-1:1,cycle=t+i*.5,start=Math.floor(cycle)-i*.5,phase=cycle-Math.floor(cycle),swing=clamp((phase-.5)*2);
-  const a=kalinkaTravel(start),b=kalinkaTravel(start+1),u=smooth(swing);
+  const side=i===0?-1:1,cycle=t*speed+i*.5,start=(Math.floor(cycle)-i*.5)/speed,phase=cycle-Math.floor(cycle),swing=clamp((phase-.5)*2);
+  const a=kalinkaTravel(start),b=kalinkaTravel(start+1/speed),u=smooth(swing);
   const ax=a.x+side*.33*Math.cos(a.yaw)-.04*Math.sin(a.yaw),az=a.z-side*.33*Math.sin(a.yaw)-.04*Math.cos(a.yaw);
   const bx=b.x+side*.33*Math.cos(b.yaw)-.04*Math.sin(b.yaw),bz=b.z-side*.33*Math.sin(b.yaw)-.04*Math.cos(b.yaw);
-  const lift=Math.sin(Math.PI*swing),kick=clamp(squat)*lift*lift;
-  let x=ax+(bx-ax)*u+Math.sin(root.yaw)*kick*.98,z=az+(bz-az)*u+Math.cos(root.yaw)*kick*.98;
-  let y=KALINKA_SOLE+jump+lift*(.22+.22*clamp(squat));
-  // At the jump apex both legs open sideways, with soles level in world space.
+  const lift=Math.sin(Math.PI*swing),fold=clamp(squat)*window(swing,0,.15,.29,.52),extension=clamp(squat)*window(swing,.19,.47,.62,.98);
+  let x=ax+(bx-ax)*u,z=az+(bz-az)*u,y=KALINKA_SOLE+jump+lift*.28;
+  function kickTarget(forward,drop,weight){
+   const lx=side*.33,lz=forward-.04;
+   x+=(root.x+lx*Math.cos(root.yaw)+lz*Math.sin(root.yaw)-x)*weight;
+   z+=(root.z-lx*Math.sin(root.yaw)+lz*Math.cos(root.yaw)-z)*weight;
+   y+=(height+KALINKA_SOLE+jump-drop-y)*weight;
+  }
+  // First tuck the ankle under the raised knee, then unfold to near full leg reach.
+  kickTarget(.25,.35,fold);kickTarget(1.66,.20,extension);
   const sx=root.x+side*(.33+1.63*split)*Math.cos(root.yaw),sz=root.z-side*(.33+1.63*split)*Math.sin(root.yaw)-.04;
-  x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+1.26*split,flight);
+  x=blend(x,sx,flight);z=blend(z,sz,flight);y=blend(y,KALINKA_SOLE+jump+1.16*split,flight);
   const dx=x-root.x,dz=z-root.z;
   return {x:Math.cos(root.yaw)*dx-Math.sin(root.yaw)*dz-side*.33,
    y:y-(height+KALINKA_SOLE+jump),z:Math.sin(root.yaw)*dx+Math.cos(root.yaw)*dz+.04,
-   world:{x,y,z},yaw:blend(a.yaw,b.yaw,swing),stance:phase<=.5&&jump<.025&&flight<.01};
+   world:{x,y,z},yaw:angleMix(angleMix(a.yaw,b.yaw,swing),root.yaw,extension),
+   stance:phase<=.5&&jump<.025&&flight<.01,fold,extension};
  });
- return {time:t,root,height,jump,flight,split,squat:clamp(squat),legs,lean:.035*Math.sin(t*Math.PI*2),
-  armSpread:.65+.35*Math.sin(t*Math.PI*2)+1.15*flight,armSwing:.45*Math.sin(t*Math.PI*2),
+ return {time:t,root,height,jump,flight,split,squat:clamp(squat),legs,lean:.045*Math.sin(t*Math.PI*3),
+  armSpread:.7+.4*Math.sin(t*Math.PI*3)+1.15*flight,armSwing:.6*Math.sin(t*Math.PI*3),
   mode:flight>.15?'split':squat>.5?'kicks':'hops'};
 }
 
