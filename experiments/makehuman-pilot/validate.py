@@ -23,6 +23,7 @@ size, kind = struct.unpack_from('<II', raw, 12)
 assert kind == 0x4E4F534A
 model = json.loads(raw[20:20 + size])
 assert len(model.get('meshes', [])) >= 6
+assert any(len(skin.get('joints', [])) >= 100 for skin in model.get('skins', [])), 'Exported rig missing'
 assert model.get('materials') and model.get('images')
 assert all('uri' not in item for item in model.get('buffers', []) + model.get('images', [])), 'External GLB dependency'
 assert all('bufferView' in item for item in model['images']), 'Missing embedded texture'

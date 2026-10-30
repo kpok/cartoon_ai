@@ -40,11 +40,25 @@ rig = Human.add_builtin_rig(base, 'default')
 selected = ['eyes/low-poly/low-poly.mhclo', 'eyebrows/eyebrow001/eyebrow001.mhclo', 'eyelashes/eyelashes01/eyelashes01.mhclo', 'hair/short02/short02.mhclo', 'clothes/male_casualsuit01/male_casualsuit01.mhclo', 'clothes/shoes01/shoes01.mhclo']
 skin = 'skins/young_caucasian_male/young_caucasian_male.mhmat'
 Human.set_character_skin(str(assets / skin), base, skin_type='MAKESKIN')
+def opaque(obj):
+    for slot in obj.material_slots:
+        material = slot.material
+        if not material or not material.use_nodes:
+            continue
+        for node in material.node_tree.nodes:
+            if node.type == 'BSDF_PRINCIPLED':
+                alpha = node.inputs['Alpha']
+                for link in list(alpha.links):
+                    material.node_tree.links.remove(link)
+                alpha.default_value = 1.0
+opaque(base)
 for relative in selected:
     path = assets / relative
     if not path.is_file():
         raise FileNotFoundError(path)
-    Human.add_mhclo_asset(str(path), base, subdiv_levels=1, material_type='MAKESKIN')
+    fitted = Human.add_mhclo_asset(str(path), base, subdiv_levels=1, material_type='MAKESKIN')
+    if relative.startswith('clothes/'):
+        opaque(fitted)
 characters = [obj for obj in bpy.context.scene.objects if obj.type == 'MESH']
 for obj in characters:
     for polygon in obj.data.polygons:
