@@ -56,12 +56,16 @@ export function createStrawberryStage(canvas) {
  const leafPile=group(scene);leafPile.position.set(0,0,.65);
  const pile=[];for(let i=0;i<24;i++){const a=i*2.4,r=.15+((i*7)%11)/13;const l=ball(leafPile,[0xe6b55d,0xdca475,0xe4c577][i%3],Math.cos(a)*r,.08+Math.sin(i*5)**2*.18,Math.sin(a)*r,.22,.045,.13);l.rotation.set(.15*Math.sin(i),a,.15);pile.push(l);}
  const plates=group(scene);for(const x of [-.8,.8])mesh(plates,cylinder,0xfff5dd,[x,.07,.85],[.3,.035,.3]);
- function fruit(parent,color=0xe95b68){const g=group(parent);const b=ball(g,color,0,0,0,.22,.26,.2);b.rotation.z=.12;
-  for(let i=0;i<22;i++){const a=i*2.4,y=-.17+(i%6)*.066,r=Math.sqrt(Math.max(0,1-(y/.26)**2));ball(g,0xffe2a0,Math.sin(a)*.222*r,y,Math.cos(a)*.205*r,.012,.018,.009);}
-  for(let i=0;i<5;i++){const l=ball(g,0x539963,Math.cos(i*1.257)*.09,.25,Math.sin(i*1.257)*.09,.105,.025,.045);l.rotation.y=-i*1.257;}
+ function fruit(parent,color=0xe95b68,side=0){const g=group(parent);
+  if(side){
+   mesh(g,new THREE.SphereGeometry(1,24,16,side>0?Math.PI/2:-Math.PI/2,Math.PI),color,[0,0,0],[.22,.26,.2]);
+   const cut=mesh(g,new THREE.CircleGeometry(1,28),0xffd8ba,[0,0,0],[.2,.26,1]);cut.rotation.y=side>0?-Math.PI/2:Math.PI/2;
+   const core=mesh(g,new THREE.CircleGeometry(1,24),0xffefcf,[side>0?-.002:.002,0,0],[.065,.18,1]);core.rotation.y=cut.rotation.y;
+  }else{const b=ball(g,color,0,0,0,.22,.26,.2);b.rotation.z=.12;}
+  for(let i=0;i<22;i++){const a=i*2.4,y=-.17+(i%6)*.066,r=Math.sqrt(Math.max(0,1-(y/.26)**2));if(!side||Math.sign(Math.sin(a))===side)ball(g,0xffe2a0,Math.sin(a)*.222*r,y,Math.cos(a)*.205*r,.012,.018,.009);}
+  for(let i=0;i<5;i++){if(side&&Math.sign(Math.cos(i*1.257))!==side)continue;const l=ball(g,0x539963,Math.cos(i*1.257)*.09,.25,Math.sin(i*1.257)*.09,.105,.025,.045);l.rotation.y=-i*1.257;}
   return g;}
- const berry=fruit(scene),halfLeft=fruit(scene),halfRight=fruit(scene);halfLeft.scale.set(.5,.75,.75);halfRight.scale.set(.5,.75,.75);
- for(const [half,side] of [[halfLeft,1],[halfRight,-1]]){const cut=ball(half,0xffe2cc,side*.16,0,0,.025,.22,.17);cut.castShadow=false;}
+ const berry=fruit(scene),halfLeft=fruit(scene,0xe95b68,-1),halfRight=fruit(scene,0xe95b68,1);
  const cover=mesh(scene,cylinder,0xfff5dd,[0,.3,.8],[.15,.025,.15]);
  const apple=group(scene);ball(apple,0xefad69,-.11,0,0,.29,.32,.29);ball(apple,0xeaa161,.11,0,0,.29,.32,.29);
  mesh(apple,cylinder,0x886345,[0,.34,0],[.025,.17,.025]);const appleLeaf=ball(apple,0x6eaa66,.13,.37,0,.17,.035,.075);appleLeaf.rotation.z=.4;
@@ -99,14 +103,14 @@ export function createStrawberryStage(canvas) {
  }
  function render(state){
   apply(cat,state.cat,state.t);apply(squirrel,state.squirrel,state.t);
-  pot.position.set(state.pot.x,state.pot.y,state.pot.z);pot.rotation.z=state.pot.tilt;plant.visible=state.t<34;
+  pot.position.set(state.pot.x,state.pot.y,state.pot.z);pot.rotation.z=state.pot.tilt;plant.visible=state.t<35;plant.scale.setScalar(Math.max(.001,Math.min(1,(35-state.t))));
   barrow.position.set(state.barrow.x,state.barrow.y,state.barrow.z);barrow.rotation.z=state.barrow.tilt;wheel.rotation.x=state.barrow.roll;
   berry.position.set(state.berry.x,state.berry.y,state.berry.z);berry.rotation.z=state.berry.rotation;berry.visible=state.berry.visible&&state.berry.halves===0;
   for(const [i,half] of [halfLeft,halfRight].entries()){
    half.visible=state.berry.visible&&state.berry.halves>0;
    const bite=state.chapter==='share'?Math.max(0,Math.min(1,(state.progress-.3)/.5)):0;
    half.position.set((i?1:-1)*state.berry.halves*.6,state.berry.y+bite*.55,state.berry.z-bite*.1);
-   half.scale.set(.5*(1-bite*.5),.75*(1-bite*.5),.75*(1-bite*.5));
+   half.scale.setScalar(1-bite*.5);half.rotation.y=(i?1:-1)*Math.PI/4;
   }
   cover.visible=state.chapter==='plates'&&state.progress<.75;
   cover.position.set(state.berry.x,.27+Math.abs(Math.sin(state.progress*Math.PI*4))*.09,.8);

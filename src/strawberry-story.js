@@ -29,7 +29,7 @@ function rawStory(value) {
  case 'rivals':
   cat.arm=.8+Math.sin(t*2)*.12;squirrel.arm=.8+Math.sin(t*2+1)*.12;
   cat.look=squirrel.look=Math.sin(t*.8)*.3;
-  if(t>6){cat.x=-.85+Math.sin(t*1.4)*.1;squirrel.x=.85+Math.sin(t*1.4)*.1;}
+  if(t>6){cat.x=-.85+Math.sin(t*1.4)*.1*ease((t-6)/.5);squirrel.x=.85+Math.sin(t*1.4)*.1*ease((t-6)/.5);}
   break;
  case 'tricks':{
   const beat=Math.floor((t-16)/4.5),phase=((t-16)%4.5)/4.5,shift=Math.sin((t-16)*Math.PI/4.5)*.4;
@@ -49,7 +49,7 @@ function rawStory(value) {
   cat.yaw=Math.cos(arc)*1.1;squirrel.yaw=Math.cos(arc+.65)*1.1;
   walk(cat,11);walk(squirrel,13);cat.arm=squirrel.arm=.6;
   berry.x=mix(1.65,1.3,q);berry.z=mix(.3,-2.35,q);berry.y=.24;berry.rotation=t*4;
-  if(q>.6){cat.x=mix(cat.x,-.45,(q-.6)/.4);squirrel.x=mix(squirrel.x,.45,(q-.6)/.4);cat.z=squirrel.z=-.6;cat.step=squirrel.step=Math.sin(t*6)*.35;}
+  if(q>.6){cat.x=mix(cat.x,-.45,(q-.6)/.4);squirrel.x=mix(squirrel.x,.45,(q-.6)/.4);cat.z=mix(cat.z,-.6,(q-.6)/.4);squirrel.z=mix(squirrel.z,-.6,(q-.6)/.4);cat.step=squirrel.step=Math.sin(t*6)*.35;}
   break;}
  case 'boarding':
   cat.x=mix(-.45,1.05,u);squirrel.x=mix(.45,1.7,u);cat.z=mix(-.6,-2.35,u);squirrel.z=mix(-.6,-2.35,u);
@@ -62,7 +62,7 @@ function rawStory(value) {
   cat.x=barrow.x-.32;squirrel.x=barrow.x+.32;cat.z=squirrel.z=barrow.z;
   cat.y=squirrel.y=u<.78?.48:mix(.48,0,(u-.78)/.22);cat.lean=sway;squirrel.lean=-sway;cat.arm=squirrel.arm=u>.55?1.4:.7;
   cat.eyes=squirrel.eyes=u>.55?1.25:1;berry.x=barrow.x+Math.sin(t*4)*.22;berry.z=barrow.z;berry.y=.85;
-  state.leaves=clamp((u-.7)/.15);if(u>.85){cat.x=-.6;squirrel.x=.6;berry.x=0;berry.z=.5;berry.y=.25;}
+  state.leaves=clamp((u-.7)/.15);if(u>.85){const landing=(u-.85)/.15;cat.x=mix(cat.x,-.6,landing);squirrel.x=mix(squirrel.x,.6,landing);berry.x=mix(berry.x,0,landing);berry.z=mix(berry.z,.5,landing);berry.y=mix(berry.y,.25,landing);}
   break;}
  case 'plates':
   cat.x=-.7;squirrel.x=.7;cat.z=squirrel.z=.4;cat.arm=squirrel.arm=1;

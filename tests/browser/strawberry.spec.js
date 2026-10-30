@@ -32,3 +32,11 @@ test('missing WebGL presents a readable fallback without an uncaught error',asyn
  await page.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){if(type.startsWith('webgl'))return null;return original.call(this,type,...args);};});
  await page.goto('/strawberry.html');await expect(page.locator('#failure')).toBeVisible();await expect(page.locator('#play')).toBeDisabled();await page.locator('#fallback-link').click();await expect(page.locator('.story-library')).toBeVisible();
 });
+
+
+test('returning from another story restores a functioning player',async({page})=>{
+ await ready(page);await page.locator('#watch').click();await page.locator('#play').click();await seek(page,80);
+ await page.locator('#home').click();await page.goBack();const canvas=page.locator('#strawberry-canvas');
+ await expect(canvas).toHaveAttribute('data-ready','true');await seek(page,140);await expect(canvas).toHaveAttribute('data-time','140.000');
+ await page.locator('#play').click();await expect.poll(async()=>Number(await canvas.getAttribute('data-time'))).toBeGreaterThan(140);
+});

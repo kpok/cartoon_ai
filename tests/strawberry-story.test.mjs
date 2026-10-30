@@ -26,3 +26,13 @@ test('clock stops at exact end, replay resets, pause and hidden time never advan
  c.play();assert.equal(c.time,0);assert.equal(c.playing,true);c.seek(160);assert.equal(c.playing,false);
  c.seek(NaN);assert.equal(c.time,160);c.restart();assert.equal(c.time,0);c.play();c.tick(100);c.tick(50);assert.equal(c.time,0);
 });
+
+
+test('actors and props do not teleport at chapter or internal movement transitions',()=>{
+ const boundaries=[...CHAPTERS.slice(1).map(c=>c.start),57.4,80+23*.78,80+23*.85,145+10*.3];
+ for(const time of boundaries){const a=sampleStory(time-.0001),b=sampleStory(time+.0001);
+  for(const key of ['cat','squirrel','berry','pot','barrow'])for(const axis of ['x','y','z']){
+   assert.ok(Math.abs(a[key][axis]-b[key][axis])<.015,`${key}.${axis} jumps at ${time}`);
+  }
+ }
+});
