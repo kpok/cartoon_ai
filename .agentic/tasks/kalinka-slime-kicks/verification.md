@@ -32,3 +32,14 @@ All55Node tests,26auditregressions(withGitleaks), build37-fileinventory, license
 owner-onlyworkflowpolicy, publishedrobotvalidation andoriginaldancechecks PASS.
 Full58-case desktop/mobilebrowserregressionPASS (3.3min). UIprose/docs-onlychanges afterruntime review;
 no behaviorchanges. BranchpublicauditPASS at271367b.
+
+
+## Follow-up CI evidence
+
+PR7 merged asbf623d7; publicaudit,test andPagesdeploymentPASS. Live desktop/mobile source,
+straightkick,slimeback,camera andoriginaldancechecksPASS. Mainbrowserjob found2timeouts
+in the same monolithiccamera test (desktop/mobile); other56cases passed. Nofailedexpectation.
+Follow-up splits that case into four focusedbehaviors with everyoriginal assertion retained:
+renderedsplit,exactbackwardseek,manualoverride/originalnavigation,exactautorestoration.
+Default30stesttimeoutunchanged; no retries,skips,workflowguard orruntimechanges.
+Next: focusedlocal/browserreview, branchaudit, mergefollow-up, fullmainCIincludingexport.
