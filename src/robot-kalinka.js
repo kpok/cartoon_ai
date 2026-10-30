@@ -36,7 +36,7 @@ export function kalinkaPose(time){
   const a=kalinkaTravel(start),b=kalinkaTravel(start+1/speed),u=smooth(swing);
   const ax=a.x+side*.33*Math.cos(a.yaw)-.04*Math.sin(a.yaw),az=a.z-side*.33*Math.sin(a.yaw)-.04*Math.cos(a.yaw);
   const bx=b.x+side*.33*Math.cos(b.yaw)-.04*Math.sin(b.yaw),bz=b.z-side*.33*Math.sin(b.yaw)-.04*Math.cos(b.yaw);
-  const lift=Math.sin(Math.PI*swing),fold=clamp(squat)*window(swing,0,.15,.29,.52),extension=clamp(squat)*window(swing,.19,.47,.62,.98);
+  const lift=Math.sin(Math.PI*swing),fold=clamp(squat)*window(swing,0,.14,.26,.42),extension=clamp(squat)*window(swing,.28,.54,.65,1);
   let x=ax+(bx-ax)*u,z=az+(bz-az)*u,y=KALINKA_SOLE+jump+lift*.28;
   function kickTarget(forward,drop,weight){
    const lx=side*.33,lz=forward-.04;
@@ -95,8 +95,8 @@ export function createKalinka(model,THREE){
  model.updateMatrixWorld(true);
  const slime=decorateKalinkaSlime(model,THREE);
  const qz=new THREE.Quaternion(),qx=new THREE.Quaternion(),axisX=new THREE.Vector3(1,0,0),axisY=new THREE.Vector3(0,1,0),axisZ=new THREE.Vector3(0,0,1),desired=new THREE.Quaternion();
- const bootMeshes=[];for(const limb of limbs)limb.hip.traverse(o=>{if(o.isMesh)bootMeshes.push(o);});
- const box=new THREE.Box3();
+ const bootMeshes=[];for(const limb of limbs)limb.hip.traverse(o=>{if(o.isMesh&&o.visible)bootMeshes.push(o);});
+
  function update(time){
   const pose=kalinkaPose(time);root.position.set(pose.root.x,pose.height+KALINKA_SOLE+pose.jump+.1,pose.root.z);root.rotation.set(0,pose.root.yaw,0);
   for(const side of ['Left','Right']){const lid=model.getObjectByName(side+'LidPivot');if(lid)lid.scale.y=.015+.95*Math.max(0,1-Math.abs((pose.time%4.8)-4.2)/.12);}
@@ -110,8 +110,8 @@ export function createKalinka(model,THREE){
    foot.quaternion.copy(hip.quaternion).multiply(knee.quaternion).invert().multiply(desired);
    const side=i===0?-1:1;arm.rotation.set(-.45+side*pose.armSwing,0,side*(pose.armSpread));elbow.rotation.set(-.55-.3*(1-pose.flight),0,0);wrist.rotation.set(.1,0,side*.15*Math.sin(pose.time*Math.PI*2));
   });
-  // The targets use the sole offset, but validate real geometry as the final floor guard.
-  model.updateMatrixWorld(true);let min=Infinity;for(const mesh of bootMeshes){box.setFromObject(mesh);min=Math.min(min,box.min.y);}
+  // Measure rendered vertices: rotated bounding boxes overestimate curved boot volume.
+  model.updateMatrixWorld(true);let min=Infinity;for(const mesh of bootMeshes){const points=mesh.geometry.attributes.position,e=mesh.matrixWorld.elements;for(let j=0;j<points.count;j++)min=Math.min(min,e[1]*points.getX(j)+e[5]*points.getY(j)+e[9]*points.getZ(j)+e[13]);}
   if(min<0){root.position.y-=min;model.updateMatrixWorld(true);}
   return pose;
  }
