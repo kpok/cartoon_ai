@@ -51,13 +51,14 @@ def add_stubble(base, rig, height, material):
     mesh = evaluated.to_mesh()
     eligible = [p for p in mesh.polygons if height * .87 < p.center.z < height * .925
                 and p.center.y < -height * .05 and abs(p.center.x) < height * .10
+                and 'lips' not in base.material_slots[p.material_index].name.lower()
                 and not (abs(p.center.x) < height * .035 and p.center.z > height * .90)]
     if not eligible:
         evaluated.to_mesh_clear()
         raise RuntimeError('No anatomical beard surface found')
     randomizer = random.Random(101)
     vertices, faces = [], []
-    for _ in range(900):
+    for _ in range(1800):
         polygon = randomizer.choice(eligible)
         triangle = [mesh.vertices[index].co for index in polygon.vertices[:3]]
         u, v = randomizer.random(), randomizer.random()
@@ -67,8 +68,8 @@ def add_stubble(base, rig, height, material):
         normal = polygon.normal.normalized()
         tangent = normal.cross(Vector((0, 0, 1))).normalized()
         second = normal.cross(tangent).normalized()
-        radius = height * .00020
-        end = root + normal * height * randomizer.uniform(.0010, .0020)
+        radius = height * .00012
+        end = root + normal * height * randomizer.uniform(.0007, .0012)
         start = len(vertices)
         vertices.extend(tuple(root + axis * radius) for axis in (tangent, second, -tangent, -second))
         vertices.append(tuple(end))
@@ -85,3 +86,28 @@ def add_stubble(base, rig, height, material):
     modifier = obj.modifiers.new('Head attachment', 'ARMATURE')
     modifier.object = rig
     return obj
+
+
+def tint_materials(obj, color, *, skin=False):
+    """Retain upstream texture detail and alpha while adjusting the pigment factor."""
+    for slot in obj.material_slots:
+        mat = slot.material
+        if not mat or not mat.use_nodes:
+            continue
+        for node in list(mat.node_tree.nodes):
+            if node.type != 'BSDF_PRINCIPLED':
+                continue
+            socket = node.inputs['Base Color']
+            if socket.is_linked:
+                source = socket.links[0].from_socket
+                mix = mat.node_tree.nodes.new('ShaderNodeMixRGB')
+                mix.blend_type = 'MULTIPLY'
+                mix.inputs[0].default_value = 1
+                mix.inputs[2].default_value = (*color, 1)
+                mat.node_tree.links.new(source, mix.inputs[1])
+                mat.node_tree.links.new(mix.outputs[0], socket)
+            else:
+                socket.default_value = tuple(socket.default_value[i] * color[i] for i in range(3)) + (1,)
+            if skin:
+                node.inputs['Roughness'].default_value = .55
+                node.inputs['Subsurface Weight'].default_value = .025

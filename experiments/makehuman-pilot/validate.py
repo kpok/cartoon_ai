@@ -12,9 +12,16 @@ def validate_manifest(manifest):
     assert math.isfinite(manifest['height']) and manifest['height'] > 0
     assert math.isfinite(manifest['roundtripPoseMaxError']) and 0 <= manifest['roundtripPoseMaxError'] <= manifest['height'] * .005, 'Pose changed during GLB roundtrip'
     assert [character['role'] for character in manifest['characters']] == roles
+    if manifest['scene'] == 'salsa':
+        assert math.isfinite(manifest['roundtripFaceMaxError']) and 0 <= manifest['roundtripFaceMaxError'] <= manifest['height'] * .002, 'Sculpted face lost in export'
     for character in manifest['characters']:
         assert character['rigBones'] >= 100 and character['sourceVertices'] >= 10000
         assert len(character['meshes']) >= 6
+        if manifest['scene'] == 'salsa':
+            profile = character['faceProfile']
+            assert len(profile['targets']) >= 10
+            assert set(profile['targets']) == set(profile['targetHashes'])
+            assert all(len(value) == 64 and all(c in '0123456789abcdef' for c in value) for value in profile['targetHashes'].values())
     for view in ('front', 'three-quarter', 'side', 'back'):
         frame = manifest['framing'][view]
         assert all(math.isfinite(value) for value in frame.values())
@@ -50,6 +57,12 @@ def main(root):
             assert data[:8] == b'\x89PNG\r\n\x1a\n'
             assert struct.unpack('>II', data[16:24]) == (640, 800)
             assert len(data) > 1000, 'Truncated image'
+    if manifest['scene'] == 'salsa':
+        for role in ('woman', 'man'):
+            for style in ('beauty', 'clay'):
+                data = (root / f'{style}-face-{role}.png').read_bytes()
+                assert data[:8] == b'\x89PNG\r\n\x1a\n' and len(data) > 1000
+                assert struct.unpack('>II', data[16:24]) == (640, 800)
     assert (root / 'makehuman-pilot.blend').stat().st_size > 100000
     raw = (root / 'makehuman-pilot.glb').read_bytes()
     magic, version, length = struct.unpack_from('<III', raw)

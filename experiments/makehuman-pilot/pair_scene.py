@@ -116,10 +116,10 @@ def partner_pose(rig, height, offset, role):
     rig.location.x = offset
     rig.rotation_euler.z = math.radians(35 if role == 'woman' else -12)
     # Targets are in world space; IK deforms the anatomical mesh and fitted assets.
-    targets = {'woman': {'R': (-.10, -.29, 1.05), 'L': (.12, -.04, 1.40)},
-               'man': {'R': (.03, -.29, 1.07), 'L': (.28, .07, .99)}}[role]
+    targets = {'woman': {'R': (-.10, -.29, 1.05), 'L': (.04, -.18, 1.44)},
+               'man': {'R': (.03, -.29, 1.07), 'L': (.57, -.05, 1.03)}}[role]
     poles = {'woman': {'R': (-.45, -.40, 1.04), 'L': (-.02, -.35, 1.28)},
-             'man': {'R': (.30, -.40, 1.17), 'L': (.50, .30, 1.10)}}[role]
+             'man': {'R': (.30, -.40, 1.17), 'L': (.65, -.15, 1.20)}}[role]
     for bone in rig.pose.bones:
         bone.rotation_mode = 'XYZ'
     bpy.context.view_layer.update()

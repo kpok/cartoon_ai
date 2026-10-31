@@ -7,8 +7,9 @@ from validate import validate_manifest, validate_model
 class PairValidationTests(unittest.TestCase):
     def setUp(self):
         self.manifest = {'scene': 'salsa', 'glbRoundtrip': True, 'height': 1.8,
-                         'roundtripPoseMaxError': 0, 'characters': [
+                         'roundtripPoseMaxError': 0, 'roundtripFaceMaxError': 0, 'characters': [
                              {'role': role, 'rigBones': 163, 'sourceVertices': 19158,
+                              'faceProfile': {'targets': {str(i): .1 for i in range(10)}, 'targetHashes': {str(i): 'a' * 64 for i in range(10)}},
                               'meshes': [f'{role}_{i}' for i in range(6)]} for role in ('woman', 'man')],
                          'framing': {view: {'minX': .1, 'maxX': .9, 'minY': .1, 'maxY': .9}
                                      for view in ('front', 'three-quarter', 'side', 'back')}}
@@ -48,6 +49,16 @@ class PairValidationTests(unittest.TestCase):
             manifest['framing']['front']['minX'] = value
             with self.assertRaises(AssertionError):
                 validate_manifest(manifest)
+
+    def test_lost_face_sculpt(self):
+        self.manifest['roundtripFaceMaxError'] = .1
+        with self.assertRaises(AssertionError):
+            validate_manifest(self.manifest)
+
+    def test_missing_face_profile(self):
+        self.manifest['characters'][0]['faceProfile']['targetHashes'] = {}
+        with self.assertRaises(AssertionError):
+            validate_manifest(self.manifest)
 
     def test_external_texture(self):
         self.model['images'][0]['uri'] = '/tmp/skin.png'
