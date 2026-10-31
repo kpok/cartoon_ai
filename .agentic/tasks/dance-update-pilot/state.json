@@ -2,9 +2,9 @@
   "task_id": "dance-update-pilot",
   "repository": "kpok/cartoon_ai",
   "baseline_revision": "afe6164232c901ac8eb78f6012b7faea5f2c9b49",
-  "current_revision": "3940fad3a60a6ff316258724c2551d2efa9f1898",
-  "phase": "VERIFY",
-  "status": "in_progress",
+  "current_revision": "51b17349cb5db5eaee02324f0f30604535a03058",
+  "phase": "HANDOFF",
+  "status": "complete",
   "authorized_actions": [
     "local implementation",
     "remote branch checkpoints",
@@ -17,21 +17,28 @@
     "node_suite": "59 passed",
     "smoke_mp4": "360x640,.5s,H264+AAC48kmono PASS",
     "full_mp4": "PASS:24s,720x1280,576frames,H264+AAC48kmono; decoded peak0.342628,RMS0.0352925",
-    "broad_browser": "in progress serially without concurrent render; previously timing-out first two Kalinka tests now PASS at default limits",
+    "broad_browser": "75/78 initial; corrected gallery expectation plus isolated Kalinka/strawberry rerun4/4PASS; all78cases covered across runs, not one clean broad run",
     "privacy": "PASS after exact-tree synchronization to policy-compliant remote history",
     "license": "PASS",
     "vulnerabilities": "PASS",
     "framing": "PASS independent576frame check,maxX0.916897,maxY0.768584",
     "public_audit": "PASS locally (26audit tests), remote runtime3940fad run41235192441 success; local private-term filter not configured",
-    "silent_export_regression": "PASS:.5s360p original and Kalinka,one H264 stream,no audio"
+    "silent_export_regression": "PASS:.5s360p original and Kalinka,one H264 stream,no audio",
+    "baseline_comparison": "main afe6164 manual-Kalinka desktopPASS16.3s; final branchPASS18.3s at default30s"
   },
   "findings": [
     {
       "id": "DU-001",
       "status": "closed",
       "summary": "final hand clipping fixed and independently verified"
+    },
+    {
+      "id": "DU-002",
+      "status": "closed",
+      "summary": "gallery assertion updated from5to6with explicit pilot visibility; independent review and both device rerunsPASS"
     }
   ],
-  "next_step": "finish broad browser suite and record final handoff",
-  "updated_at": "2026-10-31"
+  "next_step": "owner reviews MP4 and PR11; merge/deployment not performed",
+  "updated_at": "2026-10-31",
+  "tested_runtime_revision": "3940fad3a60a6ff316258724c2551d2efa9f1898"
 }
