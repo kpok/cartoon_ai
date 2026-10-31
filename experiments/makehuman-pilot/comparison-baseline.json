@@ -1,0 +1,39 @@
+{
+  "algorithm": "mpfb-foreground-v1",
+  "kind": "First authoritative CPU24sample CI baseline; local8sample preliminary score is not a model improvement delta",
+  "implementationRevision": "b687a19b42dc93c67ae26a13c9e30247ff5efa9b",
+  "workflowRunId": 41195818734,
+  "comparisonArtifactId": 13040826430,
+  "modelArtifactId": 13040856360,
+  "samples": 24,
+  "device": "CPU",
+  "pillowVersion": "12.3.0",
+  "scorePercent": 15.982954537356076,
+  "people": {
+    "woman": {
+      "silhouetteIoU": 0.5260778298078476,
+      "foregroundRGBSSIM": 0.048558373166285536,
+      "edgeF1Diagnostic": 0.4480366579761008,
+      "scorePercent": 15.982954537356076,
+      "missingCandidate": false
+    },
+    "man": {
+      "silhouetteIoU": 0.48870015834173025,
+      "foregroundRGBSSIM": 0.1513842580220331,
+      "edgeF1Diagnostic": 0.38481534352075464,
+      "scorePercent": 27.199542434719916,
+      "missingCandidate": false
+    }
+  },
+  "thresholdPercent": 80,
+  "passed": false,
+  "sha256": {
+    "reference": "51030de7c1bc504597d6d3e43eb361696321d8bf6c5bc1cb2ca50cfda933b973",
+    "render": "ab7ae0a32bc33340f14e5e5415ee0eb110efd4cb135fd82a83bd8b7c1881fac4",
+    "semantic": "929ac6aea5a6d3fb3717d26d400f3de7f557aff799cc02f34d972fa4ef82b066",
+    "config": "dd1dd371c11ad5f402942a31fffc2731c84c1b34bb488da61f720c3d7747be73",
+    "algorithmCode": "03473e05fe497a10d21587eca85a88fc546079d6e33fb0f28a036003a3323b0f"
+  },
+  "inputLockSha256": "8a243b4764fdb306e4cb9b5f8a09e7b08808d1d68977d73539bec11a4bfdda72",
+  "comparability": "Future deltas require identical algorithmCode/config/reference hashes, renderer settings and sample count. This scale is not comparable with procedural34.1109% and is not identity likeness."
+}

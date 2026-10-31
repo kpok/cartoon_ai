@@ -18,3 +18,9 @@ __pycache__/
 /.agentic/tasks/head-face-stage/*.log
 /.agentic/tasks/head-face-stage/*.png
 /.agentic/tasks/head-face-stage/*.mp4
+
+# Generated local salsa experiment dependencies and diagnostics
+experiments/salsa-human-models/exporter.js
+experiments/salsa-human-models/output/
+
+experiments/salsa-human-models/marching.js

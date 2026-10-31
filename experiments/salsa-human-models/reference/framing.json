@@ -1,0 +1,20 @@
+{
+  "version": "subject-frame-v1",
+  "sourceSize": [
+    1024,
+    1536
+  ],
+  "sourceSha256": "e6b04a00a361b7f4403e6da51e9e1263acfed2d1e765e23aff201df2acb03205",
+  "cropBox": [
+    80,
+    24,
+    912,
+    1368
+  ],
+  "analysisSize": [
+    208,
+    336
+  ],
+  "selection": "Fixed manual rectangle around both complete reference figures, including hair and shoes, with a small margin. No per-render alignment or score-driven crop selection.",
+  "coordinateSemantics": "[left, top, rightExclusive, bottomExclusive] in original image pixels"
+}

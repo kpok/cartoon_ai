@@ -1,0 +1,63 @@
+{
+  "regions": {
+    "fullFrame": {
+      "ssim": 0.35253036833583845,
+      "edgeF1": 0.42775636489102453,
+      "scorePercent": 37.50981673023943
+    },
+    "leftHalf": {
+      "ssim": 0.3881724482986798,
+      "edgeF1": 0.43924236578493503,
+      "scorePercent": 40.349342354455636
+    },
+    "rightHalf": {
+      "ssim": 0.31688828837299704,
+      "edgeF1": 0.41285054900770507,
+      "scorePercent": 34.56769665634094
+    }
+  },
+  "scorePercent": 34.56769665634094,
+  "legacyFullImageV1": {
+    "regions": {
+      "fullFrame": {
+        "ssim": 0.4196338371238577,
+        "edgeF1": 0.39856280025924257,
+        "scorePercent": 41.33125260644731
+      },
+      "leftHalf": {
+        "ssim": 0.4524953619701374,
+        "edgeF1": 0.41863212014558415,
+        "scorePercent": 44.23363894227714
+      },
+      "rightHalf": {
+        "ssim": 0.3867723122775781,
+        "edgeF1": 0.378927776721324,
+        "scorePercent": 38.441895161070185
+      }
+    },
+    "scorePercent": 38.441895161070185
+  },
+  "modelCommit": "b4ffce409a68b6e7c675512ca730381842580fad",
+  "framing": {
+    "version": "subject-frame-v1",
+    "sourceSize": [
+      1024,
+      1536
+    ],
+    "sourceSha256": "e6b04a00a361b7f4403e6da51e9e1263acfed2d1e765e23aff201df2acb03205",
+    "cropBox": [
+      80,
+      24,
+      912,
+      1368
+    ],
+    "analysisSize": [
+      208,
+      336
+    ],
+    "selection": "Fixed manual rectangle around both complete reference figures, including hair and shoes, with a small margin. No per-render alignment or score-driven crop selection.",
+    "coordinateSemantics": "[left, top, rightExclusive, bottomExclusive] in original image pixels"
+  },
+  "renderSha256": "4a369f08aecb98a0d8e3da8e19a5241e59d06b4798de22b20fbcc4e038d84897",
+  "note": "Immediate previous PR model shown in user preview; used to disclose regressions, separately from the initial crop calibration baseline."
+}

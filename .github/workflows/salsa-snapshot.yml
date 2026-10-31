@@ -1,0 +1,96 @@
+name: Salsa fixed-camera snapshot
+on:
+  push:
+    branches: [main, experiment/salsa-human-models]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  snapshot:
+    if: >-
+      github.repository == 'kpok/cartoon_ai' &&
+      github.repository_id == '1433681495' &&
+      github.repository_owner_id == '10676481' &&
+      github.actor_id == '10676481' &&
+      github.actor == 'kpok' &&
+      github.triggering_actor == 'kpok' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/experiment/salsa-human-models') &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    concurrency:
+      group: trusted-salsa-snapshot
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run check:workflows
+      - name: Audit before artifact publication
+        id: audit
+        run: bash scripts/run-public-audit.sh
+        env:
+          PRIVATE_TERMS: ${{ secrets.PRIVATE_TERMS }}
+      - run: node experiments/salsa-human-models/prepare.mjs
+      - run: npx playwright install --with-deps chromium
+      - name: Capture static 3D scene
+        id: capture
+        run: node experiments/salsa-human-models/capture.mjs
+      - name: Publish snapshot even if a later validation fails
+        id: artifact
+        if: always() && steps.audit.outcome == 'success' && steps.capture.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: salsa-fixed-camera-snapshot
+          path: |
+            experiments/salsa-human-models/output/render.png
+            experiments/salsa-human-models/output/capture.json
+          retention-days: 1
+          if-no-files-found: error
+      - name: Link snapshot in build summary
+        if: always() && steps.artifact.outcome == 'success'
+        env:
+          SNAPSHOT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          printf '## Salsa fixed-camera snapshot\n\n[Download PNG and camera settings](%s)\n\n1024 × 1536 PNG; static front camera; Chromium / SwiftShader.\n\nThe PNG remains available even when the separate 80%% reference-comparison gate fails.\n\nArtifact retention: 1 day.\n' "$SNAPSHOT_URL" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Validate detailed model geometry
+        run: node --test tests/salsa-model.test.mjs
+      - name: Install isolated image-comparison dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/salsa-image-comparison"
+          "$RUNNER_TEMP/salsa-image-comparison/bin/python" -m pip install --only-binary=:all: -r experiments/salsa-human-models/requirements.txt
+      - name: Validate image metric behavior
+        run: '"$RUNNER_TEMP/salsa-image-comparison/bin/python" -m unittest discover -s tests -p test_salsa_comparison.py'
+      - name: Compare reference and render (minimum 80 percent)
+        id: compare
+        run: '"$RUNNER_TEMP/salsa-image-comparison/bin/python" experiments/salsa-human-models/compare.py'
+      - name: Publish comparison even below threshold
+        id: comparison_artifact
+        if: always() && steps.audit.outcome == 'success' && steps.capture.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: salsa-reference-comparison
+          path: |
+            experiments/salsa-human-models/output/reference-comparison.png
+            experiments/salsa-human-models/output/reference-cropped.png
+            experiments/salsa-human-models/output/render-cropped.png
+            experiments/salsa-human-models/output/difference.png
+            experiments/salsa-human-models/output/metrics.json
+            experiments/salsa-human-models/output/summary.md
+          retention-days: 1
+          if-no-files-found: error
+      - name: Link comparison report in summary
+        if: always() && steps.comparison_artifact.outcome == 'success'
+        env:
+          REPORT_URL: ${{ steps.comparison_artifact.outputs.artifact-url }}
+        run: |
+          printf '\n[Download reference / render / difference panel and metrics](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"

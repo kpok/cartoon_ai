@@ -1,0 +1,22 @@
+{
+  "blender": {
+    "version": "4.2.0",
+    "url": "https://download.blender.org/release/Blender4.2/blender-4.2.0-linux-x64.tar.xz",
+    "sha256": "4f4fd7646af01f6fee9d420408318381a6e52571268eb7cf9cd5033bd9e7a359",
+    "license": "GPL-3.0-or-later"
+  },
+  "mpfb": {
+    "version": "2.0.18",
+    "commit": "d0a32e57a7f915cb2f2b95410e2117648c7bbb7e",
+    "url": "https://codeload.github.com/makehumancommunity/mpfb2/zip/d0a32e57a7f915cb2f2b95410e2117648c7bbb7e",
+    "sha256": "b50c69cea33cce250ca49d838079904da7fb84a21943f3cb7fc5a9bb3e0165f8",
+    "codeLicense": "GPL-3.0-or-later",
+    "coreAssetsLicense": "CC0-1.0"
+  },
+  "systemAssets": {
+    "url": "https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+    "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+    "license": "CC0-1.0",
+    "source": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html"
+  }
+}

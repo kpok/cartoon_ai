@@ -1,0 +1,16 @@
+{
+  "version": "mpfb-face-v1",
+  "sourceSha256": "51030de7c1bc504597d6d3e43eb361696321d8bf6c5bc1cb2ca50cfda933b973",
+  "sourceSize": [832,1344],
+  "analysisSize": [160,192],
+  "targetEyes": [[52,66],[108,66]],
+  "innerFaceOval": [22,26,138,186],
+  "pillowVersion": "12.3.0",
+  "formula": "100*RGB-block-SSIM inside fixed inner face oval; independent diagnostic per person, no pass threshold",
+  "alignment": "Analytical two-eye orientation-preserving similarity (rotation/uniform scale/translation); no reflection, affine/nonrigid warp, score optimization or color fitting",
+  "sourceAnnotation": "Manual visible iris centres at native pixel resolution; no generative enlargement. Model anchors approximate globe centres from rig eye bones. Expression, yaw and lighting remain differences.",
+  "people": {
+    "woman": {"sourceCrop": [207,134,367,298], "sourceEyes": [[265,185],[300,170]]},
+    "man": {"sourceCrop": [438,53,599,226], "sourceEyes": [[484,135],[526,120]]}
+  }
+}
