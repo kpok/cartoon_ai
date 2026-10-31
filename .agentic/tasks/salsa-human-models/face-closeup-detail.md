@@ -17,3 +17,6 @@ Acceptance:
 - FACE-006: existingowner-onlyauditedCPUCIpublishesseparatefaceartifact/Summaryevenwhenglobal80gatefails. Originalwholepairreport remainsversionedunchanged.
 
 Plan: sourcecrops/anchorconfig+checkpoint; planreview; implementdenserbody/exportandprojectedeyes+claycontrol;checkpoint; faceanalysis+tests+CI; freeze sourceanchoroverlay beforefirstface-onlyscore; localrenders/GLB/headcounts; independentreview/fixes; actualCIartifacts andfirstfacebaseline. CPU45mincap maintained; no globalmetricretuning.
+
+
+Independent face_stage_plan_review PASS: sourceirisanchors checkedwithin~1pixel; inversecanonicaloval fullyinsidefixednativecrops forbothpeople. Configuration frozenbeforefirstface-onlymeasurement. Currentdensityslice recordscontrol/evaluatedheadcounts, retainseditableblend, andbakesonlybodyforexport; proofpendingactualgeneration. Hairassets remainunchanged perboundedbody-onlycouncilrecommendation.
