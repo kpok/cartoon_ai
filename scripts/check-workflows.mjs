@@ -81,6 +81,18 @@ export function checkPolicy(workflows,pins){
     assert.equal(report.with.name,'makehuman-foreground-comparison');assert.equal(report.with['retention-days'],1);
     assert.deepEqual(report.with.path.trim().split('\n'),['metrics.json','summary.md','comparison.png','reference-annotation.png','reference-normalized.png','render-normalized.png','overlap.png','difference.png'].map(p=>'${{ runner.temp }}/makehuman-comparison/'+p));
     assert.ok(job.steps.indexOf(report)>job.steps.indexOf(compare));
+    const faceTests=job.steps.find(step=>step.id==='face_tests'),faces=job.steps.find(step=>step.id==='faces');
+    const faceCondition="always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && steps.validate.outcome == 'success' && steps.comparison_dependencies.outcome == 'success'";
+    assert.equal(faceTests.if,faceCondition);assert.equal(faces.if,faceCondition+" && steps.face_tests.outcome == 'success'");
+    assert.equal(faces.run,'"$RUNNER_TEMP/mpfb-comparison/bin/python" experiments/makehuman-pilot/compare_faces.py --model-dir "$RUNNER_TEMP/makehuman-output" --output "$RUNNER_TEMP/makehuman-faces" >> "$GITHUB_STEP_SUMMARY"');
+    assert.equal(faces['continue-on-error'],undefined);
+    assert.ok(job.steps.indexOf(faces)>job.steps.indexOf(compare),'Face report must run even after global gate failure');
+    const faceArtifact=job.steps.find(step=>step.id==='face_artifact');
+    assert.equal(faceArtifact.if,"always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && (steps.faces.outcome == 'success' || steps.faces.outcome == 'failure')");
+    assert.equal(faceArtifact.with.name,'makehuman-face-inspection');assert.equal(faceArtifact.with['retention-days'],1);
+    const faceFiles=['face-metrics.json','face-summary.md',...['woman','man'].flatMap(role=>[`reference-face-${role}.png`,`model-face-${role}.png`,`reference-face-${role}-aligned.png`,`model-face-${role}-aligned.png`,`reference-face-${role}-anchors.png`,`model-face-${role}-anchors.png`,`face-${role}-difference.png`,`face-${role}-panel.png`,`surface-control-${role}.png`])];
+    assert.deepEqual(faceArtifact.with.path.trim().split('\n'),faceFiles.map(name=>'${{ runner.temp }}/makehuman-faces/'+name));
+
 
    }
    if(file==='salsa-snapshot.yml'){

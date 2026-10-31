@@ -15,3 +15,8 @@ print('The previous procedural-scene score is unchanged; this MPFB scene has no 
 
 if m['scene'] == 'salsa':
     print(f"Face geometry roundtrip error: {m['roundtripFaceMaxError']:.6f}; explicit adult facial profiles and geometric beard, no image-generation service.\n")
+
+if m['scene'] == 'salsa':
+    for character in m['characters']:
+        detail = character['surfaceDetail']
+        print(f"- {character['role']} anatomical surface: head vertices {detail['controlHeadVertices']} -> {detail['evaluatedHeadVertices']}; dense GLB body {detail['exportBakedVertices']}. Editable blend retains morphs and one subdivision level.")

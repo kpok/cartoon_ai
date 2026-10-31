@@ -9,14 +9,16 @@ class PairValidationTests(unittest.TestCase):
         self.manifest = {'scene': 'salsa', 'glbRoundtrip': True, 'height': 1.8,
                          'roundtripPoseMaxError': 0, 'roundtripFaceMaxError': 0, 'characters': [
                              {'role': role, 'rigBones': 163, 'sourceVertices': 19158,
+                              'surfaceDetail': {'method': 'Catmull-Clark', 'levels': 1, 'controlHeadVertices': 1000, 'evaluatedHeadVertices': 4000, 'controlBodyVertices': 2000, 'evaluatedBodyVertices': 8000, 'exportBakedVertices': 8000, 'modifierOrder': ['MASK', 'SUBSURF', 'ARMATURE']},
                               'faceProfile': {'targets': {str(i): .1 for i in range(10)}, 'targetHashes': {str(i): 'a' * 64 for i in range(10)}},
-                              'meshes': [f'{role}_{i}' for i in range(6)]} for role in ('woman', 'man')],
+                              'meshes': [f'{role}_body'] + [f'{role}_{i}' for i in range(5)]} for role in ('woman', 'man')],
                          'framing': {view: {'minX': .1, 'maxX': .9, 'minY': .1, 'maxY': .9}
                                      for view in ('front', 'three-quarter', 'side', 'back')}}
         self.model = {'skins': [{'joints': list(range(163))} for _ in range(2)],
                       'nodes': [{'name': name, 'mesh': index, 'skin': owner}
                                 for owner, character in enumerate(self.manifest['characters'])
                                 for index, name in enumerate(character['meshes'])],
+                      'meshes': [{'primitives': [{'attributes': {'POSITION': 0}}]} for _ in range(6)], 'accessors': [{'count': 8000}],
                       'materials': [{}], 'images': [{'bufferView': 0}], 'buffers': [{}]}
 
     def test_complete_pair(self):
@@ -59,6 +61,16 @@ class PairValidationTests(unittest.TestCase):
         self.manifest['characters'][0]['faceProfile']['targetHashes'] = {}
         with self.assertRaises(AssertionError):
             validate_manifest(self.manifest)
+
+    def test_exported_low_poly_body_rejected(self):
+        self.model['accessors'][0]['count'] = 2000
+        with self.assertRaises(AssertionError):
+            validate_model(self.model, self.manifest)
+
+    def test_render_only_subdivision_rejected(self):
+        self.manifest['characters'][0]['surfaceDetail']['exportBakedVertices'] = 2000
+        with self.assertRaises(AssertionError):
+            validate_model(self.model, self.manifest)
 
     def test_external_texture(self):
         self.model['images'][0]['uri'] = '/tmp/skin.png'

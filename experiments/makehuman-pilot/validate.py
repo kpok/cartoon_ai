@@ -18,6 +18,12 @@ def validate_manifest(manifest):
         assert character['rigBones'] >= 100 and character['sourceVertices'] >= 10000
         assert len(character['meshes']) >= 6
         if manifest['scene'] == 'salsa':
+            detail = character['surfaceDetail']
+            assert detail['levels'] == 1 and detail['method'] == 'Catmull-Clark'
+            assert detail['evaluatedHeadVertices'] >= detail['controlHeadVertices'] * 3 >= 300
+            assert detail['evaluatedBodyVertices'] >= detail['controlBodyVertices'] * 3
+            assert detail['exportBakedVertices'] == detail['evaluatedBodyVertices']
+            assert detail['modifierOrder'][-2:] == ['SUBSURF', 'ARMATURE']
             profile = character['faceProfile']
             assert len(profile['targets']) >= 10
             assert set(profile['targets']) == set(profile['targetHashes'])
@@ -42,6 +48,12 @@ def validate_model(model, manifest):
         assigned = {node.get('skin') for node in nodes}
         assert len(assigned) == 1 and None not in assigned, 'Character skin ownership missing'
         owners.update(assigned)
+        if manifest['scene'] == 'salsa':
+            body = next(node for node in nodes if node['name'] == character['role'] + '_body')
+            mesh = model['meshes'][body['mesh']]
+            accessors = {primitive['attributes']['POSITION'] for primitive in mesh['primitives']}
+            exported_positions = sum(model['accessors'][index]['count'] for index in accessors)
+            assert exported_positions >= character['surfaceDetail']['exportBakedVertices'], 'GLB body lost dense surface geometry'
     assert len(owners) == len(roles), 'Characters share an unexpected rig'
     assert model.get('materials') and model.get('images')
     assert all('uri' not in item for item in model.get('buffers', []) + model.get('images', [])), 'External GLB dependency'
@@ -63,6 +75,9 @@ def main(root):
                 data = (root / f'{style}-face-{role}.png').read_bytes()
                 assert data[:8] == b'\x89PNG\r\n\x1a\n' and len(data) > 1000
                 assert struct.unpack('>II', data[16:24]) == (640, 800)
+            control = (root / f'clay-face-{role}-control.png').read_bytes()
+            assert control[:8] == b'\x89PNG\r\n\x1a\n' and len(control) > 1000
+            assert struct.unpack('>II', control[16:24]) == (640, 800)
     assert (root / 'makehuman-pilot.blend').stat().st_size > 100000
     raw = (root / 'makehuman-pilot.glb').read_bytes()
     magic, version, length = struct.unpack_from('<III', raw)

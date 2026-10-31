@@ -65,7 +65,8 @@ jobs:
           ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
         run: |
           python3 experiments/makehuman-pilot/summary.py "$RUNNER_TEMP/makehuman-output" >> "$GITHUB_STEP_SUMMARY"
-      - name: Install isolated foreground-comparison dependency
+      - id: comparison_dependencies
+        name: Install isolated foreground-comparison dependency
         run: |
           python3 -m venv "$RUNNER_TEMP/mpfb-comparison"
           "$RUNNER_TEMP/mpfb-comparison/bin/python" -m pip install --only-binary=:all: -r experiments/salsa-human-models/requirements.txt
@@ -96,3 +97,45 @@ jobs:
           REPORT_URL: ${{ steps.comparison_artifact.outputs.artifact-url }}
         run: |
           printf '\n[Download foreground comparison, masks and metrics](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"
+      - id: face_tests
+        name: Validate separate face metric
+        if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && steps.validate.outcome == 'success' && steps.comparison_dependencies.outcome == 'success'
+        run: '"$RUNNER_TEMP/mpfb-comparison/bin/python" -m unittest discover -s experiments/makehuman-pilot -p test_faces.py'
+      - id: faces
+        name: Inspect each face independently
+        if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && steps.validate.outcome == 'success' && steps.comparison_dependencies.outcome == 'success' && steps.face_tests.outcome == 'success'
+        run: '"$RUNNER_TEMP/mpfb-comparison/bin/python" experiments/makehuman-pilot/compare_faces.py --model-dir "$RUNNER_TEMP/makehuman-output" --output "$RUNNER_TEMP/makehuman-faces" >> "$GITHUB_STEP_SUMMARY"'
+      - id: face_artifact
+        if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && (steps.faces.outcome == 'success' || steps.faces.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: makehuman-face-inspection
+          path: |
+            ${{ runner.temp }}/makehuman-faces/face-metrics.json
+            ${{ runner.temp }}/makehuman-faces/face-summary.md
+            ${{ runner.temp }}/makehuman-faces/reference-face-woman.png
+            ${{ runner.temp }}/makehuman-faces/model-face-woman.png
+            ${{ runner.temp }}/makehuman-faces/reference-face-woman-aligned.png
+            ${{ runner.temp }}/makehuman-faces/model-face-woman-aligned.png
+            ${{ runner.temp }}/makehuman-faces/reference-face-woman-anchors.png
+            ${{ runner.temp }}/makehuman-faces/model-face-woman-anchors.png
+            ${{ runner.temp }}/makehuman-faces/face-woman-difference.png
+            ${{ runner.temp }}/makehuman-faces/face-woman-panel.png
+            ${{ runner.temp }}/makehuman-faces/surface-control-woman.png
+            ${{ runner.temp }}/makehuman-faces/reference-face-man.png
+            ${{ runner.temp }}/makehuman-faces/model-face-man.png
+            ${{ runner.temp }}/makehuman-faces/reference-face-man-aligned.png
+            ${{ runner.temp }}/makehuman-faces/model-face-man-aligned.png
+            ${{ runner.temp }}/makehuman-faces/reference-face-man-anchors.png
+            ${{ runner.temp }}/makehuman-faces/model-face-man-anchors.png
+            ${{ runner.temp }}/makehuman-faces/face-man-difference.png
+            ${{ runner.temp }}/makehuman-faces/face-man-panel.png
+            ${{ runner.temp }}/makehuman-faces/surface-control-man.png
+          retention-days: 1
+          if-no-files-found: error
+      - name: Link separate face report
+        if: always() && steps.face_artifact.outcome == 'success'
+        env:
+          FACE_REPORT_URL: ${{ steps.face_artifact.outputs.artifact-url }}
+        run: |
+          printf '\n[Download native face crops, aligned diagnostics and L0/L1 surface controls](%s)\n' "$FACE_REPORT_URL" >> "$GITHUB_STEP_SUMMARY"

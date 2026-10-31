@@ -126,6 +126,15 @@ def main():
                             projectedEyeMeaning=portrait['anchorMeaning'], modelImageSha256=digest(path))
             report['people'][role] = measured
             save_panel(role, reference, model, aligned, args.output)
+            for label, picture, anchors in (('reference', reference, source_eyes), ('model', model, portrait['eyes'])):
+                overlay = picture.copy()
+                draw = ImageDraw.Draw(overlay)
+                radius = max(3, round(picture.width * .006))
+                for index, (x, y) in enumerate(anchors):
+                    color = 'red' if index == 0 else 'lime'
+                    draw.line((x - radius, y, x + radius, y), fill=color, width=1)
+                    draw.line((x, y - radius, x, y + radius), fill=color, width=1)
+                overlay.save(args.output / f'{label}-face-{role}-anchors.png')
             shutil.copyfile(path, args.output / f'model-face-{role}.png')
             before = Image.open(args.model_dir / f'clay-face-{role}-control.png').convert('RGB')
             after = Image.open(args.model_dir / f'clay-face-{role}.png').convert('RGB')
