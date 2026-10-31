@@ -36,7 +36,7 @@ Human = importlib.import_module(module + '.services.humanservice').HumanService
 Target = importlib.import_module(module + '.services.targetservice').TargetService
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from face_profiles import apply_profile, add_stubble, tint_materials
-from pair_scene import fitted_dress, landmarks, material, partner_pose, world_points, repair_small_trouser_holes
+from pair_scene import fitted_dress, landmarks, material, partner_pose, world_points, repair_small_trouser_holes, head_surface_points
 def opaque(obj):
     for slot in obj.material_slots:
         material = slot.material
@@ -117,8 +117,9 @@ if not .5 < height < 30:
 expected_landmarks = landmarks(rigs)
 face_samples = {}
 for role in roles:
-    head_z = expected_landmarks[role]['head'][2]
-    face_points = [point for point in world_points([bpy.data.objects[role + '_body']]) if point.z > head_z - height * .04]
+    face_points = head_surface_points(bpy.data.objects[role + '_body'], rigs[role])
+    if len(face_points) < 100:
+        raise RuntimeError('Missing anatomical head surface for ' + role)
     face_samples[role] = face_points[::max(1, len(face_points) // 100)]
 scene = bpy.context.scene
 scene.render.engine = 'CYCLES'

@@ -206,3 +206,17 @@ def repair_small_trouser_holes(obj, height):
     mesh.to_mesh(obj.data)
     mesh.free()
     obj.data.update()
+
+
+def head_surface_points(base, rig):
+    """Select the head by anatomical weights, excluding raised hands near the face."""
+    allowed = {'head'} | {bone.name for bone in rig.data.bones['head'].children_recursive}
+    graph = bpy.context.evaluated_depsgraph_get()
+    evaluated = base.evaluated_get(graph)
+    mesh = evaluated.to_mesh(preserve_all_data_layers=True, depsgraph=graph)
+    try:
+        return [evaluated.matrix_world @ vertex.co for vertex in mesh.vertices
+                if sum(group.weight for group in vertex.groups
+                       if base.vertex_groups[group.group].name in allowed) > .5]
+    finally:
+        evaluated.to_mesh_clear()
