@@ -2,7 +2,7 @@
   "task_id": "dance-update-pilot",
   "repository": "kpok/cartoon_ai",
   "baseline_revision": "afe6164232c901ac8eb78f6012b7faea5f2c9b49",
-  "current_revision": "67d40dda8032d9750609f08314cabd78d396c088",
+  "current_revision": "3940fad3a60a6ff316258724c2551d2efa9f1898",
   "phase": "VERIFY",
   "status": "in_progress",
   "authorized_actions": [
@@ -14,15 +14,24 @@
     "plan_review": "PASS",
     "implementation_review": "PASS",
     "new_browser_cases": "14 passed desktop/mobile",
-    "node_suite": "58 passed before final export-settings test;5focused passed after",
+    "node_suite": "59 passed",
     "smoke_mp4": "360x640,.5s,H264+AAC48kmono PASS",
-    "full_mp4": "720x1280,24s render in progress",
-    "broad_browser": "interrupted after legacy Kalinka screenshot timeouts while parallel software render; rerun serially after render",
+    "full_mp4": "PASS:24s,720x1280,576frames,H264+AAC48kmono; decoded peak0.342628,RMS0.0352925",
+    "broad_browser": "in progress serially without concurrent render; previously timing-out first two Kalinka tests now PASS at default limits",
     "privacy": "PASS after exact-tree synchronization to policy-compliant remote history",
     "license": "PASS",
-    "vulnerabilities": "PASS"
+    "vulnerabilities": "PASS",
+    "framing": "PASS independent576frame check,maxX0.916897,maxY0.768584",
+    "public_audit": "PASS locally (26audit tests), remote runtime3940fad run41235192441 success; local private-term filter not configured",
+    "silent_export_regression": "PASS:.5s360p original and Kalinka,one H264 stream,no audio"
   },
-  "findings": [],
-  "next_step": "finish full export, validate decoded media and rerun browser regressions without concurrent rendering",
+  "findings": [
+    {
+      "id": "DU-001",
+      "status": "closed",
+      "summary": "final hand clipping fixed and independently verified"
+    }
+  ],
+  "next_step": "finish broad browser suite and record final handoff",
   "updated_at": "2026-10-31"
 }
