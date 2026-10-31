@@ -159,6 +159,8 @@ def partner_pose(rig, height, offset, role):
     for bone in rig.pose.bones:
         if bone.name.startswith('finger') and '-1.' not in bone.name:
             bone.rotation_euler.x = .35
+    head = rig.pose.bones['head']
+    head.rotation_euler.y = -rig.rotation_euler.z * .8
     bpy.context.view_layer.update()
 
 
