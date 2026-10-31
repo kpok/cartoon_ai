@@ -25,3 +25,12 @@ Plan review: score_plan_review found substantial reference-only contour errors i
 - Local unchanged MPFB models rendered at8samples; semantic pass2.33s from packed front scene, originalmaterialalpha. Generator now enforces the same front camera matrix and records semantic provenance.
 - First technical result: pair15.9138%, woman15.9138% (IoU0.5261, foregroundSSIM0.0481), man27.5396% (IoU0.4887, foregroundSSIM0.1552). Below80, expected quality-gate failure. No model/metric/mask adjustment performed after observing it. This is not comparable to old34.1109%.
 - Independent implementation review and full CI report remain pending at this checkpoint.
+
+
+## Verified delivery
+- Implementation b687a19b42dc93c67ae26a13c9e30247ff5efa9b: independent score_code_review PASS (13metric tests, workflowadversarial tests and11jobpolicy independentlypassed); exact firstlocal result independentlyrecomputed15.9137566696. No blocking findings or metric tuning after measurement.
+- Full GitHub run41195818734: generator, identicalfrontcamera guard, nine modelvalidator tests, full model/GLBvalidator, thirteenmetricbehavior tests and both artifactuploads succeeded. Only80qualitygate failed asdesigned (valid measured result, not computationerror).
+- Downloaded and inspected actual CI ZIP: all8expectedreportfiles present. Canonical24sample CI baseline pair15.982954537356076%; woman15.982954537356076% (IoU0.5260778298/SSIM0.0485583732), man27.199542434719916% (IoU0.4887001583/SSIM0.1513842580). Hashes of localconfig and algorithm code match actualCIreport. Difference from8samplelocalpreliminary reflects renderer sample settings, not model improvement.
+- Model artifact13040856360 (42,576,975bytes); comparisonartifact13040826430 (1,636,548bytes), one-dayretention; Summarypublished score/components/face diagnostics andartifactlinks despiteexpectedFAIL.
+- Sixty Node testsPASS; 13Pythonmetric+9modelvalidation testsPASS; production37filebuild, licensegate,11jobpolicy andgitdiff checksPASS. Separate oldprocedural80gate remainsunchanged/expectedfailure.
+- Frozen canonical baseline committed ascomparison-baseline.json withexactrender/semantic/source/config/code hashes andrenderer settings. No future delta claim isvalid across changedmetric/reference/sample settings. All SCORE-001..006acceptance checkscovered. No merge/deployment, modelretuning or AIimage-generation service.
