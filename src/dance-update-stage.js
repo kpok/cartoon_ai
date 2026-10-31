@@ -46,7 +46,7 @@ export async function createUpdateStage(canvas){
  const badges=[badge(-1.4,.8),badge(1.4,.8),badge(-1.42,2.0),badge(1.42,2.0)];
  const footMeshes=[];for(const side of ['Left','Right'])nodes[side+'FootPivot'].traverse(o=>{if(o.isMesh)footMeshes.push(o);});
  const footBox=new THREE.Box3();
- function render(time){
+ function render(time,paint=true){
   const p=updatePose(time);
   for(const [node,r] of rest){node.position.copy(r.position);node.quaternion.copy(r.quaternion);node.scale.copy(r.scale);}
   root.position.y+=floorOffset;root.rotation.y=p.turn;
@@ -76,11 +76,17 @@ export async function createUpdateStage(canvas){
   const specs=[[p.time>=.25&&p.time<3,p.leftProgress],[p.time>=7&&p.time<11.6,p.rightProgress],
    [p.time>=17.25&&p.time<21,p.handProgress],[p.time>=21,p.finalProgress]];
   badges.forEach((b,i)=>{const [visible,progress]=specs[i];b.group.visible=visible;b.arrow.rotation.z=progress>=1?0:-p.time*2;for(let j=0;j<16;j++){b.segments[j].visible=j<Math.max(1,Math.ceil(progress*16));b.segments[j].material.color.set(progress>=1?0x7fffb2:0xffc45b);}});
-  renderer.render(scene,camera);return p;
+  if(paint)renderer.render(scene,camera);return p;
  }
  function resize(width=canvas.clientWidth||360,height=canvas.clientHeight||640){
-  renderer.setSize(width,height,false);const vertical=6.8;camera.left=-vertical*width/height/2;camera.right=-camera.left;camera.top=vertical/2;camera.bottom=-vertical/2;camera.updateProjectionMatrix();
+  renderer.setSize(width,height,false);const vertical=7.6;camera.left=-vertical*width/height/2;camera.right=-camera.left;camera.top=vertical/2;camera.bottom=-vertical/2;camera.updateProjectionMatrix();
  }
  function dispose(){const geometries=new Set(),materials=new Set();scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);for(const m of Array.isArray(o.material)?o.material:o.material?[o.material]:[])materials.add(m);});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());environment.dispose();renderer.dispose();}
- resize();render(0);return {render,resize,dispose};
+ function frameBounds(){
+  model.updateMatrixWorld(true);camera.updateMatrixWorld(true);
+  const bounds=new THREE.Box3().setFromObject(model),point=new THREE.Vector3();let x=0,y=0;
+  for(const px of [bounds.min.x,bounds.max.x])for(const py of [bounds.min.y,bounds.max.y])for(const pz of [bounds.min.z,bounds.max.z]){point.set(px,py,pz).project(camera);x=Math.max(x,Math.abs(point.x));y=Math.max(y,Math.abs(point.y));}
+  return {x,y};
+ }
+ resize();render(0);return {render,resize,dispose,frameBounds};
 }

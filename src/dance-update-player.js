@@ -51,6 +51,6 @@ try{
  stage=await createUpdateStage(canvas);if(unavailable){stage.dispose();}else{
  canvas.hidden=false;$('preview').hidden=true;stage.resize();canvas.dataset.ready='true';$('status').textContent='24 sekundy · efekty dźwiękowe uruchomią się po naciśnięciu Odtwórz.';
  for(const id of ['play','restart','seek','mute'])$(id).disabled=false;draw();
- if(exporting){stage.resize(innerWidth,innerHeight);window.renderRobotFrame=value=>{if(unavailable||!Number.isFinite(value)||value<0||value>=UPDATE_DURATION)throw new Error('Invalid robot export frame');time=value;draw();return {time,width:canvas.width,height:canvas.height};};window.robotExportReady=true;}
+ if(exporting){stage.resize(innerWidth,innerHeight);window.renderRobotFrame=value=>{if(unavailable||!Number.isFinite(value)||value<0||value>=UPDATE_DURATION)throw new Error('Invalid robot export frame');time=value;draw();return {time,width:canvas.width,height:canvas.height};};window.inspectUpdateFrame=value=>{if(unavailable||!Number.isFinite(value)||value<0||value>=UPDATE_DURATION)throw new Error('Invalid pilot inspection time');stage.render(value,false);return stage.frameBounds();};window.robotExportReady=true;}
  }
 }catch{fail();}

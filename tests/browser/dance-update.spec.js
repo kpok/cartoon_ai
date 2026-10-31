@@ -19,6 +19,8 @@ test('portrait export frames are repeatable, bounded and include all story beats
  await page.evaluate(()=>window.renderRobotFrame(.65));expect((await canvas.screenshot()).equals(first)).toBe(true);
  for(const t of [-1,24,NaN])await expect(page.evaluate(t=>window.renderRobotFrame(t),t)).rejects.toThrow('Invalid robot export frame');
  await expect(page.locator('#play')).toBeHidden();await expect(canvas).toHaveAttribute('data-audio-playing','false');
+ const bounds=await page.evaluate(()=>{let maxX=0,maxY=0;for(let i=0;i<576;i++){const b=window.inspectUpdateFrame(i/24);maxX=Math.max(maxX,b.x);maxY=Math.max(maxY,b.y);}return {maxX,maxY};});
+ expect(bounds.maxX).toBeLessThan(.95);expect(bounds.maxY).toBeLessThan(.95);
 });
 test('pilot ends at24s and preserves its last frame until explicitly replayed',async({page})=>{
  await ready(page);const c=page.locator('#robot-canvas');await page.locator('#seek').evaluate(el=>{el.value='23.85';el.dispatchEvent(new Event('input'));});
