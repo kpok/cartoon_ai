@@ -1,6 +1,6 @@
 # MakeHuman anatomical pilot
 
-This code-only CPU experiment uses pinned MPFB 2.0.18 anatomy. The default CLI scene remains a neutral male. GitHub CI now uses `--scene salsa`: an adult female and male, separate anatomical rigs, a static partner pose, an emerald fitted dress, navy shirt and gray trousers. It replaces neither the old procedural salsa scene nor its source image or comparison gate. No image-generation service, generated photograph, photo projection or external model-generation API is used.
+This code-only CPU experiment uses pinned MPFB 2.0.18 anatomy. The default CLI scene remains a neutral male. GitHub CI now uses `--scene salsa`: an adult female and male, separate anatomical rigs, a static partner pose, an emerald fitted dress, navy shirt and gray trousers. It replaces neither the old procedural salsa scene nor its source image or comparison gate. No image-generation service, generated photograph, reference-photo projection or external model-generation API is used. Existing licensed CC0 MakeHuman skin, eye and hair textures remain inputs.
 
 Faces use explicit profiles in `face_profiles.py`: 17 female and 15 male geometry targets shape the jaw, chin, cheeks, nose, eyelids, brows and lips. The male also has 1,800 short code-generated beard strands. Profile values and exact upstream target hashes are saved per character. They are artistic approximations of visible reference features, not an identity reconstruction. Adult MPFB age=.5 is used for this scene.
 

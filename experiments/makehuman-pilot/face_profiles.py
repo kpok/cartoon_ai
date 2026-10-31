@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Hand-tuned reference-inspired facial geometry; no photo textures or identity claim."""
+"""Hand-tuned reference-inspired facial geometry; no reference-photo textures or identity claim."""
 import hashlib
 from pathlib import Path
 import random
