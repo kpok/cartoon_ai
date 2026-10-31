@@ -2,10 +2,11 @@ import {test,expect} from '@playwright/test';
 const seek=async(page,time)=>page.locator('#seek').evaluate((input,t)=>{input.value=String(t);input.dispatchEvent(new Event('input',{bubbles:true}));},time);
 async function ready(page,path='/strawberry.html'){await page.goto(path);await expect(page.locator('#strawberry-canvas')).toHaveAttribute('data-ready','true',{timeout:30000});}
 
-test('fifth tile preserves four earlier stories and opens a silent local WebGL film',async({page,baseURL})=>{
+test('library preserves earlier stories beside the new pilot and opens the silent strawberry film',async({page,baseURL})=>{
  const errors=[],external=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(new URL(r.url()).origin!==new URL(baseURL).origin)external.push(r.url());});
  await page.addInitScript(()=>{window.audioCalls=0;window.violations=[];for(const key of ['AudioContext','webkitAudioContext','Audio']){if(window[key])window[key]=class{constructor(){window.audioCalls++;throw Error('Unexpected audio');}};}if(window.speechSynthesis)window.speechSynthesis.speak=()=>{window.audioCalls++;};document.addEventListener('securitypolicyviolation',e=>window.violations.push(e.effectiveDirective));});
- await page.goto('/?lang=en');const gallery=page.locator('.story-library');await expect(gallery.locator(':scope > button, :scope > a')).toHaveCount(5);
+ await page.goto('/?lang=en');const gallery=page.locator('.story-library');await expect(gallery.locator(':scope > button, :scope > a')).toHaveCount(6);
+ await expect(gallery.locator('a[href="./dance-update.html"]')).toBeVisible();
  await expect(gallery.locator('button[data-story="meadow"]')).toBeVisible();await expect(gallery.locator('button[data-story="garden"]')).toBeVisible();await expect(gallery.locator('a[href="./robot.html"]')).toBeVisible();await expect(gallery.locator('a[href="./robot.html?dance=kalinka"]')).toBeVisible();
  await page.getByRole('link',{name:/The Last Strawberry/}).click();await expect(page.locator('html')).toHaveAttribute('lang','en');
  const canvas=page.locator('#strawberry-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await expect(canvas).toHaveAttribute('data-playing','false');

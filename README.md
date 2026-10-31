@@ -229,3 +229,9 @@ Aktualizacja „Kalinki”: różowy i niebieski szlam obejmuje też plecy i ko�
 wysokie cholewki są wyraźne, a wykop rozwija się od podciągniętego kolana do niemal
 prostej nogi skierowanej do przodu. Szybsze kroki, dłuższa nieregularna trasa i obroty
 pokazują wszystkie strony robota. Obszar ruchu nie ma widocznych granic ani słupków.
+
+## Pilot01 — Aktualizacja tańca
+
+Osobna24-sekundowa komedia: jedna noga robota aktualizuje się przed resztą ciała. Oryginalne efekty dźwiękowe są generowane kodem; film nie wymaga konkretnej piosenki. Odtwarzacz uruchamia dźwięk dopiero po kliknięciu Odtwórz i zatrzymuje film na końcu.
+
+[Scenariusz, podgląd i eksport MP4 z dźwiękiem](docs/DANCE_UPDATE_PILOT.md). Po wdrożeniu podgląd jest dostępny jako `dance-update.html`. Eksport: `npm run robot:mp4 -- --dance update`.

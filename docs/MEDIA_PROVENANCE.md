@@ -43,3 +43,5 @@ https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL
   with project-authored silent choreography. No imported character models, textures,
   audio or third-party cartoon footage. This describes technical provenance, not a
   certification of legal exclusivity. No new asset-specific reuse license is granted.
+
+- Dance Update pilot: original project-authored24s comedy using the existing published robot model and its existing licensing/attribution. New poses, stage/badges and48kHz synthesized effects are produced by project code, with no external samples or music. Web preview and exported AAC share one PCM synthesis/timeline. This is technical provenance, not a claim of legal exclusivity.
