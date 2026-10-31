@@ -14,3 +14,9 @@ test('Kalinka exports its full24s loop and rejects unknown dances or overrun',()
  assert.throws(()=>robotSettings(['--dance','kalinka','--duration','25']));
  assert.throws(()=>robotSettings(['--dance','unknown']));
 });
+
+test('update pilot exports24s with the existing portrait frame grid',()=>{
+ const c=robotSettings(['--dance','update']);assert.equal(c.duration,24);assert.equal(c.frames,576);
+ assert.throws(()=>robotSettings(['--dance','update','--duration','25']));
+ assert.equal(robotSettings(['--dance','update','--duration','.5']).frames,12);
+});

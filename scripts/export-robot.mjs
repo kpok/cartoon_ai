@@ -7,12 +7,14 @@ import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {chromium} from '@playwright/test';
 import {createStaticServer} from './static-server.mjs';
-import {run} from './export-audio.mjs';
+import {run,wav} from './export-audio.mjs';
+import {updateSamples} from '../src/dance-update-audio.js';
+import {validateMovie} from './export-validation.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..');
 export function robotSettings(args){
  const {values:v}=parseArgs({args,options:{width:{type:'string',default:'720'},duration:{type:'string'},dance:{type:'string',default:'original'},out:{type:'string',default:'robot-video/robot-dance.mp4'}}});
- const dance=v.dance;if(!['original','kalinka'].includes(dance))throw new Error('Expected dance original or kalinka');
- const maximum=dance==='kalinka'?24:40;
+ const dance=v.dance;if(!['original','kalinka','update'].includes(dance))throw new Error('Expected dance original, kalinka or update');
+ const maximum=dance==='original'?40:24;
  const width=Number(v.width),duration=Number(v.duration??maximum),fps=24;
  if(![360,720,1080].includes(width)||!Number.isFinite(duration)||duration<=0||duration>maximum||Math.abs(duration*fps-Math.round(duration*fps))>1e-6)throw new Error(`Expected width360/720/1080 and duration within${maximum}s on the24fps grid`);
  if(!v.out.endsWith('.mp4'))throw new Error('Output must end in .mp4');
@@ -26,7 +28,7 @@ export async function exportRobot(config){
   browser=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
   const page=await browser.newPage({viewport:{width:config.width,height:config.height},deviceScaleFactor:1});
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
-  await page.goto(`http://127.0.0.1:${server.address().port}/robot.html?export=1&dance=${config.dance}`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/${config.dance==='update'?'dance-update.html':'robot.html'}?export=1&dance=${config.dance}`);
   await page.waitForFunction(()=>window.robotExportReady===true,null,{timeout:30000});
   const video=join(temporary,'robot.mp4');
   encoder=spawn('ffmpeg',['-v','error','-f','image2pipe','-framerate',String(config.fps),'-vcodec','png','-i','pipe:0','-an','-c:v','libx264','-preset','fast','-crf','19','-pix_fmt','yuv420p','-threads','2','-movflags','+faststart','-y',video],{stdio:['pipe','ignore','pipe']});
@@ -43,13 +45,21 @@ export async function exportRobot(config){
   }
   encoder.stdin.end();await encoderDone;encoder=null;
   if(interrupted||errors.length)throw new Error('Export interrupted or renderer failed');
-  const probe=JSON.parse((await run('ffprobe',['-v','error','-show_streams','-show_format','-of','json',video])).toString());
-  const streams=probe.streams||[],v=streams[0];
+  let movie=video;
+  if(config.dance==='update'){
+   const audio=join(temporary,'effects.wav');await writeFile(audio,wav(updateSamples(config.duration)));
+   movie=join(temporary,'pilot-with-effects.mp4');
+   await run('ffmpeg',['-v','error','-i',video,'-i',audio,'-map','0:v:0','-map','1:a:0','-c:v','copy','-c:a','aac','-b:a','128k','-ar','48000','-ac','1','-t',String(config.duration),'-movflags','+faststart','-y',movie]);
+  }
+  const probe=JSON.parse((await run('ffprobe',['-v','error','-show_streams','-show_format','-of','json',movie])).toString());
+  const streams=probe.streams||[],v=streams.find(s=>s.codec_type==='video');
+  if(config.dance==='update')validateMovie(probe,config);
+  else
   if(streams.length!==1||v?.codec_type!=='video'||v.codec_name!=='h264'||v.pix_fmt!=='yuv420p'||v.width!==config.width||v.height!==config.height||v.avg_frame_rate!=='24/1'||Number(v.nb_frames)!==config.frames||!Number.isFinite(Number(probe.format?.duration))||Math.abs(Number(probe.format.duration)-config.duration)>.05)throw new Error('MP4 validation failed');
   await mkdir(dirname(config.out),{recursive:true});
-  const partial=config.out+'.partial';await copyFile(video,partial);await rename(partial,config.out);
+  const partial=config.out+'.partial';await copyFile(movie,partial);await rename(partial,config.out);
   const manifest=JSON.parse(await readFile(join(root,'published/robot/manifest.json'),'utf8'));
-  const metadata={...config,model_sha256:manifest.files['robot.glb'].sha256,audio:false,codec:'h264',pix_fmt:'yuv420p',source_commit:process.env.GITHUB_SHA??'local',streams:streams.length};
+  const metadata={...config,model_sha256:manifest.files['robot.glb'].sha256,audio:config.dance==='update',soundtrack:config.dance==='update'?'original-procedural-effects-v1':null,codec:'h264',pix_fmt:'yuv420p',source_commit:process.env.GITHUB_SHA??'local',streams:streams.length};
   await writeFile(config.out.replace(/\.mp4$/,'.json'),JSON.stringify(metadata,null,2)+'\n');console.log(`Validated MP4: ${config.out}`);return metadata;
  }finally{
   process.off('SIGINT',interrupt);process.off('SIGTERM',interrupt);if(encoder){encoder.stdin.destroy();encoder.kill('SIGKILL');await encoderDone?.catch(()=>{});}

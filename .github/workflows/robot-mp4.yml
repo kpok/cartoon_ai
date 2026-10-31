@@ -10,6 +10,7 @@ on:
         options:
           - kalinka
           - original
+          - update
 permissions: {}
 jobs:
   render:
@@ -51,7 +52,7 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium
       - run: sudo apt-get update && sudo apt-get install -y ffmpeg
-      - name: Render selected dance and validate silent portrait MP4
+      - name: Render selected dance and validate portrait MP4 (update includes effects)
         run: npm run robot:mp4 -- --dance "$ROBOT_DANCE"
         env:
           ROBOT_DANCE: ${{ inputs.dance }}

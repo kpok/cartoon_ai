@@ -43,7 +43,7 @@ export async function createUpdateStage(canvas){
   const tip=new THREE.Mesh(new THREE.CircleGeometry(.095,3),shaft.material);tip.position.y=.10;arrow.add(tip);
   return {group,segments,arrow};
  }
- const badges=[badge(-1.55,.8),badge(1.55,.8),badge(-1.65,2.0),badge(1.65,2.0)];
+ const badges=[badge(-1.4,.8),badge(1.4,.8),badge(-1.42,2.0),badge(1.42,2.0)];
  const footMeshes=[];for(const side of ['Left','Right'])nodes[side+'FootPivot'].traverse(o=>{if(o.isMesh)footMeshes.push(o);});
  const footBox=new THREE.Box3();
  function render(time){
@@ -51,7 +51,7 @@ export async function createUpdateStage(canvas){
   for(const [node,r] of rest){node.position.copy(r.position);node.quaternion.copy(r.quaternion);node.scale.copy(r.scale);}
   root.position.y+=floorOffset;root.rotation.y=p.turn;
   nodes.TorsoPivot.rotation.z=p.lean;nodes.HeadPivot.rotation.x=p.lookDown;
-  nodes.HeadPivot.rotation.z=-p.lean*.7;
+  nodes.HeadPivot.rotation.z=-p.lean*.7+p.alarm*.10;
   for(const [i,side] of ['Left','Right'].entries()){
    const sign=i===0?-1:1,kick=i===0?p.left:p.right;
    nodes[side+'HipPivot'].rotation.set(-kick*1.10,0,sign*kick*.12);
@@ -62,14 +62,14 @@ export async function createUpdateStage(canvas){
    nodes[side+'ElbowPivot'].rotation.x=-.35-p.restraint*.65+arm*.45;
    nodes[side+'WristPivot'].rotation.z=arm*.9;
    nodes[side+'GazePivot'].position.y-=p.lookDown*.35;
-   nodes[side+'GazePivot'].position.x+=p.alarm*.045*(i===0?1:-1);
-   nodes[side+'BrowPivot'].rotation.z=sign*(.12-p.relief*.2+p.alarm*.2);
+   nodes[side+'GazePivot'].position.x+=p.alarm*.07;
+   nodes[side+'BrowPivot'].rotation.z=sign*(.12-p.relief*.2+p.alarm*.35);
    const blink=Math.abs((p.time%4.2)-3.7)<.07;nodes[side+'LidPivot'].scale.y=blink?1:.015;
   }
   // The second foot reaches across to restrain the first; it visibly fails.
   nodes.RightHipPivot.rotation.z-=p.restraint*.48;
   nodes.RightKneePivot.rotation.x+=p.restraint*.35;
-  nodes.SmilePivot.rotation.z=p.alarm*.10;nodes.SmilePivot.position.y+=p.alarm*.035-p.relief*.025;
+  nodes.SmilePivot.rotation.z=p.alarm*.10;nodes.SmilePivot.position.y+=p.alarm*.035-p.relief*.025;nodes.SmilePivot.scale.y*=1-p.alarm*.55;
   model.updateMatrixWorld(true);let lowest=Infinity;
   for(const mesh of footMeshes)lowest=Math.min(lowest,footBox.setFromObject(mesh).min.y);
   if(lowest<.015){root.position.y+=.015-lowest;model.updateMatrixWorld(true);}

@@ -10,7 +10,7 @@ const now=()=>context?context.currentTime:performance.now()/1000;
 function readTime(){return playing?Math.min(UPDATE_DURATION,Math.max(0,now()-origin)):time;}
 function stopSource(){if(source){source.onended=null;try{source.stop();}catch{}source.disconnect();source=null;}canvas.dataset.audioPlaying='false';}
 function sync(){
- canvas.dataset.time=time.toFixed(3);canvas.dataset.playing=String(playing);canvas.dataset.muted=String(muted);$('seek').value=String(time);
+ canvas.dataset.audioPlaying=String(playing&&!muted&&Boolean(source));canvas.dataset.time=time.toFixed(3);canvas.dataset.playing=String(playing);canvas.dataset.muted=String(muted);$('seek').value=String(time);
  $('readout').textContent=`${time.toFixed(1)} / 24 s`;$('play').textContent=playing?'Wstrzymaj':'Odtwórz';$('play').setAttribute('aria-pressed',String(playing));
  $('mute').textContent=muted?'Włącz efekty':'Wycisz efekty';$('mute').setAttribute('aria-pressed',String(muted));
 }
