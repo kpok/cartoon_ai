@@ -1,0 +1,28 @@
+{
+  "task_id": "dance-update-pilot",
+  "repository": "kpok/cartoon_ai",
+  "baseline_revision": "afe6164232c901ac8eb78f6012b7faea5f2c9b49",
+  "current_revision": "67d40dda8032d9750609f08314cabd78d396c088",
+  "phase": "VERIFY",
+  "status": "in_progress",
+  "authorized_actions": [
+    "local implementation",
+    "remote branch checkpoints",
+    "PR handoff"
+  ],
+  "checks": {
+    "plan_review": "PASS",
+    "implementation_review": "PASS",
+    "new_browser_cases": "14 passed desktop/mobile",
+    "node_suite": "58 passed before final export-settings test;5focused passed after",
+    "smoke_mp4": "360x640,.5s,H264+AAC48kmono PASS",
+    "full_mp4": "720x1280,24s render in progress",
+    "broad_browser": "interrupted after legacy Kalinka screenshot timeouts while parallel software render; rerun serially after render",
+    "privacy": "PASS after exact-tree synchronization to policy-compliant remote history",
+    "license": "PASS",
+    "vulnerabilities": "PASS"
+  },
+  "findings": [],
+  "next_step": "finish full export, validate decoded media and rerun browser regressions without concurrent rendering",
+  "updated_at": "2026-10-31"
+}
