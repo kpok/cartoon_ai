@@ -72,6 +72,16 @@ export function checkPolicy(workflows,pins){
     assert.equal(upload.if,"always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success'");
     assert.equal(upload.with['retention-days'],1);
     assert.equal(upload.with.path,'${{ runner.temp }}/makehuman-output/');
+    const compare=job.steps.find(step=>step.id==='compare');
+    assert.equal(compare.run,'"$RUNNER_TEMP/mpfb-comparison/bin/python" experiments/makehuman-pilot/compare.py --model-dir "$RUNNER_TEMP/makehuman-output" --output "$RUNNER_TEMP/makehuman-comparison" >> "$GITHUB_STEP_SUMMARY"');
+    assert.equal(compare.if,undefined);assert.equal(compare['continue-on-error'],undefined);
+    assert.ok(job.steps.indexOf(upload)<job.steps.indexOf(compare),'Model artifact must precede score gate');
+    const report=job.steps.find(step=>step.id==='comparison_artifact');
+    assert.equal(report.if,"always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')");
+    assert.equal(report.with.name,'makehuman-foreground-comparison');assert.equal(report.with['retention-days'],1);
+    assert.deepEqual(report.with.path.trim().split('\n'),['metrics.json','summary.md','comparison.png','reference-annotation.png','reference-normalized.png','render-normalized.png','overlap.png','difference.png'].map(p=>'${{ runner.temp }}/makehuman-comparison/'+p));
+    assert.ok(job.steps.indexOf(report)>job.steps.indexOf(compare));
+
    }
    if(file==='salsa-snapshot.yml'){
     for(const event_name of ['push','workflow_dispatch'])assert.equal(evaluateGate(job.if,ownerContext({ref:'refs/heads/experiment/salsa-human-models',event_name})),true,'Snapshot must accept the authorized experiment branch');

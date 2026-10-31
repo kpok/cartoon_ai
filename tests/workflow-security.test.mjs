@@ -7,6 +7,9 @@ const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',impor
 test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),11);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='compare')['continue-on-error']=true;},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='comparison_artifact').if="steps.compare.outcome == 'success'";},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='comparison_artifact').with.path='${{ runner.temp }}/';},
   w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='artifact').if='always()';},
   w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='artifact').with.path='${{ runner.temp }}/';},
   w=>{w['makehuman-pilot.yml'].on.push.branches.push('**');},

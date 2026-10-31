@@ -18,3 +18,10 @@ Plan: freeze annotations/config and checkpoint; plan review; add renderer masks 
 
 
 Plan review: score_plan_review found substantial reference-only contour errors in initialannotation (legs/dress/shoes). Adopted independent263woman/162manpoint source-only repair and visually checked /tmp/score-annotation-proposal.png before any model scoring. Remaining hairwisps/sandalarches/intertwinedhands approximation declared. Plan PASS after repair. Both council experts explicitly accept geometricmean with conditions. No weights/thresholds were fitted to model output.
+
+## First local measurement (frozen parameters, not a tuned target)
+- Corrected source-only annotation and geomean definition committed before measurement (e3b6916).
+- Thirteen metric behavior tests PASS. All-source/hash/reference/semantic anti-gaming checks retained. Workflow policy and adversarial publication/gate tests PASS.
+- Local unchanged MPFB models rendered at8samples; semantic pass2.33s from packed front scene, originalmaterialalpha. Generator now enforces the same front camera matrix and records semantic provenance.
+- First technical result: pair15.9138%, woman15.9138% (IoU0.5261, foregroundSSIM0.0481), man27.5396% (IoU0.4887, foregroundSSIM0.1552). Below80, expected quality-gate failure. No model/metric/mask adjustment performed after observing it. This is not comparable to old34.1109%.
+- Independent implementation review and full CI report remain pending at this checkpoint.

@@ -65,3 +65,34 @@ jobs:
           ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
         run: |
           python3 experiments/makehuman-pilot/summary.py "$RUNNER_TEMP/makehuman-output" >> "$GITHUB_STEP_SUMMARY"
+      - name: Install isolated foreground-comparison dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/mpfb-comparison"
+          "$RUNNER_TEMP/mpfb-comparison/bin/python" -m pip install --only-binary=:all: -r experiments/salsa-human-models/requirements.txt
+      - name: Validate foreground metric behavior
+        run: '"$RUNNER_TEMP/mpfb-comparison/bin/python" -m unittest discover -s experiments/makehuman-pilot -p test_comparison.py'
+      - id: compare
+        name: Compare MPFB foreground (technical target 80)
+        run: '"$RUNNER_TEMP/mpfb-comparison/bin/python" experiments/makehuman-pilot/compare.py --model-dir "$RUNNER_TEMP/makehuman-output" --output "$RUNNER_TEMP/makehuman-comparison" >> "$GITHUB_STEP_SUMMARY"'
+      - id: comparison_artifact
+        if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: makehuman-foreground-comparison
+          path: |
+            ${{ runner.temp }}/makehuman-comparison/metrics.json
+            ${{ runner.temp }}/makehuman-comparison/summary.md
+            ${{ runner.temp }}/makehuman-comparison/comparison.png
+            ${{ runner.temp }}/makehuman-comparison/reference-annotation.png
+            ${{ runner.temp }}/makehuman-comparison/reference-normalized.png
+            ${{ runner.temp }}/makehuman-comparison/render-normalized.png
+            ${{ runner.temp }}/makehuman-comparison/overlap.png
+            ${{ runner.temp }}/makehuman-comparison/difference.png
+          retention-days: 1
+          if-no-files-found: error
+      - name: Link foreground comparison report
+        if: always() && steps.comparison_artifact.outcome == 'success'
+        env:
+          REPORT_URL: ${{ steps.comparison_artifact.outputs.artifact-url }}
+        run: |
+          printf '\n[Download foreground comparison, masks and metrics](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"
