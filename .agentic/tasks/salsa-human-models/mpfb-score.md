@@ -15,3 +15,6 @@ Acceptance:
 - SCORE-006: existing audited owner-only CI publishes original model artifact before threshold80 comparison; comparisonreport uploaded even when threshold fails; truthful Summary.80 is aspirational technicaltarget, not80%identity confidence.
 
 Plan: freeze annotations/config and checkpoint; plan review; add renderer masks and metric/test slices; checkpoint; actual local render/score after behavior tests; independent implementation review bounded3rounds; fix confirmed defects; CI score/report; record firstbaseline without tuning weights/masks to improve it.
+
+
+Plan review: score_plan_review found substantial reference-only contour errors in initialannotation (legs/dress/shoes). Adopted independent263woman/162manpoint source-only repair and visually checked /tmp/score-annotation-proposal.png before any model scoring. Remaining hairwisps/sandalarches/intertwinedhands approximation declared. Plan PASS after repair. Both council experts explicitly accept geometricmean with conditions. No weights/thresholds were fitted to model output.

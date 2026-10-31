@@ -151,6 +151,7 @@ clay.diffuse_color = (.45, .45, .45, 1)
 clay.use_nodes = True
 clay.node_tree.nodes.get('Principled BSDF').inputs['Base Color'].default_value = (.45, .45, .45, 1)
 framing = {}
+front_camera = None
 from bpy_extras.object_utils import world_to_camera_view
 for style in ('beauty', 'clay'):
     scene.view_layers[0].material_override = clay if style == 'clay' else None
@@ -160,6 +161,8 @@ for style in ('beauty', 'clay'):
         aim(camera, center)
         bpy.context.view_layer.update()
         if style == 'beauty':
+            if name == 'front':
+                front_camera = {'matrixWorld': [list(row) for row in camera.matrix_world], 'orthoScale': camera.data.ortho_scale, 'resolution': [640, 800]}
             projected = [world_to_camera_view(scene, camera, point) for point in points]
             framing[name] = {'minX': min(p.x for p in projected), 'maxX': max(p.x for p in projected), 'minY': min(p.y for p in projected), 'maxY': max(p.y for p in projected)}
         scene.render.filepath = str(out / (style + '-' + name + '.png'))
@@ -179,6 +182,12 @@ if args.scene == 'salsa':
 scene.view_layers[0].material_override = None
 camera.location = center + Vector((0, -height * 2, 0))
 aim(camera, center)
+if args.scene == 'salsa':
+    from semantic_mask import render_semantic_mask
+    bpy.context.view_layer.update()
+    if any(abs(camera.matrix_world[row][col] - front_camera['matrixWorld'][row][col]) > 1e-7 for row in range(4) for col in range(4)):
+        raise RuntimeError('Semantic mask camera differs from beauty front')
+    render_semantic_mask(scene, characters, out / 'segmentation-front.png')
 for image in bpy.data.images:
     if image.source == 'FILE' and image.has_data:
         image.pack()
@@ -223,5 +232,5 @@ if face_error > height * .002:
     raise RuntimeError('GLB roundtrip changed sculpted face geometry: ' + str(face_error))
 shutil.copyfile(Path(__file__).with_name('README.md'), out / 'README.md')
 shutil.copyfile(Path(__file__).with_name('inputs.lock.json'), out / 'inputs.lock.json')
-manifest = {'pilot': 'Static anatomical pair approximation' if args.scene == 'salsa' else 'Single MPFB male; not a reconstruction of the reference couple', 'scene': args.scene, 'characters': inventory, 'framing': framing, 'poseLandmarks': expected_landmarks, 'roundtripFaceMaxError': face_error, 'roundtripPoseMaxError': landmark_error, 'height': height, 'blender': bpy.app.version_string, 'sourceVertices': source_vertices, 'rigBones': rig_bones, 'meshCount': len(characters), 'assets': sorted(set(all_assets)), 'assetHashes': {relative: hashlib.sha256((assets / relative).read_bytes()).hexdigest() for relative in sorted(set(all_assets))}, 'glbRoundtrip': True, 'seconds': round(time.monotonic() - started, 2), 'device': 'CPU', 'samples': args.samples, 'views': ['front', 'three-quarter', 'side', 'back']}
+manifest = {'pilot': 'Static anatomical pair approximation' if args.scene == 'salsa' else 'Single MPFB male; not a reconstruction of the reference couple', 'scene': args.scene, 'semanticMask': {'file': 'segmentation-front.png', 'camera': front_camera, 'alphaCutoff': 128, 'ownership': 'woman=red, man=blue, original material alpha, full scene occlusion'} if args.scene == 'salsa' else None, 'characters': inventory, 'framing': framing, 'poseLandmarks': expected_landmarks, 'roundtripFaceMaxError': face_error, 'roundtripPoseMaxError': landmark_error, 'height': height, 'blender': bpy.app.version_string, 'sourceVertices': source_vertices, 'rigBones': rig_bones, 'meshCount': len(characters), 'assets': sorted(set(all_assets)), 'assetHashes': {relative: hashlib.sha256((assets / relative).read_bytes()).hexdigest() for relative in sorted(set(all_assets))}, 'glbRoundtrip': True, 'seconds': round(time.monotonic() - started, 2), 'device': 'CPU', 'samples': args.samples, 'views': ['front', 'three-quarter', 'side', 'back']}
 (out / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
