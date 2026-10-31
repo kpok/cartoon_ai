@@ -40,3 +40,20 @@ python3 -m venv /tmp/mpfb-comparison
 ```
 
 Exit0 meets80; exit1 means a valid score below80; exit2 means no valid score. The model artifact uploads before comparison dependencies/tests and the gate. Comparison JSON, Markdown, reference annotation, normalized images, semantic-mask panel, silhouette overlap and difference images upload even when the comparison fails. The Summary includes per-person/components, face diagnostics and report link; one-day retention applies.
+
+## Dense surface and separate face inspection
+
+The pair uses one Catmull-Clark body subdivision level, after helper/clothing masks and before the armature. The editable Blender scene retains the original morph controls, rig and modifier. Only body geometry is baked for GLB export, with its armature retained. The manifest distinguishes control, evaluated and baked counts; the validator checks actual unique POSITION accessors so a render-only improvement cannot pass.
+
+Head surfaces increase from 4,069 to 16,275 vertices per person. This smooths contours without reconstructing missing identity, expression or hair. Hair assets remain separate and unchanged. Same-camera clay L0/L1 controls show the change; stubble is hidden in both clay portraits to isolate skin surface smoothing.
+
+`face-comparison.json` defines a separate `mpfb-face-v1` diagnostic. It crops existing reference pixels at native 160×164 and 161×173 resolution, with independently reviewed iris centres. Model anchors are eye-globe centres projected from the portrait camera. Each face receives only an analytical rotation, uniform scale and translation into 160×192, with a fixed inner-face oval. There is no reflection, nonrigid warp, color fitting or score search. The index is 100 times RGB block-SSIM in the oval; edge F1 and color MAE remain diagnostics. Lighting, expression, yaw and approximate eye anchors still affect it. There is no calibrated face threshold or identity-recognition claim.
+
+```bash
+/tmp/mpfb-comparison/bin/python -m unittest discover -s experiments/makehuman-pilot -p test_faces.py
+/tmp/mpfb-comparison/bin/python experiments/makehuman-pilot/compare_faces.py --model-dir /tmp/makehuman-output --output /tmp/makehuman-faces
+```
+
+CI publishes a separate `makehuman-face-inspection` artifact and Summary even after the global 80 gate fails. Its 20 files include native source crops, original model portraits, eye-anchor overlays, aligned images, differences, per-person panels, L0/L1 clay controls, JSON and Markdown. The whole-pair algorithm, annotation and baseline remain unchanged. Face indices are not comparable with old global-layout ROI diagnostics.
+
+The first separate CPU/24-sample CI baseline is 27.1896% for the woman and 36.0667% for the man, saved with exact hashes/settings in `face-comparison-baseline.json`. These are technical face appearance indices, not percentages of identity likeness. All generation and inspection use code and pinned licensed inputs; source crops are ordinary pixel extraction, not generative enlargement.

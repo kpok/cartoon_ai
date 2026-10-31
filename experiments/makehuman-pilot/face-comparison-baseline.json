@@ -1,0 +1,235 @@
+{
+  "algorithm": "mpfb-face-v1",
+  "meaning": "Separate eye-registered technical face appearance index, not identity likeness. Lighting, expression and 3D yaw remain differences. No calibrated pass threshold.",
+  "people": {
+    "woman": {
+      "faceScorePercent": 27.189560176032334,
+      "innerFaceRGBSSIM": 0.27189560176032335,
+      "edgeF1Diagnostic": 0.5711642545480556,
+      "colorMAE255Diagnostic": 52.927790181088334,
+      "transforms": {
+        "reference": {
+          "matrix": [
+            [
+              1.3517241379310343,
+              -0.5793103448275861,
+              3.144827586206901
+            ],
+            [
+              0.5793103448275861,
+              1.3517241379310343,
+              -36.53793103448274
+            ]
+          ],
+          "inverse": [
+            0.6250000000000001,
+            0.2678571428571429,
+            7.821428571428564,
+            -0.2678571428571429,
+            0.6250000000000001,
+            23.678571428571423
+          ],
+          "uniformScale": 1.4706320480288924,
+          "rotationDegrees": 23.19859051364819,
+          "eyeDistancePixels": 38.07886552931954,
+          "eyeLineDegrees": -23.19859051364819
+        },
+        "model": {
+          "matrix": [
+            [
+              0.48449484588401776,
+              -0.007965107265326152,
+              -79.68259579807614
+            ],
+            [
+              0.007965107265326152,
+              0.48449484588401776,
+              -142.91821165580092
+            ]
+          ],
+          "inverse": [
+            2.0634477479117255,
+            0.03392313207898821,
+            169.26910621779305,
+            -0.03392313207898821,
+            2.0634477479117255,
+            292.20117875507896
+          ],
+          "uniformScale": 0.48456031474103023,
+          "rotationDegrees": 0.9418591868163546,
+          "eyeDistancePixels": 115.56868834776286,
+          "eyeLineDegrees": -0.9418591868163546
+        }
+      },
+      "sourceEyes": [
+        [
+          58,
+          51
+        ],
+        [
+          93,
+          36
+        ]
+      ],
+      "modelEyes": [
+        [
+          278.807315826416,
+          426.6247272491455
+        ],
+        [
+          394.36038970947266,
+          424.72503185272217
+        ]
+      ],
+      "sourceCrop": [
+        207,
+        134,
+        367,
+        298
+      ],
+      "nativeSourceSize": [
+        160,
+        164
+      ],
+      "projectedEyeMeaning": "Projected rig eye-globe centres; approximate iris centres, sorted image-left/right",
+      "modelImageSha256": "d00b7f79a3e4d945829bd369dbb4d81c92afc8dcc4b573a4902dacd71d12430a"
+    },
+    "man": {
+      "faceScorePercent": 36.06669415227782,
+      "innerFaceRGBSSIM": 0.3606669415227782,
+      "edgeF1Diagnostic": 0.5698745235681966,
+      "colorMAE255Diagnostic": 57.11774124439032,
+      "transforms": {
+        "reference": {
+          "matrix": [
+            [
+              1.1825037707390649,
+              -0.42232277526395173,
+              32.23529411764706
+            ],
+            [
+              0.42232277526395173,
+              1.1825037707390649,
+              -50.3921568627451
+            ]
+          ],
+          "inverse": [
+            0.75,
+            0.26785714285714285,
+            -10.678571428571427,
+            -0.26785714285714285,
+            0.75,
+            46.42857142857143
+          ],
+          "uniformScale": 1.2556558821264499,
+          "rotationDegrees": 19.65382405805331,
+          "eyeDistancePixels": 44.598206241955516,
+          "eyeLineDegrees": -19.65382405805331
+        },
+        "model": {
+          "matrix": [
+            [
+              0.463516066399115,
+              0.003253861991262527,
+              -66.74113033959244
+            ],
+            [
+              -0.003253861991262527,
+              0.463516066399115,
+              -121.40271315369007
+            ]
+          ],
+          "inverse": [
+            2.157316207885742,
+            -0.015144262995038715,
+            142.1431675979069,
+            0.015144262995038715,
+            2.157316207885742,
+            262.9147859982081
+          ],
+          "uniformScale": 0.4635274872410125,
+          "rotationDegrees": -0.4022071948983454,
+          "eyeDistancePixels": 120.81268434223973,
+          "eyeLineDegrees": 0.40220719489834533
+        }
+      },
+      "sourceEyes": [
+        [
+          46,
+          82
+        ],
+        [
+          88,
+          67
+        ]
+      ],
+      "modelEyes": [
+        [
+          253.32408905029297,
+          406.0851573944092
+        ],
+        [
+          374.13379669189453,
+          406.93323612213135
+        ]
+      ],
+      "sourceCrop": [
+        438,
+        53,
+        599,
+        226
+      ],
+      "nativeSourceSize": [
+        161,
+        173
+      ],
+      "projectedEyeMeaning": "Projected rig eye-globe centres; approximate iris centres, sorted image-left/right",
+      "modelImageSha256": "20acdb9fe4c7e4ab7202996bd724986c21a2774615154b5973d49831dd85b746"
+    }
+  },
+  "sourceSha256": "51030de7c1bc504597d6d3e43eb361696321d8bf6c5bc1cb2ca50cfda933b973",
+  "configSha256": "46c388448ba9ad8ff45a4da53e0b449bd23008676ba022bfc2ed17ae3d04963e",
+  "algorithmCodeSha256": "916196c4bd949ae953c7e5ee24998d5c98013dd7ccf26cc8a0cd6901b4385926",
+  "pillowVersion": "12.3.0",
+  "surfaceDetail": {
+    "woman": {
+      "method": "Catmull-Clark",
+      "levels": 1,
+      "modifierOrder": [
+        "MASK",
+        "MASK",
+        "SUBSURF",
+        "ARMATURE"
+      ],
+      "controlBodyVertices": 11134,
+      "evaluatedBodyVertices": 44496,
+      "controlHeadVertices": 4069,
+      "evaluatedHeadVertices": 16275,
+      "exportBakedVertices": 44496
+    },
+    "man": {
+      "method": "Catmull-Clark",
+      "levels": 1,
+      "modifierOrder": [
+        "MASK",
+        "MASK",
+        "MASK",
+        "SUBSURF",
+        "ARMATURE"
+      ],
+      "controlBodyVertices": 7840,
+      "evaluatedBodyVertices": 31177,
+      "controlHeadVertices": 4069,
+      "evaluatedHeadVertices": 16275,
+      "exportBakedVertices": 31177
+    }
+  },
+  "implementationRevision": "58f62e5920d38d8d73d9c9ea8803c9657f689ba6",
+  "workflowRunId": 41203907454,
+  "artifactId": 13043876895,
+  "samples": 24,
+  "device": "CPU",
+  "threshold": null,
+  "excludedFromGlobalHeadline": true,
+  "comparability": "First separate face baseline. Do not compare with whole-pair or old layout ROI numbers. Future deltas require unchanged protocol, eye anchors, source and rendering settings."
+}
