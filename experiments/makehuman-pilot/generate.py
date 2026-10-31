@@ -66,7 +66,8 @@ for role in roles:
                 'clothes/shoes01/shoes01.mhclo']
     if role == 'man':
         required.append('clothes/male_casualsuit01/male_casualsuit01.mhclo')
-    raw_height = max(v.co.z for v in base.data.vertices) - min(v.co.z for v in base.data.vertices)
+    body_points = list(world_points([base]))
+    raw_height = max(v.z for v in body_points) - min(v.z for v in body_points)
     for relative in required:
         path = assets / relative
         if not path.is_file():
@@ -90,7 +91,7 @@ for role in roles:
             polygon.use_smooth = True
     if args.scene == 'salsa':
         rig.scale = (1.62 / raw_height,) * 3 if role == 'woman' else (1.80 / raw_height,) * 3
-        partner_pose(rig, raw_height, -.30 if role == 'woman' else .30, role)
+        partner_pose(rig, raw_height, -.23 if role == 'woman' else .27, role)
     rigs[role] = rig
     all_assets.extend([skin] + required)
     inventory.append({'role': role, 'rig': rig.name, 'rigBones': len(rig.data.bones), 'sourceVertices': len(base.data.vertices), 'meshes': [obj.name for obj in meshes], 'assets': [skin] + required, 'generatedGarments': ['fitted emerald dress'] if role == 'woman' else []})

@@ -4,6 +4,7 @@ import math
 import bpy
 from mathutils import Vector
 from mathutils.kdtree import KDTree
+from mathutils.bvhtree import BVHTree
 
 
 def material(name, color, roughness=.65):
@@ -31,18 +32,26 @@ def fitted_dress(base, rig, height):
     """Fit the bodice by ray casting; keep the skirt attached to the pelvis."""
     graph = bpy.context.evaluated_depsgraph_get()
     body = base.evaluated_get(graph)
+    evaluated_mesh = body.to_mesh(preserve_all_data_layers=True, depsgraph=graph)
+    bone_names = set(rig.data.bones.keys())
+    def torso_weights(vertex):
+        return [(base.vertex_groups[g.group].name, g.weight) for g in vertex.groups
+                if base.vertex_groups[g.group].name in bone_names and base.vertex_groups[g.group].name.startswith(('spine', 'pelvis', 'root', 'breast')) and g.weight > .001]
+    allowed = {v.index for v in evaluated_mesh.vertices if sum(w for _, w in torso_weights(v)) > .3}
+    surface = BVHTree.FromPolygons([v.co for v in evaluated_mesh.vertices],
+                                 [list(p.vertices) for p in evaluated_mesh.polygons if all(i in allowed for i in p.vertices)])
     vertices, faces, torso = [], [], []
     sides, rings = 64, 32
     for row in range(rings):
         t = row / (rings - 1)
-        z = height * (.50 + .285 * t)
+        z = height * (.54 + .20 * t)
         for col in range(sides):
             angle = 2 * math.pi * col / sides
             radial = Vector((math.sin(angle), -math.cos(angle), 0))
             center = Vector((0, -.025 * height, z))
-            hit, location, _, _ = body.ray_cast(center + radial * height, -radial, distance=height * 2)
-            if not hit:
-                raise RuntimeError('Dress bodice ray missed anatomical torso')
+            location, _, _, _ = surface.ray_cast(center + radial * height, -radial, height * 2)
+            if location is None:
+                raise RuntimeError('Dress bodice ray missed anatomical torso: ' + str((row, col, height, z)))
             vertices.append(tuple(location + radial * height * .006))
             torso.append(True)
             if row and col:
@@ -57,7 +66,8 @@ def fitted_dress(base, rig, height):
         for row in range(18):
             t = row / 17
             for col in range(sides):
-                angle = -.12 + (2 * math.pi - .40) * col / (sides - 1)
+                opening = .40 * max(0, (t - .35) / .65)
+                angle = -.12 + opening / 2 + (2 * math.pi - opening) * col / (sides - 1)
                 wave = math.sin(angle * 7 + t * 2 + layer) * .012 * t
                 radius = height * (.135 + t * (.08 + .016 * layer) + wave)
                 z = height * (.535 - t * (.105 + .035 * layer) + .025 * math.sin(angle + .4) * t)
@@ -74,7 +84,7 @@ def fitted_dress(base, rig, height):
     garment.data.materials.append(material('Emerald satin', (.006, .13, .075), .38))
     # Match only vertices with actual anatomical rig influences, excluding helpers.
     bone_names = set(rig.data.bones.keys())
-    valid = [v for v in base.data.vertices if any(base.vertex_groups[g.group].name in bone_names and g.weight > .01 for g in v.groups)]
+    valid = [v for v in evaluated_mesh.vertices if v.index in allowed]
     tree = KDTree(len(valid))
     for index, vertex in enumerate(valid):
         tree.insert(vertex.co, index)
@@ -85,13 +95,16 @@ def fitted_dress(base, rig, height):
             groups['root'].add([index], 1, 'REPLACE')
             continue
         _, nearest, _ = tree.find(Vector(coordinate))
-        weights = [(base.vertex_groups[g.group].name, g.weight) for g in valid[nearest].groups if base.vertex_groups[g.group].name in bone_names]
+        weights = torso_weights(valid[nearest])
         total = sum(weight for _, weight in weights)
         for name, weight in weights:
             groups[name].add([index], weight / total, 'REPLACE')
+    body.to_mesh_clear()
     garment.parent = rig
     modifier = garment.modifiers.new('Anatomical rig', 'ARMATURE')
     modifier.object = rig
+    smooth = garment.modifiers.new('Smooth fabric folds', 'SUBSURF')
+    smooth.levels = 1
     solid = garment.modifiers.new('Cloth thickness', 'SOLIDIFY')
     solid.thickness = height * .0015
     for polygon in mesh.polygons:
@@ -103,8 +116,8 @@ def partner_pose(rig, height, offset, role):
     rig.location.x = offset
     rig.rotation_euler.z = math.radians(-12 if role == 'woman' else 10)
     # Targets are in world space; IK deforms the anatomical mesh and fitted assets.
-    targets = {'woman': {'R': (-.025, -.30, 1.03), 'L': (.18, -.07, 1.43)},
-               'man': {'R': (.035, -.29, 1.04), 'L': (.28, .07, .99)}}[role]
+    targets = {'woman': {'R': (-.045, -.24, 1.05), 'L': (.12, -.04, 1.40)},
+               'man': {'R': (-.04, -.24, 1.05), 'L': (.28, .07, .99)}}[role]
     for side, target in targets.items():
         empty = bpy.data.objects.new(role + '_hand_target_' + side, None)
         bpy.context.collection.objects.link(empty)
