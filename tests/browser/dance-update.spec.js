@@ -36,3 +36,15 @@ test('a delayed audio resume cannot restart playback after a seek',async({page})
  await page.locator('#seek').evaluate(el=>{el.value='12';el.dispatchEvent(new Event('input'));});await page.evaluate(()=>window.releasePilotAudio());
  await expect(page.locator('#robot-canvas')).toHaveAttribute('data-time','12.000');await expect(page.locator('#robot-canvas')).toHaveAttribute('data-playing','false');
 });
+
+test('hidden document pauses audio and never resumes it automatically',async({page})=>{
+ await ready(page);const canvas=page.locator('#robot-canvas');await page.locator('#play').click();await expect(canvas).toHaveAttribute('data-audio-playing','true');
+ await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:true});document.dispatchEvent(new Event('visibilitychange'));});
+ await expect(canvas).toHaveAttribute('data-playing','false');await expect(canvas).toHaveAttribute('data-audio-playing','false');const time=await canvas.getAttribute('data-time');
+ await page.evaluate(()=>{Object.defineProperty(document,'hidden',{configurable:true,value:false});document.dispatchEvent(new Event('visibilitychange'));});await page.waitForTimeout(150);await expect(canvas).toHaveAttribute('data-time',time);
+});
+test('audio failure gives a silent working player instead of blocking playback',async({page})=>{
+ await page.addInitScript(()=>{AudioContext.prototype.resume=()=>Promise.reject(new Error('Unavailable audio device'));});
+ await ready(page);await page.locator('#play').click();await expect(page.locator('#status')).toContainText('Dźwięk niedostępny');await expect(page.locator('#mute')).toBeDisabled();
+ await expect.poll(async()=>Number(await page.locator('#robot-canvas').getAttribute('data-time'))).toBeGreaterThan(.1);await expect(page.locator('#robot-canvas')).toHaveAttribute('data-audio-playing','false');await page.locator('#play').click();await expect(page.locator('#robot-canvas')).toHaveAttribute('data-playing','false');
+});
