@@ -4,9 +4,25 @@ import {readFile} from 'node:fs/promises';
 import {readWorkflows,checkPolicy,evaluateGate,ownerContext} from '../scripts/check-workflows.mjs';
 const workflows=await readWorkflows();
 const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',import.meta.url),'utf8'));
-test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),9);});
+test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),11);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='compare')['continue-on-error']=true;},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='comparison_artifact').if="steps.compare.outcome == 'success'";},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='comparison_artifact').with.path='${{ runner.temp }}/';},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='artifact').if='always()';},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.steps.find(s=>s.id==='artifact').with.path='${{ runner.temp }}/';},
+  w=>{w['makehuman-pilot.yml'].on.push.branches.push('**');},
+  w=>{w['makehuman-pilot.yml'].jobs.generate.if=w['makehuman-pilot.yml'].jobs.generate.if.replace("github.actor_id == '10676481' &&",'');},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='compare')['continue-on-error']=true;},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='comparison_artifact').if="steps.compare.outcome == 'success'";},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='comparison_artifact').with.path='experiments/';},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot['runs-on']='ubuntu-latest';},
+  w=>{w['salsa-snapshot.yml'].on.push.branches.push('**');},
+  w=>{w['salsa-snapshot.yml'].on.pull_request_target={};},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='artifact').if='always()';},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot.steps.find(s=>s.id==='artifact').with.path='experiments/salsa-human-models/output/';},
+  w=>{w['salsa-snapshot.yml'].jobs.snapshot.if=w['salsa-snapshot.yml'].jobs.snapshot.if.replace("github.actor_id == '10676481' &&",'');},
   w=>{w["public-audit.yml"].on.push["paths-ignore"]=["docs/**"];},
   w=>{w["ci.yml"].jobs.test.steps=w["ci.yml"].jobs.test.steps.filter(s=>s.run!=="bash scripts/run-public-audit.sh");},
   w=>{w["robot-mp4.yml"].jobs.render.steps.find(s=>s.run==="bash scripts/run-public-audit.sh")["continue-on-error"]=true;},

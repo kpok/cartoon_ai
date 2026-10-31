@@ -1,0 +1,98 @@
+name: MakeHuman anatomical pilot
+on:
+  push:
+    branches: [main, experiment/salsa-human-models]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  generate:
+    if: >-
+      github.repository == 'kpok/cartoon_ai' &&
+      github.repository_id == '1433681495' &&
+      github.repository_owner_id == '10676481' &&
+      github.actor_id == '10676481' &&
+      github.actor == 'kpok' &&
+      github.triggering_actor == 'kpok' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/experiment/salsa-human-models') &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    concurrency:
+      group: trusted-makehuman-pilot
+      cancel-in-progress: false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - id: audit
+        name: Public repository audit before publication
+        run: bash scripts/run-public-audit.sh
+        env:
+          PRIVATE_TERMS: ${{ secrets.PRIVATE_TERMS }}
+      - name: Download and verify pinned inputs
+        run: python3 experiments/makehuman-pilot/prepare.py "$RUNNER_TEMP/makehuman-inputs"
+      - id: generate
+        name: Generate CPU renders and model
+        run: |
+          "$RUNNER_TEMP/makehuman-inputs/blender/blender-4.2.0-linux-x64/blender" --background --factory-startup --offline-mode --threads 4 --python-exit-code 1 --python experiments/makehuman-pilot/generate.py -- --addon "$RUNNER_TEMP/makehuman-inputs/mpfb/mpfb2-d0a32e57a7f915cb2f2b95410e2117648c7bbb7e/src" --assets "$RUNNER_TEMP/makehuman-inputs/systemAssets" --output "$RUNNER_TEMP/makehuman-output" --scene salsa
+          cp experiments/makehuman-pilot/inputs.lock.json "$RUNNER_TEMP/makehuman-output/inputs.lock.json"
+      - id: validate
+        name: Validate deliverables
+        run: |
+          python3 -m unittest discover -s experiments/makehuman-pilot -p test_validation.py
+          python3 experiments/makehuman-pilot/validate.py "$RUNNER_TEMP/makehuman-output"
+      - id: artifact
+        if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: makehuman-anatomical-pilot
+          path: ${{ runner.temp }}/makehuman-output/
+          if-no-files-found: error
+          retention-days: 1
+      - name: Publish pilot summary
+        if: always() && steps.artifact.outcome == 'success'
+        env:
+          VALIDATION_STATUS: ${{ steps.validate.outcome }}
+          ARTIFACT_URL: ${{ steps.artifact.outputs.artifact-url }}
+        run: |
+          python3 experiments/makehuman-pilot/summary.py "$RUNNER_TEMP/makehuman-output" >> "$GITHUB_STEP_SUMMARY"
+      - name: Install isolated foreground-comparison dependency
+        run: |
+          python3 -m venv "$RUNNER_TEMP/mpfb-comparison"
+          "$RUNNER_TEMP/mpfb-comparison/bin/python" -m pip install --only-binary=:all: -r experiments/salsa-human-models/requirements.txt
+      - name: Validate foreground metric behavior
+        run: '"$RUNNER_TEMP/mpfb-comparison/bin/python" -m unittest discover -s experiments/makehuman-pilot -p test_comparison.py'
+      - id: compare
+        name: Compare MPFB foreground (technical target 80)
+        run: '"$RUNNER_TEMP/mpfb-comparison/bin/python" experiments/makehuman-pilot/compare.py --model-dir "$RUNNER_TEMP/makehuman-output" --output "$RUNNER_TEMP/makehuman-comparison" >> "$GITHUB_STEP_SUMMARY"'
+      - id: comparison_artifact
+        if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success' && (steps.compare.outcome == 'success' || steps.compare.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: makehuman-foreground-comparison
+          path: |
+            ${{ runner.temp }}/makehuman-comparison/metrics.json
+            ${{ runner.temp }}/makehuman-comparison/summary.md
+            ${{ runner.temp }}/makehuman-comparison/comparison.png
+            ${{ runner.temp }}/makehuman-comparison/reference-annotation.png
+            ${{ runner.temp }}/makehuman-comparison/reference-normalized.png
+            ${{ runner.temp }}/makehuman-comparison/render-normalized.png
+            ${{ runner.temp }}/makehuman-comparison/overlap.png
+            ${{ runner.temp }}/makehuman-comparison/difference.png
+          retention-days: 1
+          if-no-files-found: error
+      - name: Link foreground comparison report
+        if: always() && steps.comparison_artifact.outcome == 'success'
+        env:
+          REPORT_URL: ${{ steps.comparison_artifact.outputs.artifact-url }}
+        run: |
+          printf '\n[Download foreground comparison, masks and metrics](%s)\n' "$REPORT_URL" >> "$GITHUB_STEP_SUMMARY"

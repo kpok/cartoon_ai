@@ -40,5 +40,40 @@
     "attribution": "Kalinka background generated with ChatGPT; supplied by kpok",
     "origin": "Generated with ChatGPT image generation on 2026-10-29 for the owner-requested Kalinka background; no source photograph used",
     "review": "Synthetic photorealistic depiction, not a documentary photograph; no additional reuse license or exclusivity certification."
+  },
+  "experiments/salsa-human-models/reference/concept.png": {
+    "sha256": "e6b04a00a361b7f4403e6da51e9e1263acfed2d1e765e23aff201df2acb03205",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Concept image generated with ChatGPT; supplied by kpok",
+    "origin": "Original generated image approved by user in this conversation",
+    "review": "Synthetic fictional adults; original PNG preserved. Documentation/model reference only; no additional reuse license or exclusivity certification."
+  },
+  "experiments/salsa-human-models/review/front.png": {
+    "sha256": "6b887dfffc6335a012bff21c847ed0489b0367b79440d106c8a4ddaf53bfa896",
+    "license": "CC-BY-4.0",
+    "attribution": "Salsa procedural reconstruction by kpok",
+    "origin": "Screenshot of original code-generated Three.js geometry; no image textures or third-party model assets",
+    "review": "Stylized prototype, not photographic likeness. Generated locally with Chromium/SwiftShader."
+  },
+  "experiments/salsa-human-models/review/side.png": {
+    "sha256": "f6d92388d82e4d07944189732e4613e4524842796a7d9344d17e1a814432195c",
+    "license": "CC-BY-4.0",
+    "attribution": "Salsa procedural reconstruction by kpok",
+    "origin": "Screenshot of original code-generated Three.js geometry; no image textures or third-party model assets",
+    "review": "Stylized prototype, not photographic likeness. Generated locally with Chromium/SwiftShader."
+  },
+  "experiments/salsa-human-models/review/rear.png": {
+    "sha256": "8f5f6868328fdadd0e00d76b7a7731306e224a211d6549a13a0620fbc86e25f2",
+    "license": "CC-BY-4.0",
+    "attribution": "Salsa procedural reconstruction by kpok",
+    "origin": "Screenshot of original code-generated Three.js geometry; no image textures or third-party model assets",
+    "review": "Stylized prototype, not photographic likeness. Generated locally with Chromium/SwiftShader."
+  },
+  "experiments/salsa-human-models/reference/concept-cropped.png": {
+    "sha256": "51030de7c1bc504597d6d3e43eb361696321d8bf6c5bc1cb2ca50cfda933b973",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Concept image generated with ChatGPT; supplied by kpok",
+    "origin": "Deterministic pixel crop [80,24,912,1368] of preserved concept.png (SHA-256 e6b04a00a361b7f4403e6da51e9e1263acfed2d1e765e23aff201df2acb03205); no generative edits or rescaling",
+    "review": "Both fictional adults retained in full with margin; source colors unchanged. Same rights/provenance as source."
   }
 }
