@@ -1,0 +1,130 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+"""Static partner pose and fitted garment over real MPFB anatomy."""
+import math
+import bpy
+from mathutils import Vector
+from mathutils.kdtree import KDTree
+
+
+def material(name, color, roughness=.65):
+    mat = bpy.data.materials.new(name)
+    mat.use_nodes = True
+    node = mat.node_tree.nodes.get('Principled BSDF')
+    node.inputs['Base Color'].default_value = (*color, 1)
+    node.inputs['Roughness'].default_value = roughness
+    return mat
+
+
+def world_points(objects):
+    graph = bpy.context.evaluated_depsgraph_get()
+    for obj in objects:
+        evaluated = obj.evaluated_get(graph)
+        mesh = evaluated.to_mesh()
+        try:
+            for vertex in mesh.vertices:
+                yield evaluated.matrix_world @ vertex.co
+        finally:
+            evaluated.to_mesh_clear()
+
+
+def fitted_dress(base, rig, height):
+    """Fit the bodice by ray casting; keep the skirt attached to the pelvis."""
+    graph = bpy.context.evaluated_depsgraph_get()
+    body = base.evaluated_get(graph)
+    vertices, faces, torso = [], [], []
+    sides, rings = 64, 32
+    for row in range(rings):
+        t = row / (rings - 1)
+        z = height * (.50 + .285 * t)
+        for col in range(sides):
+            angle = 2 * math.pi * col / sides
+            radial = Vector((math.sin(angle), -math.cos(angle), 0))
+            center = Vector((0, -.025 * height, z))
+            hit, location, _, _ = body.ray_cast(center + radial * height, -radial, distance=height * 2)
+            if not hit:
+                raise RuntimeError('Dress bodice ray missed anatomical torso')
+            vertices.append(tuple(location + radial * height * .006))
+            torso.append(True)
+            if row and col:
+                a = row * sides + col
+                faces.append((a - sides - 1, a - sides, a, a - 1))
+        if row:
+            a = row * sides
+            faces.append((a - 1, a - sides, a, a + sides - 1))
+    # Open front slit and layered, asymmetric folds are deliberate garment edges.
+    for layer in range(3):
+        offset = len(vertices)
+        for row in range(18):
+            t = row / 17
+            for col in range(sides):
+                angle = -.12 + (2 * math.pi - .40) * col / (sides - 1)
+                wave = math.sin(angle * 7 + t * 2 + layer) * .012 * t
+                radius = height * (.135 + t * (.08 + .016 * layer) + wave)
+                z = height * (.535 - t * (.105 + .035 * layer) + .025 * math.sin(angle + .4) * t)
+                vertices.append((radius * math.sin(angle), -.025 * height - radius * .76 * math.cos(angle), z))
+                torso.append(False)
+                if row and col:
+                    a = offset + row * sides + col
+                    faces.append((a - sides - 1, a - sides, a, a - 1))
+    mesh = bpy.data.meshes.new('Fitted emerald dress')
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    garment = bpy.data.objects.new('dress', mesh)
+    bpy.context.collection.objects.link(garment)
+    garment.data.materials.append(material('Emerald satin', (.006, .13, .075), .38))
+    # Match only vertices with actual anatomical rig influences, excluding helpers.
+    bone_names = set(rig.data.bones.keys())
+    valid = [v for v in base.data.vertices if any(base.vertex_groups[g.group].name in bone_names and g.weight > .01 for g in v.groups)]
+    tree = KDTree(len(valid))
+    for index, vertex in enumerate(valid):
+        tree.insert(vertex.co, index)
+    tree.balance()
+    groups = {name: garment.vertex_groups.new(name=name) for name in bone_names}
+    for index, coordinate in enumerate(vertices):
+        if not torso[index]:
+            groups['root'].add([index], 1, 'REPLACE')
+            continue
+        _, nearest, _ = tree.find(Vector(coordinate))
+        weights = [(base.vertex_groups[g.group].name, g.weight) for g in valid[nearest].groups if base.vertex_groups[g.group].name in bone_names]
+        total = sum(weight for _, weight in weights)
+        for name, weight in weights:
+            groups[name].add([index], weight / total, 'REPLACE')
+    garment.parent = rig
+    modifier = garment.modifiers.new('Anatomical rig', 'ARMATURE')
+    modifier.object = rig
+    solid = garment.modifiers.new('Cloth thickness', 'SOLIDIFY')
+    solid.thickness = height * .0015
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    return garment
+
+
+def partner_pose(rig, height, offset, role):
+    rig.location.x = offset
+    rig.rotation_euler.z = math.radians(-12 if role == 'woman' else 10)
+    # Targets are in world space; IK deforms the anatomical mesh and fitted assets.
+    targets = {'woman': {'R': (-.025, -.30, 1.03), 'L': (.18, -.07, 1.43)},
+               'man': {'R': (.035, -.29, 1.04), 'L': (.28, .07, .99)}}[role]
+    for side, target in targets.items():
+        empty = bpy.data.objects.new(role + '_hand_target_' + side, None)
+        bpy.context.collection.objects.link(empty)
+        empty.location = target
+        bone = rig.pose.bones['lowerarm02.' + side]
+        constraint = bone.constraints.new('IK')
+        constraint.target = empty
+        constraint.chain_count = 4
+        constraint.use_stretch = False
+        constraint.iterations = 100
+    for bone in rig.pose.bones:
+        bone.rotation_mode = 'XYZ'
+        if bone.name.startswith('finger') and '-1.' not in bone.name:
+            bone.rotation_euler.x = .35
+    bpy.context.view_layer.update()
+
+
+def landmarks(rigs):
+    result = {}
+    for role, rig in rigs.items():
+        result[role] = {name: list(rig.matrix_world @ rig.pose.bones[name].head)
+                        for name in ('head', 'wrist.L', 'wrist.R', 'foot.L', 'foot.R')}
+    return result
