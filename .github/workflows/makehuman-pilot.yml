@@ -43,11 +43,13 @@ jobs:
       - id: generate
         name: Generate CPU renders and model
         run: |
-          "$RUNNER_TEMP/makehuman-inputs/blender/blender-4.2.0-linux-x64/blender" --background --factory-startup --offline-mode --threads 4 --python-exit-code 1 --python experiments/makehuman-pilot/generate.py -- --addon "$RUNNER_TEMP/makehuman-inputs/mpfb/mpfb2-d0a32e57a7f915cb2f2b95410e2117648c7bbb7e/src" --assets "$RUNNER_TEMP/makehuman-inputs/systemAssets" --output "$RUNNER_TEMP/makehuman-output"
+          "$RUNNER_TEMP/makehuman-inputs/blender/blender-4.2.0-linux-x64/blender" --background --factory-startup --offline-mode --threads 4 --python-exit-code 1 --python experiments/makehuman-pilot/generate.py -- --addon "$RUNNER_TEMP/makehuman-inputs/mpfb/mpfb2-d0a32e57a7f915cb2f2b95410e2117648c7bbb7e/src" --assets "$RUNNER_TEMP/makehuman-inputs/systemAssets" --output "$RUNNER_TEMP/makehuman-output" --scene salsa
           cp experiments/makehuman-pilot/inputs.lock.json "$RUNNER_TEMP/makehuman-output/inputs.lock.json"
       - id: validate
         name: Validate deliverables
-        run: python3 experiments/makehuman-pilot/validate.py "$RUNNER_TEMP/makehuman-output"
+        run: |
+          python3 -m unittest discover -s experiments/makehuman-pilot -p test_validation.py
+          python3 experiments/makehuman-pilot/validate.py "$RUNNER_TEMP/makehuman-output"
       - id: artifact
         if: always() && steps.audit.outcome == 'success' && steps.generate.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

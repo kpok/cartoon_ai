@@ -2,7 +2,7 @@
 """Static partner pose and fitted garment over real MPFB anatomy."""
 import math
 import bpy
-from mathutils import Vector
+from mathutils import Matrix, Vector
 from mathutils.kdtree import KDTree
 from mathutils.bvhtree import BVHTree
 
@@ -75,7 +75,7 @@ def fitted_dress(base, rig, height):
                 torso.append(False)
                 if row and col:
                     a = offset + row * sides + col
-                    faces.append((a - sides - 1, a - sides, a, a - 1))
+                    faces.append((a - 1, a, a - sides, a - sides - 1))
     mesh = bpy.data.meshes.new('Fitted emerald dress')
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
@@ -114,22 +114,49 @@ def fitted_dress(base, rig, height):
 
 def partner_pose(rig, height, offset, role):
     rig.location.x = offset
-    rig.rotation_euler.z = math.radians(-12 if role == 'woman' else 10)
+    rig.rotation_euler.z = math.radians(35 if role == 'woman' else -12)
     # Targets are in world space; IK deforms the anatomical mesh and fitted assets.
-    targets = {'woman': {'R': (-.045, -.24, 1.05), 'L': (.12, -.04, 1.40)},
-               'man': {'R': (-.04, -.24, 1.05), 'L': (.28, .07, .99)}}[role]
-    for side, target in targets.items():
-        empty = bpy.data.objects.new(role + '_hand_target_' + side, None)
-        bpy.context.collection.objects.link(empty)
-        empty.location = target
-        bone = rig.pose.bones['lowerarm02.' + side]
-        constraint = bone.constraints.new('IK')
-        constraint.target = empty
-        constraint.chain_count = 4
-        constraint.use_stretch = False
-        constraint.iterations = 100
+    targets = {'woman': {'R': (-.10, -.29, 1.05), 'L': (.12, -.04, 1.40)},
+               'man': {'R': (.03, -.29, 1.07), 'L': (.28, .07, .99)}}[role]
+    poles = {'woman': {'R': (-.45, -.40, 1.04), 'L': (-.02, -.35, 1.28)},
+             'man': {'R': (.30, -.40, 1.17), 'L': (.50, .30, 1.10)}}[role]
     for bone in rig.pose.bones:
         bone.rotation_mode = 'XYZ'
+    bpy.context.view_layer.update()
+    inverse = rig.matrix_world.inverted()
+    for side, target in targets.items():
+        names = [name + '.' + side for name in ('upperarm01', 'upperarm02', 'lowerarm01', 'lowerarm02')]
+        bones = [rig.pose.bones[name] for name in names]
+        shoulder = rig.matrix_world @ bones[0].head
+        upper = sum(bone.length for bone in bones[:2]) * rig.scale.x
+        lower = sum(bone.length for bone in bones[2:]) * rig.scale.x
+        delta = Vector(target) - shoulder
+        distance = min(delta.length, (upper + lower) * .98)
+        direction = delta.normalized()
+        hand = shoulder + direction * distance
+        pole = Vector(poles[side]) - shoulder
+        bend = (pole - direction * pole.dot(direction)).normalized()
+        along = (upper * upper - lower * lower + distance * distance) / (2 * distance)
+        elbow = shoulder + direction * along + bend * math.sqrt(max(0, upper * upper - along * along))
+        # Treat the two twist bones in each limb segment as one anatomical bone.
+        # A generic four-link IK solver can fold these twist bones into extra elbows.
+        for segment, begin, finish in ((bones[:2], shoulder, elbow), (bones[2:], elbow, hand)):
+            local_direction = (inverse @ finish - inverse @ begin).normalized()
+            cursor = inverse @ begin
+            for bone in segment:
+                rest = bone.bone.matrix_local.to_quaternion()
+                rotation = (rest @ Vector((0, 1, 0))).rotation_difference(local_direction) @ rest
+                bone.matrix = Matrix.LocRotScale(cursor, rotation, Vector((1, 1, 1)))
+                bpy.context.view_layer.update()
+                cursor = cursor + local_direction * bone.bone.length
+    wrist = rig.pose.bones['wrist.R']
+    rest = wrist.bone.matrix_local.to_quaternion()
+    desired = Vector((1, 0, .2) if role == 'woman' else (-1, 0, -.2))
+    local_direction = (inverse.to_3x3() @ desired).normalized()
+    rotation = (rest @ Vector((0, 1, 0))).rotation_difference(local_direction) @ rest
+    wrist.matrix = Matrix.LocRotScale(wrist.head.copy(), rotation, Vector((1, 1, 1)))
+    bpy.context.view_layer.update()
+    for bone in rig.pose.bones:
         if bone.name.startswith('finger') and '-1.' not in bone.name:
             bone.rotation_euler.x = .35
     bpy.context.view_layer.update()

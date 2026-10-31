@@ -63,7 +63,7 @@ for role in roles:
     opaque(base)
     required = ['eyes/low-poly/low-poly.mhclo', 'eyebrows/eyebrow001/eyebrow001.mhclo', 'eyelashes/eyelashes01/eyelashes01.mhclo',
                 'hair/long01/long01.mhclo' if role == 'woman' else 'hair/short02/short02.mhclo',
-                'clothes/shoes01/shoes01.mhclo']
+                'clothes/shoes03/shoes03.mhclo']
     if role == 'man':
         required.append('clothes/male_casualsuit01/male_casualsuit01.mhclo')
     body_points = list(world_points([base]))
@@ -91,7 +91,7 @@ for role in roles:
             polygon.use_smooth = True
     if args.scene == 'salsa':
         rig.scale = (1.62 / raw_height,) * 3 if role == 'woman' else (1.80 / raw_height,) * 3
-        partner_pose(rig, raw_height, -.23 if role == 'woman' else .27, role)
+        partner_pose(rig, raw_height, -.10 if role == 'woman' else .27, role)
     rigs[role] = rig
     all_assets.extend([skin] + required)
     inventory.append({'role': role, 'rig': rig.name, 'rigBones': len(rig.data.bones), 'sourceVertices': len(base.data.vertices), 'meshes': [obj.name for obj in meshes], 'assets': [skin] + required, 'generatedGarments': ['fitted emerald dress'] if role == 'woman' else []})
