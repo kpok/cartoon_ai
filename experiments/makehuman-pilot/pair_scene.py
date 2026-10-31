@@ -159,6 +159,13 @@ def partner_pose(rig, height, offset, role):
     for bone in rig.pose.bones:
         if bone.name.startswith('finger') and '-1.' not in bone.name:
             bone.rotation_euler.x = .35
+    if role == 'woman':
+        wrist = rig.pose.bones['wrist.L']
+        rest = wrist.bone.matrix_local.to_quaternion()
+        local_direction = (inverse.to_3x3() @ Vector((.7, .1, -.3))).normalized()
+        rotation = (rest @ Vector((0, 1, 0))).rotation_difference(local_direction) @ rest
+        wrist.matrix = Matrix.LocRotScale(wrist.head.copy(), rotation, Vector((1, 1, 1)))
+        bpy.context.view_layer.update()
     head = rig.pose.bones['head']
     head.rotation_euler.y = -rig.rotation_euler.z * .8
     bpy.context.view_layer.update()
@@ -170,3 +177,32 @@ def landmarks(rigs):
         result[role] = {name: list(rig.matrix_world @ rig.pose.bones[name].head)
                         for name in ('head', 'wrist.L', 'wrist.R', 'foot.L', 'foot.R')}
     return result
+
+
+def repair_small_trouser_holes(obj, height):
+    """Close small distressed-jeans holes while retaining cuffs and waist openings."""
+    import bmesh
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    pending = {edge for edge in mesh.edges if edge.is_boundary}
+    while pending:
+        seed = pending.pop()
+        loop, stack = {seed}, [seed]
+        while stack:
+            edge = stack.pop()
+            for vertex in edge.verts:
+                for adjacent in vertex.link_edges:
+                    if adjacent in pending:
+                        pending.remove(adjacent)
+                        loop.add(adjacent)
+                        stack.append(adjacent)
+        perimeter = sum(edge.calc_length() for edge in loop)
+        vertices = {vertex for edge in loop for vertex in edge.verts}
+        if len(loop) >= 3 and perimeter < height * .10 and max(v.co.z for v in vertices) < height * .5:
+            result = bmesh.ops.holes_fill(mesh, edges=list(loop), sides=0)
+            for face in result['faces']:
+                face.material_index = 1
+                face.smooth = True
+    mesh.to_mesh(obj.data)
+    mesh.free()
+    obj.data.update()

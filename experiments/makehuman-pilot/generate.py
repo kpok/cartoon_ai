@@ -36,7 +36,7 @@ Human = importlib.import_module(module + '.services.humanservice').HumanService
 Target = importlib.import_module(module + '.services.targetservice').TargetService
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from face_profiles import apply_profile, add_stubble, tint_materials
-from pair_scene import fitted_dress, landmarks, material, partner_pose, world_points
+from pair_scene import fitted_dress, landmarks, material, partner_pose, world_points, repair_small_trouser_holes
 def opaque(obj):
     for slot in obj.material_slots:
         material = slot.material
@@ -87,6 +87,7 @@ for role in roles:
             fitted.data.materials.append(material('Gray trousers', (.24, .25, .27)))
             for polygon in fitted.data.polygons:
                 polygon.material_index = 0 if polygon.center.z > raw_height * .55 else 1
+            repair_small_trouser_holes(fitted, raw_height)
     if role == 'woman':
         fitted_dress(base, rig, raw_height)
     elif args.scene == 'salsa':
