@@ -1,0 +1,7 @@
+# Independent reviews
+
+Plan reviewer shelter_plan_review: PASS baselineafe6164, actual plan/analysis and existing code read. Emphasized300s clock (old StoryClock is160s), cancel sound on hide/BFCache/context loss, short device-variable speech windows/subtitles, actual images/prop contact, correct merge SHA and waiting main regression as well as deploy. No additional technical council required for the user-selected established browser stack.
+
+Fresh implementation reviewer shelter_code_review: initially CHANGES_REQUIRED at41eef42. SH-001: progress overwrote authored board thickness; SH-002: squirrel obscured wheelbarrow on camera side. Root confirmed both with actual images. One bounded repair round preserves sy*progress, builds base first, moves squirrel behind tray, parks barrow outside dialogue scenes, adjusts camera and keeps rounded heads separated. Actual geometry regression added.
+
+Bounded independent re-review at6291d64: PASS; SH-001/002 closed. Reviewer independently rendered185/191/197/259s and inspected actual source.13focused story/sound testsPASS, no pageerrors, readable wheelbarrow/load/wheel/pushing and thin roof/opening/butterfly verified. Other14milestones inspected by root with additional fixed images. Full voice audition on a physical device was not performed; browser voice quality remains device-dependent. No required findings remain; main CI/Pages/live smoke still mandatory before delivery complete.

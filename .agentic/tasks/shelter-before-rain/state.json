@@ -1,0 +1,40 @@
+{
+  "task_id": "shelter-before-rain",
+  "repository": "kpok/cartoon_ai",
+  "baseline_revision": "afe6164232c901ac8eb78f6012b7faea5f2c9b49",
+  "tested_runtime_revision": "6291d64a9d8bc9c09283784f6522ce8b522d31a7",
+  "phase": "HANDOFF",
+  "status": "ready_for_review",
+  "authorization": [
+    "branch checkpoints",
+    "PR12merge after checks",
+    "existing main GitHub Pages deployment",
+    "open deployed new tile"
+  ],
+  "checks": {
+    "unit": "62PASS",
+    "shelter_browser": "14PASS desktop/mobile",
+    "build": "43filesPASS",
+    "workflow_policy": "9jobsPASS",
+    "local_public_audit": "PASS incl26audit tests",
+    "remote_runtime_audit": "41291664350SUCCESS",
+    "plan_review": "PASS",
+    "implementation_review": "PASS after one bounded fix round",
+    "full_local_browser": "78/78PASS4.3minutes, no retries or timeout increases",
+    "main_ci_pages": "pending merge"
+  },
+  "findings": [
+    {
+      "id": "SH-001",
+      "status": "closed",
+      "summary": "preserved authored board thickness and base-first assembly"
+    },
+    {
+      "id": "SH-002",
+      "status": "closed",
+      "summary": "readable wheelbarrow staging and parked position"
+    }
+  ],
+  "next_step": "merge PR12 after final head audit; wait main test/regression/deploy and verify live tile/playback",
+  "updated_at": "2026-11-01"
+}

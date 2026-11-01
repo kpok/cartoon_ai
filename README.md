@@ -229,3 +229,9 @@ Aktualizacja „Kalinki”: różowy i niebieski szlam obejmuje też plecy i ko�
 wysokie cholewki są wyraźne, a wykop rozwija się od podciągniętego kolana do niemal
 prostej nogi skierowanej do przodu. Szybsze kroki, dłuższa nieregularna trasa i obroty
 pokazują wszystkie strony robota. Obszar ruchu nie ma widocznych granic ani słupków.
+
+## Domek przed deszczem — pięciominutowa bajka3D
+
+Kotek buduje za szybko, wiewiórka planuje za dużo, a motylek potrzebuje suchego schronienia. Pełna300-sekundowa historia z12scenami, dialogami i napisami PL/EN, syntezą mowy w przeglądarce oraz spokojną muzyką proceduralną. Start przyciskiem, pauza, przewijanie, sceny i pełny ekran. Głosy zależą od urządzenia; przy braku głosu pozostają napisy.
+
+[Otwórz bajkę](https://kpok.github.io/cartoon_ai/shelter.html) · [Scenariusz i sposób działania](docs/SHELTER_BEFORE_RAIN.md).

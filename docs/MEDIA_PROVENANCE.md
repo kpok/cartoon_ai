@@ -43,3 +43,5 @@ https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL
   with project-authored silent choreography. No imported character models, textures,
   audio or third-party cartoon footage. This describes technical provenance, not a
   certification of legal exclusivity. No new asset-specific reuse license is granted.
+
+- A Shelter Before the Rain: project-authored300-second story and bilingual dialogue, procedural kitten/squirrel adapted from the existing garden recipes, procedural butterfly/shelter/wheelbarrow/cloud/rain geometry. Browser-provided SpeechSynthesis voices (local preferred; some may require network) and existing procedural melody. No new binary assets, audio samples, image/video/model-generation API or prerecorded voice. This records technical origin, not a claim of legal exclusivity or guaranteed voice availability.
