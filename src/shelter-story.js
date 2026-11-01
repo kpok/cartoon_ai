@@ -43,7 +43,7 @@ export function shelterState(value){
  const cat=actorPath(CAT,t,-1),squirrel=actorPath(SQUIRREL,t,1);
  const wind=smooth((t-3)/3)*(1-smooth((t-24)/5))*.8+.12*Math.sin(t*.7)**2;
  const rain=smooth((t-240)/8)*(1-smooth((t-294)/5));
- const quickBuild=clamp((t-46)/24),collapse=clamp((t-73)/9),build=clamp((t-206)/34);
+ const quickBuild=clamp((t-46)/20),collapse=clamp((t-73)/9),build=clamp((t-206)/34);
  const butterfly={x:mix(.5,2.25,clamp((t-8)/10)),y:1.3+Math.sin(t*3)*.07,z:-.5,flutter:1};
  if(t>22&&t<242){butterfly.x=2.25+Math.sin(t*.5)*.05;butterfly.y=1.45+Math.sin(t)*.04;butterfly.z=-.7;butterfly.flutter=.25;}
  if(t>=242){const q=clamp((t-244)/8);butterfly.x=mix(2.25,.05,q);butterfly.y=mix(1.45,.68,q);butterfly.z=mix(-.7,-1.3,q);butterfly.flutter=1-q*.85;}
@@ -81,7 +81,7 @@ export function shelterState(value){
  return {t,chapter:chapter.id,progress:clamp(u),cat,squirrel,butterfly,leaf,barrow,camera,wind,rain,
   quickBuild,collapse,quickVisible:t>=45&&t<96,planVisible:t>=98&&t<148,planComplexity:clamp((t-123)/19),
   build,finalVisible:t>=206,gutter:clamp((t-271)/10),leak:t>=254&&t<280,shower:t>=289&&t<295,
-  carrying:chapter.id==='quick'||(chapter.id==='together'&&t<232),blueprint:chapter.id==='plan'||chapter.id==='complicated'};
+  carrying:(chapter.id==='quick'&&t<66)||(chapter.id==='together'&&t<232),blueprint:chapter.id==='plan'||chapter.id==='complicated'};
 }
 export class ShelterClock{
  constructor(){this.time=0;this.playing=false;this.last=null;}
