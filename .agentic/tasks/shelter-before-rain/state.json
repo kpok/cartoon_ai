@@ -4,7 +4,7 @@
   "baseline_revision": "afe6164232c901ac8eb78f6012b7faea5f2c9b49",
   "tested_runtime_revision": "6291d64a9d8bc9c09283784f6522ce8b522d31a7",
   "phase": "HANDOFF",
-  "status": "ready_for_review",
+  "status": "complete_with_documented_browser_limitations",
   "authorization": [
     "branch checkpoints",
     "PR12merge after checks",
@@ -21,7 +21,10 @@
     "plan_review": "PASS",
     "implementation_review": "PASS after one bounded fix round",
     "full_local_browser": "78/78PASS4.3minutes, no retries or timeout increases",
-    "main_ci_pages": "pending merge"
+    "main_ci_pages": "41292699598SUCCESS at a50e4f7; 78browser tests and both portrait export regressionsPASS",
+    "main_public_audit": "41292699539SUCCESS",
+    "runner_repair_review": "PASS at fef8c75; repair PR13merged",
+    "live_browser": "Gallery tile and story URL verified; cloud browser WebGL disabled, correct fallback shown; no live 3D playback or audible voice claimed"
   },
   "findings": [
     {
@@ -35,6 +38,8 @@
       "summary": "readable wheelbarrow staging and parked position"
     }
   ],
-  "next_step": "merge PR12 after final head audit; wait main test/regression/deploy and verify live tile/playback",
-  "updated_at": "2026-11-01"
+  "next_step": "User playback on a WebGL-capable browser; device voice availability remains platform-dependent.",
+  "updated_at": "2026-11-01",
+  "delivered_main_revision": "a50e4f789b07bb295d4fa0145bd5131ff93e8ca5",
+  "live_url": "https://kpok.github.io/cartoon_ai/shelter.html"
 }

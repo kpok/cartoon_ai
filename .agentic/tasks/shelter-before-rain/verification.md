@@ -19,3 +19,11 @@ Pre-merge gate: all mandatory local implementation checks and independent review
 ## Post-merge CI repair
 
 Feature PR12 merged at94afb8ff24fcc1c6d8bf3349091aadde9013b333. Main run41292202950: testPASS and Pages deployPASS, regression failed before tests: Playwright1.56.1 cannot install dependencies on ubuntu26.04-x64 after ubuntu-latest moved. This is an observed runner/platform incompatibility, not a passed regression run. Repair branchfix/shelter-ci-runner pins the three existing browser-render jobs (main regression, manual story MP4, manual robot MP4) to ubuntu-24.04, explicitly supported by the locked package's dependency table. Other jobs stay ubuntu-latest; workflow policy enforces this exact per-job mapping and rejects drift. No dependency/browser upgrades, permissions, event gates, timeouts or test assertions relaxed. Required next gate: independent narrow review, audit, merge repair PR and wait new main regression/test/deploy plus live check.
+
+## Final delivery
+
+Feature PR12 and runner repair PR13 merged. Delivered main revision: a50e4f789b07bb295d4fa0145bd5131ff93e8ca5. Main workflow41292699598SUCCESS; public audit41292699539SUCCESS. Browser job124807169763:78passed in8.9minutes; both portrait export regressions passed (H264/AAC, frame count/duration, non-silent dialogue/music and SRT). No retry, assertion relaxation or timeout increase. Runner repair independently reviewedPASS at fef8c75; branch audit41292495554SUCCESS.
+
+Live gallery showed the new Domek przed deszczem tile and navigation opened https://kpok.github.io/cartoon_ai/shelter.html with correct title,12chapters, PL/EN and controls. The cloud UI browser reports GL_VENDOR/GL_RENDERER Disabled and cannot create a WebGL context; the intended accessible fallback and disabled controls appeared. This is not a successful live3D playback or voice audition. Local and GitHub browser tests used software WebGL and passed. User-facing page left open. Physical-device voice audition remains unperformed; captions cover absent voices.
+
+Final delivery evidence is checkpointed on the repair branch after merge; this documentation-only checkpoint does not change the deployed runtime. Unrelated robot PR11 remains unmerged.
