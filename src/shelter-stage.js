@@ -64,12 +64,12 @@ export function createShelterStage(canvas){
  for(const x of [-.024,.024])ball(butterfly,0xffffff,x,.19,.075,.018,.023,.01);
  const quick=group(scene),final=group(scene),ghost=group(scene);for(const g of [quick,final,ghost])g.position.set(0,0,-1.0);
  const pieces=[];
- const boardSpec=[[-.65,.56,0,.09,1.12,.12],[.65,.56,0,.09,1.12,.12],[-.65,.56,-.7,.09,1.12,.12],[.65,.56,-.7,.09,1.12,.12],
-  [0,.12,-.35,1.4,.10,.9],[0,.48,-.74,1.4,.10,.10],[0,.85,-.74,1.4,.10,.10],[-.65,.5,-.35,.10,.10,.7],[.65,.5,-.35,.10,.10,.7],
+ const boardSpec=[[0,.12,-.35,1.4,.10,.9],[-.65,.56,0,.09,1.12,.12],[.65,.56,0,.09,1.12,.12],[-.65,.56,-.7,.09,1.12,.12],[.65,.56,-.7,.09,1.12,.12],
+  [0,.48,-.74,1.4,.10,.10],[0,.85,-.74,1.4,.10,.10],[-.65,.5,-.35,.10,.10,.7],[.65,.5,-.35,.10,.10,.7],
   [0,1.18,-.4,1.65,.12,1.25]];
  for(const [i,s] of boardSpec.entries()){
   const [x,y,z,sx,sy,sz]=s;const q=block(quick,0xdab381,x,y,z,sx,sy,sz),f=block(final,i===9?0x89af78:0xdab381,x,y,z,sx,sy,sz);
-  pieces.push({q,f,x,y,z,index:i});
+  pieces.push({q,f,x,y,z,sy,index:i});
  }
  const gutter=group(final);gutter.position.set(.0,1.19,.25);const gutterLeaf=ball(gutter,0x5d9b65,0,0,0,.9,.035,.16);gutterLeaf.rotation.z=-.10;
  curve(gutter,[[-.8,.03,0],[0,0,0],[.8,-.13,.1]],0x44784e,.02);
@@ -104,8 +104,8 @@ export function createShelterStage(canvas){
   quick.visible=s.quickVisible;final.visible=s.finalVisible;ghost.visible=s.planVisible&&s.planComplexity>0;
   for(const p of pieces){
    const q=clamp((s.quickBuild*10-p.index)/.8),fall=clamp((s.collapse*11-p.index*.45)/5);
-   p.q.visible=q>0;p.q.position.set(p.x+(p.index%2?1:-1)*fall*.65,Math.max(.06,p.y-fall*(p.y-.07)),p.z+fall*.25);p.q.scale.y=q;p.q.rotation.set(fall*.55,0,(p.index%2?1:-1)*(.12+fall*1.1));
-   const built=clamp((s.build*11-p.index)/.8);p.f.visible=built>0;p.f.scale.y=built;p.f.rotation.set(p.index===9?-.14:0,0,0);
+   p.q.visible=q>0;p.q.position.set(p.x+(p.index%2?1:-1)*fall*.65,Math.max(.06,p.y-fall*(p.y-.07)),p.z+fall*.25);p.q.scale.y=p.sy*q;p.q.rotation.set(fall*.55,0,(p.index%2?1:-1)*(.12+fall*1.1));
+   const built=clamp((s.build*11-p.index)/.8);p.f.visible=built>0;p.f.scale.y=p.sy*built;p.f.rotation.set(p.index===9?-.14:0,0,0);
   }
   ghost.scale.y=.4+s.planComplexity*.7;ghost.rotation.z=Math.sin(s.t*3)*s.planComplexity*.06;
   gutter.visible=s.gutter>0;gutter.scale.x=Math.max(.001,s.gutter);gutterCarry.visible=s.t>=269&&s.t<281;
@@ -124,5 +124,6 @@ export function createShelterStage(canvas){
  }
  function resize(){renderer.setSize(Math.max(1,canvas.clientWidth),Math.max(1,canvas.clientHeight),false);}
  function dispose(){geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());rainMat.dispose();renderer.dispose();}
- resize();return {render,resize,dispose};
+ function inspect(){const roof=pieces.at(-1).f,roofBox=new THREE.Box3().setFromObject(roof);return {boards:pieces.map(p=>({visible:p.f.visible,height:p.f.scale.y,authoredHeight:p.sy})),roofHeight:roofBox.max.y-roofBox.min.y};}
+ resize();return {render,resize,dispose,inspect};
 }

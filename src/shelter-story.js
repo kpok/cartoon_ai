@@ -60,15 +60,21 @@ export function shelterState(value){
  if(chapter.id==='repair'){cat.arm=1.65;squirrel.otherArm=1.3;cat.smile=squirrel.smile=.7;}
  if(chapter.id==='shower'){cat.worry=1-smooth((t-294)/2);cat.arm=.9;cat.headTilt=.18;cat.smile=smooth((t-294)/2);squirrel.smile=1;}
  const leafBlown=clamp((t-6)/9),leaf={x:mix(.5,-2.4,leafBlown),y:mix(1.65,.08,leafBlown)+Math.sin(Math.PI*leafBlown)*1.2,z:mix(-.5,.3,leafBlown),rotation:leafBlown*5};
- const delivery=clamp((t-181)/16),barrow={x:mix(-1.5,.65,delivery),z:.8,yaw:Math.PI/2,roll:delivery*9,loaded:t>=176&&t<212};
+ const delivery=clamp((t-181)/16),parking=smooth((t-197)/9);
+ const barrow={x:t<181?mix(-2.7,-1.5,clamp((t-174)/7)):mix(-1.5,.65,delivery)+parking*2.05,
+  z:t<181?mix(-1.4,.8,clamp((t-174)/7)):mix(.8,-1.4,parking),yaw:Math.PI/2,roll:delivery*9+parking*7,loaded:t>=176&&t<212};
  const pushing=smooth((t-174)/7)*(1-smooth((t-198)/8));
  cat.x+=((barrow.x-.95)-cat.x)*pushing;cat.z+=(barrow.z-cat.z)*pushing;cat.yaw+=(Math.PI/2-cat.yaw)*pushing;cat.arm+=(-.15)*pushing;
- squirrel.x+=((barrow.x+.4)-squirrel.x)*pushing;squirrel.z+=((barrow.z+.65)-squirrel.z)*pushing;squirrel.yaw+=(Math.PI/2-squirrel.yaw)*pushing;
+ squirrel.x+=((barrow.x+.4)-squirrel.x)*pushing;squirrel.z+=((barrow.z-.85)-squirrel.z)*pushing;squirrel.yaw+=(Math.PI/2-squirrel.yaw)*pushing;
  cat.step+=Math.sin(t*9)*pushing*.6;squirrel.step+=Math.sin(t*9+.8)*pushing*.6;
+ // Keep the rounded heads from intersecting when the friends come closer to talk.
+ const dx=squirrel.x-cat.x,dz=squirrel.z-cat.z,distance=Math.hypot(dx,dz);
+ if(distance<.98){const gap=(.98-distance)/2,nx=distance?dx/distance:1,nz=distance?dz/distance:0;cat.x-=nx*gap;cat.z-=nz*gap;squirrel.x+=nx*gap;squirrel.z+=nz*gap;}
  const camera={x:0,y:3.4,z:8.5,targetX:0,targetY:.85,targetZ:-.3,span:5.8};
  // Purposeful shot changes: establish, reaction, failed construction, collaboration, payoff.
  if(['promise','listen'].includes(chapter.id)){camera.targetX=0;camera.span=4.4;camera.y=2.8;}
- if(chapter.id==='plan'){camera.targetX=.25;camera.targetY=1.05;camera.span=4.8;}
+ if(chapter.id==='plan'){camera.targetX=.25;camera.targetY=1.05;camera.span=6;}
+ if(chapter.id==='delivery'){camera.targetX=-.2;camera.span=6.8;}
  if(chapter.id==='rain'&&t>252){camera.targetX=.1;camera.targetY=.8;camera.span=4.2;}
  if(chapter.id==='repair'){camera.targetY=1;camera.span=4.8;}
  if(chapter.id==='shower'){camera.targetX=.8;camera.span=4.5;camera.y=2.8;}

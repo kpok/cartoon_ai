@@ -34,7 +34,7 @@ const lines=[
  [290,296,'kitten','Hej! Ta rynna zrobiła prysznic dla mnie!','Hey! That gutter made a shower for me!'],
  [296,300,'squirrel','Domek suchy. Kotek umyty!','A dry shelter. A clean kitten!'],
 ];
-export const shelterCues=(locale='pl')=>lines.map(([start,end,speakerId,pl,en],i)=>({id:`shelter-${i}`,start,end,speakerId,text:locale==='en'?en:pl,
+export const shelterCues=(locale='pl')=>lines.map(([start,end,speakerId,pl,en],i)=>({id:`shelter-${i}`,start,end,speakerId,pitch:{kitten:1.1,squirrel:1.25,butterfly:1.4,narrator:.95}[speakerId],text:locale==='en'?en:pl,
  speaker:(locale==='en'?{kitten:'Kitten',squirrel:'Squirrel',butterfly:'Butterfly',narrator:'Narrator'}:{kitten:'Kotek',squirrel:'Wiewiórka',butterfly:'Motyl',narrator:'Narrator'})[speakerId]}));
 const cache={pl:shelterCues('pl'),en:shelterCues('en')};
 export const shelterCueAt=(time,locale='pl')=>cache[locale==='en'?'en':'pl'].find(c=>time>=c.start&&time<c.end)||null;

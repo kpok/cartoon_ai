@@ -12,8 +12,13 @@ test('five-minute shelter story has contiguous chapters, distinct failures and a
 test('poses are finite and independent of sampling order, and actors do not teleport at chapter boundaries',()=>{
  const finite=o=>{for(const v of Object.values(o))if(typeof v==='number')assert.ok(Number.isFinite(v));else if(v&&typeof v==='object')finite(v);};
  for(let t=0;t<=300;t+=.25)finite(shelterState(t));
+ for(let t=0;t<=300;t+=.25){const s=shelterState(t);assert.ok(Math.hypot(s.cat.x-s.squirrel.x,s.cat.z-s.squirrel.z)>=.979);}
  const first=shelterState(13);shelterState(299);assert.deepEqual(shelterState(13),first);
  for(const c of SHELTER_CHAPTERS.slice(1))for(const actor of ['cat','squirrel']){const a=shelterState(c.start-.001)[actor],b=shelterState(c.start+.001)[actor];assert.ok(Math.hypot(a.x-b.x,a.z-b.z)<.01);}
+});
+test('wheelbarrow stays parked outside dialogue blocking and squirrel walks on its far side',()=>{
+ for(const t of [3,110,259]){const s=shelterState(t);assert.ok(Math.abs(s.barrow.x)>2.5);}
+ const s=shelterState(191);assert.ok(s.squirrel.z<s.barrow.z-.7);assert.ok(s.cat.x<s.barrow.x-.8);
 });
 test('all localized dialogue fits inside the film with no overlap and stable cue identity',()=>{
  for(const lang of ['pl','en']){let end=0;for(const cue of shelterCues(lang)){assert.ok(cue.start>=end);assert.ok(cue.end<=300&&cue.end>cue.start);assert.ok(cue.text.length>0);assert.equal(shelterCueAt(cue.start+.1,lang).id,cue.id);end=cue.end;}assert.equal(shelterCueAt(300,lang),null);}

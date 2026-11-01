@@ -55,3 +55,8 @@ test('seek and replay can repeat current cue while volume remains bounded',()=>{
   const {sound,log}=fixture();sound.start(24);sound.stop();sound.start(24);assert.equal(log.spoken.length,2);
   sound.setVolume(5);assert.equal(sound.volume,1);sound.setVolume(-1);assert.equal(sound.volume,0);
 });
+test('optional authored speaker pitch is bounded and old dialogue keeps its default',()=>{
+ const f=fixture();f.sound.cueProvider=()=>({id:'custom',start:0,end:10,text:'Hello',speakerId:'squirrel',pitch:1.25});f.sound.start(0);assert.equal(f.log.spoken.at(-1).pitch,1.25);
+ f.sound.cueProvider=()=>({id:'large',start:0,end:10,text:'Hello',speakerId:'kitten',pitch:9});f.sound.start(0);assert.equal(f.log.spoken.at(-1).pitch,2);
+ const old=fixture();old.sound.start(10);assert.equal(old.log.spoken.at(-1).pitch,1.05);
+});

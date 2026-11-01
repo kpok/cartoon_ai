@@ -173,7 +173,7 @@ export class FilmSound {
     utterance.lang = voice.lang;
     utterance.voice = voice;
     utterance.rate = 0.9;
-    utterance.pitch = cue.speakerId === 'butterfly' ? 1.35 : 1.05;
+    utterance.pitch = Number.isFinite(cue.pitch) ? Math.max(0, Math.min(2, cue.pitch)) : cue.speakerId === 'butterfly' ? 1.35 : 1.05;
     utterance.volume = 0.7;
     utterance.onend = () => {
       if (this.utterance === utterance) this.speaking = false;
