@@ -4,7 +4,7 @@ import {resolve,dirname,relative} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {publicFile,CONTENT_POLICY,ROBOT_POLICY} from './static-server.mjs';
 export async function verifyBuild(directory='dist'){
- const expected=['assets/kalinka/red-square-ai.png','index.html','export.html','robot.html','strawberry.html','published/robot/robot.glb','published/robot/preview.png','published/robot/manifest.json','vendor/GLTFLoader.js','vendor/OrbitControls.js','vendor/BufferGeometryUtils.js','vendor/SkeletonUtils.js','vendor/three.module.js','vendor/three.core.js','vendor/THREE-LICENSE.txt',...['strawberry-story.js','strawberry-stage.js','strawberry-player.js','strawberry.css','app.js','dialogue.js','draw.js','episodes.js','export-frame.js','garden-state.js','garden-view.js','i18n.js','sound.js','story.js','style.css','robot-view.js','robot-kalinka.js','kalinka-stage.js','kalinka-costume.js','robot-stage.js','robot-playback.js','robot.css'].map(f=>`src/${f}`)].sort();
+ const expected=['shelter.html','assets/kalinka/red-square-ai.png','index.html','export.html','robot.html','strawberry.html','published/robot/robot.glb','published/robot/preview.png','published/robot/manifest.json','vendor/GLTFLoader.js','vendor/OrbitControls.js','vendor/BufferGeometryUtils.js','vendor/SkeletonUtils.js','vendor/three.module.js','vendor/three.core.js','vendor/THREE-LICENSE.txt',...['shelter-story.js','shelter-dialogue.js','shelter-stage.js','shelter-player.js','shelter.css','strawberry-story.js','strawberry-stage.js','strawberry-player.js','strawberry.css','app.js','dialogue.js','draw.js','episodes.js','export-frame.js','garden-state.js','garden-view.js','i18n.js','sound.js','story.js','style.css','robot-view.js','robot-kalinka.js','kalinka-stage.js','kalinka-costume.js','robot-stage.js','robot-playback.js','robot.css'].map(f=>`src/${f}`)].sort();
  const files=[];
  async function walk(dir,prefix=''){
   for(const entry of await readdir(dir,{withFileTypes:true})){
@@ -16,7 +16,7 @@ export async function verifyBuild(directory='dist'){
  }
  assert.ok(!(await lstat(directory)).isSymbolicLink(),'Build root must not be a symlink');
  await walk(directory);assert.deepEqual(files.sort(),expected,'Build file inventory differs from intended static assets');
- for(const name of ['index.html','export.html','robot.html','strawberry.html']){
+ for(const name of ['shelter.html','index.html','export.html','robot.html','strawberry.html']){
   const html=await readFile(resolve(directory,name),'utf8');
   assert.ok(html.includes(`<meta http-equiv="Content-Security-Policy" content="${name==='robot.html'?ROBOT_POLICY:CONTENT_POLICY}">`),`${name}: missing reviewed CSP`);
  }

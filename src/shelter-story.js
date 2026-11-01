@@ -19,7 +19,7 @@ const CAT=[
  [148,-1.1,.8],[157,-.65,.65],[166,-.8,.7],[174,-1.8,1.2],[181,-2.3,.8],[189,-1,.8],
  [198,-.8,.9],[206,-1.1,.6],[213,-2.1,-.4],[219,-.8,.2],[226,-1,.65],[234,-.7,.4],
  [242,-1.2,.8],[251,-.7,.7],[259,-.45,.75],[268,-1.4,.6],[274,-.8,-.05],[280,-.6,.3],
- [288,.85,.7],[292,.9,.8],[294,1.3,1.2],[297,1.1,1],[300,1.1,1],
+ [288,.85,-.6],[292,.9,-.6],[294,1.3,.25],[297,1.1,.3],[300,1.1,.3],
 ];
 const SQUIRREL=[
  [0,1.6,.7],[8,.85,.8],[17,1.4,.6],[24,1.05,.8],[34,1.3,.5],[45,1.15,.7],[56,.9,.6],
@@ -46,7 +46,7 @@ export function shelterState(value){
  const quickBuild=clamp((t-46)/24),collapse=clamp((t-73)/9),build=clamp((t-206)/34);
  const butterfly={x:mix(.5,2.25,clamp((t-8)/10)),y:1.3+Math.sin(t*3)*.07,z:-.5,flutter:1};
  if(t>22&&t<242){butterfly.x=2.25+Math.sin(t*.5)*.05;butterfly.y=1.45+Math.sin(t)*.04;butterfly.z=-.7;butterfly.flutter=.25;}
- if(t>=242){const q=clamp((t-244)/8);butterfly.x=mix(2.25,.05,q);butterfly.y=mix(1.45,.68,q);butterfly.z=mix(-.7,-.65,q);butterfly.flutter=1-q*.85;}
+ if(t>=242){const q=clamp((t-244)/8);butterfly.x=mix(2.25,.05,q);butterfly.y=mix(1.45,.68,q);butterfly.z=mix(-.7,-1.3,q);butterfly.flutter=1-q*.85;}
  if(chapter.id==='wind'){cat.look=.28;cat.worry=.5;cat.arm=.8;squirrel.arm=.65;}
  if(chapter.id==='promise'){cat.arm=.85;squirrel.otherArm=.75;cat.smile=.5;}
  if(chapter.id==='quick'){cat.arm=.9;cat.lean+=.12*Math.sin(t*2);squirrel.arm=.4;squirrel.headTilt=-.12;}
@@ -61,6 +61,10 @@ export function shelterState(value){
  if(chapter.id==='shower'){cat.worry=1-smooth((t-294)/2);cat.arm=.9;cat.headTilt=.18;cat.smile=smooth((t-294)/2);squirrel.smile=1;}
  const leafBlown=clamp((t-6)/9),leaf={x:mix(.5,-2.4,leafBlown),y:mix(1.65,.08,leafBlown)+Math.sin(Math.PI*leafBlown)*1.2,z:mix(-.5,.3,leafBlown),rotation:leafBlown*5};
  const delivery=clamp((t-181)/16),barrow={x:mix(-1.5,.65,delivery),z:.8,yaw:Math.PI/2,roll:delivery*9,loaded:t>=176&&t<212};
+ const pushing=smooth((t-174)/7)*(1-smooth((t-198)/8));
+ cat.x+=((barrow.x-.95)-cat.x)*pushing;cat.z+=(barrow.z-cat.z)*pushing;cat.yaw+=(Math.PI/2-cat.yaw)*pushing;cat.arm+=(-.15)*pushing;
+ squirrel.x+=((barrow.x+.4)-squirrel.x)*pushing;squirrel.z+=((barrow.z+.65)-squirrel.z)*pushing;squirrel.yaw+=(Math.PI/2-squirrel.yaw)*pushing;
+ cat.step+=Math.sin(t*9)*pushing*.6;squirrel.step+=Math.sin(t*9+.8)*pushing*.6;
  const camera={x:0,y:3.4,z:8.5,targetX:0,targetY:.85,targetZ:-.3,span:5.8};
  // Purposeful shot changes: establish, reaction, failed construction, collaboration, payoff.
  if(['promise','listen'].includes(chapter.id)){camera.targetX=0;camera.span=4.4;camera.y=2.8;}
