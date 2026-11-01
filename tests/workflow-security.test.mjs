@@ -26,6 +26,9 @@ test('security regressions in YAML are caught before delivery',()=>{
   w=>{w['ci.yml'].jobs.test.permissions.contents='write';},
   w=>{w['ci.yml'].concurrency={group:'trusted-film-checks','cancel-in-progress':true};},
   w=>{w['ci.yml'].jobs.test['runs-on']=['self-hosted'];},
+  w=>{w['ci.yml'].jobs.regression['runs-on']='ubuntu-latest';},
+  w=>{w['robot-mp4.yml'].jobs.render['runs-on']='ubuntu-latest';},
+  w=>{w['export-mp4.yml'].jobs.export['runs-on']='ubuntu-latest';},
   w=>{w['export-mp4.yml'].jobs.export.env={OPENAI_API_KEY:'${{ secrets.OPENAI_API_KEY }}'};},
   w=>{w['sanitize-history.yml']={on:{workflow_dispatch:{}},jobs:{}};},
  ];
