@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.module.js';
-import {smooth} from './night-shift-story.js';
+import {smooth,REELS_LAYOUT} from './night-shift-story.js';
 
 // All sets are original procedural illustrations, not a model of the real premises.
 export function createNightStage(canvas) {
@@ -96,16 +96,19 @@ export function createNightStage(canvas) {
  }
  function corners(bounds){const [min,max]=bounds,result=[];for(const x of [min[0],max[0]])for(const y of [min[1],max[1]])for(const z of [min[2],max[2]])result.push(new THREE.Vector3(x,y,z));return result;}
  function view(pos,target){
-  camera.position.set(...pos);camera.lookAt(...target);
+  camera.updateProjectionMatrix();camera.position.set(...pos);camera.lookAt(...target);
   if(camera.aspect<1){
-   // Fit the authored subject box in both FOV axes, with space for the frame labels.
+   // Fit and shift the subject into the asymmetric Reels-safe band; background stays full-frame.
    const points=corners(activeBounds),center=new THREE.Vector3().addVectors(points[0],points.at(-1)).multiplyScalar(.5);
    const direction=new THREE.Vector3(...pos).sub(new THREE.Vector3(...target)).normalize();
    const right=new THREE.Vector3().crossVectors(camera.up,direction).normalize(),up=new THREE.Vector3().crossVectors(direction,right).normalize();
-   const tanY=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*.84,tanX=tanY*camera.aspect;
+   const zone=REELS_LAYOUT.subject,tan=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+   const tanY=tan*(zone.bottom-zone.top)*.94,tanX=tan*camera.aspect*(zone.right-zone.left)*.94;
    let distance=1;
    for(const point of points){const offset=point.clone().sub(center),depth=offset.dot(direction);distance=Math.max(distance,depth+Math.abs(offset.dot(right))/tanX,depth+Math.abs(offset.dot(up))/tanY);}
-   camera.position.copy(center).addScaledVector(direction,distance);camera.lookAt(center);scene.fog.near=distance+12;scene.fog.far=distance+50;
+   camera.position.copy(center).addScaledVector(direction,distance);camera.lookAt(center);
+   camera.projectionMatrix.elements[8]=-(zone.left+zone.right-1);camera.projectionMatrix.elements[9]=-(1-zone.top-zone.bottom);camera.projectionMatrixInverse.copy(camera.projectionMatrix).invert();
+   scene.fog.near=distance+12;scene.fog.far=distance+50;
   }else{scene.fog.near=22;scene.fog.far=55;}
  }
 

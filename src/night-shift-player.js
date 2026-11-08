@@ -1,4 +1,4 @@
-import {DURATION,CHAPTERS,FilmClock,stateAt,cueAt,labels,localeOf,initialFormat} from './night-shift-story.js';
+import {DURATION,CHAPTERS,FilmClock,stateAt,cueAt,labels,localeOf,initialFormat,REELS_LAYOUT,portraitCaptionAt} from './night-shift-story.js';
 import {createNightStage} from './night-shift-stage.js';
 import {FilmSound} from './sound.js';
 const $=id=>document.getElementById(id),canvas=$('night-canvas'),clock=new FilmClock();
@@ -9,13 +9,13 @@ const sound=new FilmSound({AudioContextClass:globalThis.AudioContext||globalThis
 sound.musicEnabled=false;sound.volume=.12;
 const format=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
 function draw(){
- const s=stateAt(clock.time),chapter=CHAPTERS.find(c=>c.id===s.chapter),cue=cueAt(clock.time,locale),l=labels[locale];
+ const s=stateAt(clock.time),chapter=CHAPTERS.find(c=>c.id===s.chapter),cue=cueAt(clock.time,locale),caption=pictureFormat==='portrait'?portraitCaptionAt(clock.time,locale):cue,l=labels[locale];
  if(ready&&!disposed)stage.render(s,clock.playing?cue?.speakerId:null);
  canvas.dataset.time=clock.time.toFixed(3);canvas.dataset.playing=String(clock.playing);canvas.dataset.chapter=s.chapter;
  $('play').textContent=clock.playing?l.pause:l.play;$('play').setAttribute('aria-pressed',String(clock.playing));$('seek').value=String(clock.time);$('time').textContent=`${format(clock.time)} / 1:30`;
  $('chapter-title').textContent=chapter[locale];$('scene-number').textContent=`0${CHAPTERS.indexOf(chapter)+1} / 06`;
- $('scene-note').textContent=s.chapter==='night'?l.date:s.chapter==='line'?l.illustration:s.chapter==='incident'?l.offscreen:s.chapter==='flight'&&s.time>=69?l.hospital:s.chapter==='investigation'?l.final:l.notice;
- $('caption-speaker').textContent=cue?`${cue.speaker}: `:'';$('caption-text').textContent=cue?.text||chapter[locale];$('caption').hidden=!$('captions').checked||clock.time>=DURATION;$('ending').hidden=clock.time<DURATION;$('caption-track').hidden=!$('captions').checked&&clock.time<DURATION;
+ $('scene-note').textContent=pictureFormat==='portrait'?l.reelsNote:s.chapter==='night'?l.date:s.chapter==='line'?l.illustration:s.chapter==='incident'?l.offscreen:s.chapter==='flight'&&s.time>=69?l.hospital:s.chapter==='investigation'?l.final:l.notice;
+ $('caption-speaker').textContent=caption?`${caption.speaker}: `:'';$('caption-text').textContent=caption?.text||chapter[locale];$('caption').hidden=!$('captions').checked||clock.time>=DURATION;$('ending').hidden=clock.time<DURATION;$('caption-track').hidden=!$('captions').checked&&clock.time<DURATION;
  for(const b of $('chapters').children)b.setAttribute('aria-current',String(b.dataset.chapter===s.chapter));
 }
 function cancelFrame(){if(frame!==null)cancelAnimationFrame(frame);frame=null;}
@@ -31,6 +31,8 @@ function translate(){const l=labels[locale];document.documentElement.lang=locale
 }
 function fail(){if(disposed)return;clock.pause();sound.stop();cancelFrame();ready=false;disposed=true;canvas.dataset.ready='false';canvas.hidden=true;$('failure-box').hidden=false;for(const id of ['play','restart','seek','fullscreen','speech','music','volume'])$(id).disabled=true;stage?.dispose();translate();}
 function applyFormat(){
+ const c=REELS_LAYOUT.caption,n=REELS_LAYOUT.note,style=$('picture').style;
+ for(const [key,value] of Object.entries({'caption-left':c.left,'caption-right':1-c.right,'caption-top':c.top,'caption-height':c.bottom-c.top,'note-left':n.left,'note-right':1-n.right,'note-top':n.top}))style.setProperty(`--reels-${key}`,`${value*100}%`);
  const track=$('caption-track');if(pictureFormat==='portrait')$('picture').append(track);else $('notice').after(track);
  $('player').dataset.format=pictureFormat;document.documentElement.dataset.filmFormat=pictureFormat;$('format').value=pictureFormat;
  if(ready&&!disposed){stage.resize();draw();}
