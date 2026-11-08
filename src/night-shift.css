@@ -6,10 +6,12 @@
 #player[data-format=portrait] .transport{flex-wrap:wrap}
 #player[data-format=portrait] .seek{order:5;flex-basis:100%}
 #player[data-format=portrait] #fullscreen{margin-left:auto}
-#player[data-format=portrait] .caption-track{position:absolute;z-index:2;left:12px;right:12px;bottom:16px;min-height:0;padding:12px;border:1px solid #ffffff24;border-radius:12px;background:#071522df;box-shadow:0 3px 18px #0004;pointer-events:none;overflow-wrap:anywhere}
-#player[data-format=portrait] #caption{font-size:clamp(15px,4.5cqw,20px);line-height:1.45}
+#player[data-format=portrait] .caption-track{position:absolute;z-index:2;left:var(--reels-caption-left);right:var(--reels-caption-right);top:var(--reels-caption-top);bottom:auto;height:var(--reels-caption-height);min-height:0;padding:6px;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #ffffff24;border-radius:12px;background:#071522df;box-shadow:0 3px 18px #0004;pointer-events:none;overflow-wrap:anywhere}
+#player[data-format=portrait] #caption{font-size:clamp(12px,4cqw,20px);line-height:1.3}
 #player[data-format=portrait] .film-top,#player[data-format=portrait] .film-bottom{left:12px;right:12px;max-width:calc(100% - 24px);font-size:11px}
-#player[data-format=portrait] .film-bottom{top:54px;bottom:auto;align-items:flex-start;line-height:1.5}
+#player[data-format=portrait] .film-top{display:none}
+#player[data-format=portrait] .film-bottom{left:var(--reels-note-left);right:var(--reels-note-right);top:var(--reels-note-top);bottom:auto;width:auto;max-width:none;padding:4px 6px;align-items:center;gap:0;font-size:clamp(8px,2.4cqw,12px);line-height:1.2}
+#player[data-format=portrait] .film-bottom .dot{display:none}
 #player[data-format=portrait] .dot{margin-top:5px}
 #player[data-format=portrait]:fullscreen{max-width:none}
 #player[data-format=portrait]:fullscreen .picture{width:min(100%,calc(max(68dvh,480px) * 9 / 16));height:auto;aspect-ratio:9/16}

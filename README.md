@@ -76,6 +76,41 @@ W dwóch bajkach muzyka jest syntezowana programowo, a dialogi w przeglądarce k
 
 Podgląd i eksport robota są **bez dźwięku**. Do opublikowanej wersji Facebook Reels dodałem utwór dostępny w edytorze Facebooka. Źródło referencji tańca i zakres wykorzystania materiałów opisuje [dokumentacja pochodzenia zasobów](docs/MEDIA_PROVENANCE.md).
 
+## Facebook Reels — marginesy, napisy i nakładki interfejsu
+
+Dla „Nocnej zmiany” używamy presetu **Reels 9:16**, dopasowanego do dostarczonego zrzutu z aplikacji Facebook (listopad 2026). Współrzędne poniżej liczymy **wewnątrz samego filmu**, od lewego górnego rogu. Preset zostawia miejsce na przyciski, profil, opis i kartę muzyki. Wygląd Reels zależy od telefonu, wersji aplikacji, długości opisu i widoku właściciela filmu; rozwinięte opisy, komentarze i reklamy mogą zajmować dodatkową przestrzeń. Przed publikacją sprawdź podgląd z nałożonym interfejsem.
+
+| Nakładka widoczna na zrzucie | Gdzie nachodzi na obraz | Przyjęta rezerwa w projekcie |
+| --- | --- | --- |
+| Wstecz, wyszukiwanie, menu; czasem nazwa widoku | Górna krawędź | Bez ważnego tekstu i postaci w górnych **22%** |
+| Karta dodanego utworu / muzyki | Górna część, szczególnie prawa strona | Ta sama górna rezerwa; krótka informacja o wizualizacji zaczyna się dopiero na **22%** wysokości |
+| Polubienia, komentarze, udostępnienie/repost i inne akcje | Prawa kolumna | Bez istotnych elementów w prawych **22%** szerokości |
+| Avatar, profil, opis „więcej”, oznaczenie muzyki; udostępnij/zapisz | Dolna część i prawy dół | Bez napisów i kluczowej akcji w dolnych **36%** |
+| „View insights” i dodatkowe opcje autora | Dolny panel w widoku właściciela | Uwzględnione w dolnej rezerwie |
+| „Up next” / karta reklamowa oraz paski systemowe telefonu | Mogą być przy lub poza obszarem odtwarzacza | Sprawdź rzeczywisty obszar filmu; elementów spoza filmu nie przeliczaj jako stałych marginesów obrazu |
+
+Dla obrazu 1080 × 1920 px rezerwa wynosi około **422 px u góry, 238 px po prawej, 691 px u dołu i 65 px po lewej**.
+
+**Rozmieszczenie treści** (wartości procentowe skalują się z rozdzielczością):
+
+| Element filmu | Zakres X | Zakres Y | Przykład dla 1080 × 1920 px |
+| --- | --- | --- | --- |
+| Ważne postacie, maszyna, śmigłowiec z wirnikiem | 6–78% | 27–49% | x≈65–842, y≈518–941 |
+| Napisy dialogów/narracji i plansza końcowa | 6–78% | 51–64% | x≈65–842, y≈979–1229 |
+| Krótka informacja „Wizualizacja · dialogi inscenizowane” | 6–78% | Od 22% | x≈65–842, y≈422 |
+| Tło | Cały obraz | Cały obraz | 1080 × 1920 |
+
+Podstawą tych wartości jest konserwatywny preset tego projektu i analiza dostarczonego zrzutu. Przy kolejnych wersjach sprawdzaj też [Meta Ads Guide — Facebook Reels](https://www.facebook.com/business/ads-guide/update/video/facebook-facebook-reels) i [Meta: nakładki tekstowe / bezpieczna strefa](https://www.facebook.com/business/help/980593475366490), szczególnie dla reklam. W tej zmianie nie potwierdzano reguł Meta za ekranem logowania.
+
+**Gdzie zmieniać ustawienia:**
+
+- `src/night-shift-story.js`: `REELS_LAYOUT` — wspólne proporcje stref; `splitCaption`, `portraitCaptionCues` — krótkie fragmenty napisów. Narrator nadal wypowiada pełną oryginalną kwestię; segmenty wizualne są odmierzane zegarem filmu, a tempo głosu urządzenia może się różnić.
+- `src/night-shift-stage.js`: dopasowanie i przesunięcie kamery w obu osiach FOV. Tło wypełnia cały ekran, a istotne obiekty mieszczą się w środkowej części przesuniętej w lewo.
+- `src/night-shift-player.js` i `src/night-shift.css`: zmienne CSS z tego samego presetu, położenie panelu napisów i krótkiej informacji o wizualizacji. W pionie ukrywamy zbędny nagłówek sceny przy samej górnej krawędzi.
+- `tests/browser/night-shift.spec.js`: testy wszystkich polskich i angielskich fragmentów, stref postaci, długich wyrazów, zmiany formatu i pełnego ekranu.
+
+**Nagranie / eksport:** zachowaj dokładnie 9:16 i kadruj do `.picture` (np. 1080 × 1920). Panel sterowania, opis pod filmem, pasek przeglądarki i paski Androida zostają poza materiałem. Nagranie całego ekranu telefonu może zawierać dodatkowe pasy lub opis pod filmem — przytnij je do granic obrazu przed wysłaniem do Reels. Marginesy pomagają tylko wtedy, gdy Facebook dostaje ten sam kadr, dla którego je policzono. Po zmianie tekstu, fontu, kamery lub formatu sprawdź najdłuższe kwestie PL/EN oraz ujęcia z krańcowym położeniem wirnika z symulacją nakładek.
+
 ## Co dalej
 
 Każdą animację rozwijam iteracyjnie w rozmowie: od pomysłu, przez pierwszą działającą wersję, po poprawki ruchu, tempa i wyglądu. Repozytorium zachowuje kod, z którego można odtworzyć i dalej rozwijać te sceny.

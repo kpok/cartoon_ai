@@ -22,3 +22,7 @@ test('incident narration states reported entanglement explicitly while leaving o
  assert.match(cueAt(33,'pl').text,/maszyna wciągnęła kobietę/);assert.match(cueAt(33,'pl').text,/jak doszło do pochwycenia/);
  assert.match(cueAt(33,'en').text,/machine pulled her in/);assert.match(cueAt(33,'en').text,/mechanism remains unknown/);
 });
+test('portrait chunks preserve every source word, have contiguous boundaries and readable durations',async()=>{
+ const {portraitCaptionCues}=await import('../src/night-shift-story.js');
+ for(const lang of ['pl','en'])for(const cue of cues(lang)){const parts=portraitCaptionCues(lang).filter(p=>p.id.startsWith(`${cue.id}-part-`));assert.equal(parts.map(p=>p.text).join(' '),cue.text);assert.equal(parts[0].start,cue.start);assert.equal(parts.at(-1).end,cue.end);for(let i=0;i<parts.length;i++){assert.ok(parts[i].end-parts[i].start>=.7,`${lang} ${parts[i].text}`);assert.ok(parts[i].text.length<=42);if(i)assert.equal(parts[i-1].end,parts[i].start);}}
+});
