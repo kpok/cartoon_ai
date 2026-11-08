@@ -1,0 +1,2 @@
+Independent plan review: PASS. Retain exactratio CSS on mobile/fullscreen, both FOV axes, all helicopter subshots/extremes, first sizing before stage creation, explicit mobile landscape and fallback tests.
+Independent implementation review: PASS; no blocking findings. Reviewed actual diff for query/locale persistence, playback continuity, camera fitting, fullscreen and fallback. Reviewer ran4 story tests and diff whitespace check, and inspected parent16/16 browser results. Parent inspected10 portrait scene frames including flight58,60,65,68.9,70s.

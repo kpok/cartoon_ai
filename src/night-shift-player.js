@@ -1,8 +1,10 @@
-import {DURATION,CHAPTERS,FilmClock,stateAt,cueAt,labels,localeOf} from './night-shift-story.js';
+import {DURATION,CHAPTERS,FilmClock,stateAt,cueAt,labels,localeOf,initialFormat} from './night-shift-story.js';
 import {createNightStage} from './night-shift-stage.js';
 import {FilmSound} from './sound.js';
 const $=id=>document.getElementById(id),canvas=$('night-canvas'),clock=new FilmClock();
-let locale=localeOf(new URLSearchParams(location.search).get('lang')),stage,ready=false,disposed=false,frame=null;
+const query=new URLSearchParams(location.search);
+let pictureFormat=initialFormat(query.get('format'),matchMedia('(max-width:650px)').matches);
+let locale=localeOf(query.get('lang')),stage,ready=false,disposed=false,frame=null;
 const sound=new FilmSound({AudioContextClass:globalThis.AudioContext||globalThis.webkitAudioContext,synth:globalThis.speechSynthesis,UtteranceClass:globalThis.SpeechSynthesisUtterance,locale,duration:DURATION,cueProvider:cueAt,onStatus:text=>{$('audio-status').textContent=text;}});
 sound.musicEnabled=false;sound.volume=.12;
 const format=t=>`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,'0')}`;
@@ -23,11 +25,16 @@ function play(){if(!ready||disposed||document.hidden)return;clock.play();sound.s
 function seek(value){pause();clock.seek(value);draw();}
 function translate(){const l=labels[locale];document.documentElement.lang=locale;document.title=`${l.title} — Cartoon AI`;
  for(const id of ['title','intro','eyebrow','notice','source','ending','failure','restart','fullscreen'])$(id).textContent=l[id];
- for(const [id,key]of [['language-label','language'],['speech-label','voice'],['music-label','music'],['volume-label','volume'],['captions-label','captions'],['seek-label','seek']])$(id).textContent=l[key];
+ for(const [id,key]of [['language-label','language'],['speech-label','voice'],['music-label','music'],['volume-label','volume'],['captions-label','captions'],['seek-label','seek'],['format-label','format'],['landscape-option','landscape'],['portrait-option','portrait']])$(id).textContent=l[key];
  canvas.setAttribute('aria-label',l.canvas);$('home').textContent=l.home;$('home').href=`./?lang=${locale}`;$('fallback').textContent=l.home;$('fallback').href=`./?lang=${locale}`;$('language').value=locale;$('chapters').setAttribute('aria-label',l.chapters);$('status').textContent=disposed?l.failure:ready?l.ready:l.loading;
  $('chapters').replaceChildren(...CHAPTERS.map(c=>{const b=document.createElement('button');b.type='button';b.dataset.chapter=c.id;b.textContent=`${format(c.start)} · ${c[locale]}`;b.disabled=!ready;b.onclick=()=>seek(c.start);return b;}));draw();sound.reportStatus();
 }
 function fail(){if(disposed)return;clock.pause();sound.stop();cancelFrame();ready=false;disposed=true;canvas.dataset.ready='false';canvas.hidden=true;$('failure-box').hidden=false;for(const id of ['play','restart','seek','fullscreen','speech','music','volume'])$(id).disabled=true;stage?.dispose();translate();}
+function applyFormat(){
+ $('player').dataset.format=pictureFormat;document.documentElement.dataset.filmFormat=pictureFormat;$('format').value=pictureFormat;
+ if(ready&&!disposed){stage.resize();draw();}
+}
+$('format').onchange=()=>{pictureFormat=initialFormat($('format').value);applyFormat();const url=new URL(location.href);url.searchParams.set('format',pictureFormat);history.replaceState(null,'',url);};
 $('play').onclick=()=>clock.playing?pause():play();$('restart').onclick=()=>seek(0);$('seek').oninput=()=>seek(Number($('seek').value));
 $('speech').onchange=()=>sound.setDialogue($('speech').checked);$('music').onchange=()=>sound.setMusic($('music').checked);$('volume').oninput=()=>sound.setVolume(Number($('volume').value));$('captions').onchange=draw;
 $('language').onchange=()=>{pause();locale=localeOf($('language').value);sound.setLocale(locale);const url=new URL(location.href);url.searchParams.set('lang',locale);history.replaceState(null,'',url);translate();};
@@ -39,4 +46,4 @@ const observer=new ResizeObserver(()=>{if(ready&&!disposed){stage.resize();draw(
 window.addEventListener('pagehide',event=>{pause();if(!event.persisted){disposed=true;observer.disconnect();stage?.dispose();speechCleanup();}});
 function speechCleanup(){globalThis.speechSynthesis?.removeEventListener?.('voiceschanged',sound.refreshVoices);void sound.context?.close().catch(()=>{});}
 window.addEventListener('pageshow',()=>{if(!disposed){clock.pause();sound.stop();draw();}});
-translate();try{stage=createNightStage(canvas);ready=true;canvas.dataset.ready='true';for(const id of ['play','restart','seek','fullscreen','speech','music','volume'])$(id).disabled=false;translate();}catch{fail();}
+applyFormat();translate();try{stage=createNightStage(canvas);ready=true;canvas.dataset.ready='true';for(const id of ['play','restart','seek','fullscreen','speech','music','volume'])$(id).disabled=false;translate();}catch{fail();}

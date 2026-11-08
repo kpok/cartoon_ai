@@ -14,3 +14,7 @@ test('both languages have matching cue boundaries, named speakers, short speech 
 test('playback clock advances, pauses, seeks, clamps and replays from the end',()=>{
  const c=new FilmClock();c.play();c.tick(1000);c.tick(2000);assert.equal(c.time,1);c.pause();c.tick(9000);assert.equal(c.time,1);c.seek(89.9);c.play();c.tick(10000);c.tick(11000);assert.equal(c.time,90);assert.equal(c.playing,false);c.play();assert.equal(c.time,0);c.seek(-4);assert.equal(c.time,0);c.seek(NaN);assert.equal(c.time,0);
 });
+test('format choice respects URL overrides and only defaults by initial screen size',async()=>{
+ const {initialFormat}=await import('../src/night-shift-story.js');
+ assert.equal(initialFormat(null,true),'portrait');assert.equal(initialFormat(null,false),'landscape');assert.equal(initialFormat('landscape',true),'landscape');assert.equal(initialFormat('portrait',false),'portrait');assert.equal(initialFormat('invalid',true),'portrait');
+});
