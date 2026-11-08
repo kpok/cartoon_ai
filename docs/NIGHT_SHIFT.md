@@ -1,0 +1,9 @@
+# Nocna zmiana / The Night Shift
+
+90-second procedural Three.js animation at `night-shift.html`, Polish default, `?lang=en` for English. The gallery contains a translated card. Language selection changes narration/dialogue, captions, chapter navigation and controls; switching pauses and cancels the current voice at the selected position. Play resumes in the new language.
+
+Six chapters: factory at night (0–12s), guarded illustrative can line (12–27s), emergency shown from a corridor (27–39s), paramedics attending a covered patient (39–57s), helicopter and hospital (57–73s), stopped line and investigation (73–90s). No gore, visible entanglement mechanism, employer logo or claim of fault. The factory, people and machine are original procedural illustrations. The article excerpt was supplied by the user and was not independently verified. Staged dialogue and illustrative nature are disclosed onscreen in both languages. No patient outcome beyond the supplied hospital transfer is asserted.
+
+Browser speech uses an available Polish/English device voice, preferring local voices, following the project's existing FilmSound policy. Actual pronunciation, availability and pacing vary by device; unavailable voices are reported with subtitles retained. No prerecorded audio or external runtime assets are added. Music is optional and off by default for the serious subject. Captions default on. Playback is user initiated, pauses on page hiding and supports restart, seek, chapter selection and fullscreen. WebGL failure retains translated navigation.
+
+Build with `npm run build`; validate story with `node --test tests/night-shift.test.mjs`; browser checks with `npx playwright test tests/browser/night-shift.spec.js`. The existing owner-guarded Pages workflow publishes dist from main. Revert feature changes to roll back.

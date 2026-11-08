@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; media-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101c2a"><meta name="description" content="Nocna zmiana / The Night Shift — stylizowana animacja 3D z narracją i napisami PL/EN.">
+<title>Nocna zmiana — Cartoon AI</title><link rel="stylesheet" href="./src/night-shift.css">
+</head><body>
+<header><a id="home" href="./">← Małe historie</a><span class="brand">CARTOON AI / STORIES</span><label><span id="language-label">Język filmu</span> <select id="language"><option value="pl">Polski</option><option value="en">English</option></select></label></header>
+<main><div class="intro"><p id="eyebrow" class="eyebrow">ANIMOWANA RELACJA · 3D · 1:30</p><h1 id="title">Nocna zmiana</h1><p id="intro">Jedna noc. Nagłe zagrożenie. Pomoc, która przychodzi na czas.</p></div>
+<section id="player" aria-labelledby="title">
+<div class="picture"><canvas id="night-canvas" role="img"></canvas><div class="film-top"><span id="scene-number">01 / 06</span><span id="chapter-title"></span></div><div class="film-bottom"><span class="dot"></span><span id="scene-note"></span></div><div id="failure-box" hidden><p id="failure"></p><a id="fallback" href="./">← Małe historie</a></div></div>
+<p id="notice" class="notice">Wizualizacja na podstawie relacji prasowej. Dialogi inscenizowane.</p>
+<div class="caption-track"><p id="caption" aria-live="off"><strong id="caption-speaker"></strong><span id="caption-text"></span></p><p id="ending" hidden></p></div>
+<div class="transport"><button id="play" type="button" disabled>Odtwórz</button><button id="restart" type="button" disabled>Od początku</button><output id="time">0:00 / 1:30</output><label class="seek"><span id="seek-label" class="sr-only">Pozycja w filmie</span><input id="seek" type="range" min="0" max="90" step="0.1" value="0" disabled></label><button id="fullscreen" type="button" disabled>Pełny ekran</button></div>
+<div class="sound-controls"><label><input id="speech" type="checkbox" checked disabled><span id="speech-label">Narracja i dialogi</span></label><label><input id="music" type="checkbox" disabled><span id="music-label">Muzyka</span></label><label><span id="volume-label">Głośność muzyki</span><input id="volume" type="range" min="0" max="1" step="0.01" value="0.12" disabled></label><label><input id="captions" type="checkbox" checked><span id="captions-label">Napisy</span></label></div>
+<p id="audio-status" role="status"></p><p id="status">Przygotowywanie animacji…</p>
+</section>
+<nav id="chapters" aria-label="Sceny filmu"></nav><p id="source" class="source"></p></main><footer>Cartoon AI · 2026</footer>
+<script type="module" src="./src/night-shift-player.js"></script></body></html>
