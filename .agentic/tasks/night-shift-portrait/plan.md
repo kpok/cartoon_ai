@@ -1,0 +1,11 @@
+# Night Shift portrait playback
+Baseline36c65ae68c0eb6069088e40d57fc86453c98480e; user requests phone9:16 support and publication remains authorized from this task. Prior task's local report changes are preserved in its original worktree; this isolated worktree contains only this change.
+
+Verified: player has no format option, CSS becomes4:3 on narrow screens, perspective stage only applies a1.16 width adjustment. Existing local browser test infrastructure and protected-branch/Pages publishing tools available. Previous hosted regression completed87/88: unrelated existing Kalinka mobile camera test exceeded30s; all10 NightShift tests passed. Do not alter unrelated robot code/tests.
+
+AC1: Explicit translated16:9/9:16 select, exact picture ratio in both cases. Mobile starts portrait when no valid URL override; desktop starts landscape. URLformat=portrait/landscape persists reload and language changes.
+AC2: Responsive3D framing for all six scenes, people and key machinery/rotor stay visible; no stretching. Keep image framing enough for current subject, not merely CSS clipping. Portrait captions remain readable and do not cover geometry; fullscreen preserves selected picture ratio and permits scrolling controls.
+AC3: Switching format retains position, scene, language, playing/paused state and sound preferences. Existing WebGL fallback and navigation remain usable.
+AC4: Build, unit tests, focused desktop/mobile film tests including ratio, format URL/locale/playback and allscene visual inspection. Independent plan/code review, required remote audit, merge and successful Pages deploy; verify live format control. Full unrelated browser/export suite is additional evidence and must not be reported passed before completion.
+
+Routine decision: use existing selfhosted Three.js, CSS aspectratio and perframe camera framing; no dependencies or architecture council needed. Add a dataformat attribute on player and document-level portrait UI styles, translated labels, query handling, bounded camera fit based on authored subject boxes. Keep captions below image and within portrait player width. Default mobile chosen only atinitialization; orientation changes resize selected format without overwriting explicit choice.

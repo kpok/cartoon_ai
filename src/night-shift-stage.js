@@ -81,10 +81,37 @@ export function createNightStage(canvas) {
  const investigation=sets.investigation,stopped=makeLine(investigation),officer=person(investigation,{suit:0x344a65,skin:0xb98a6c,cap:false});officer.root.position.set(-2.1,0,1.1);officer.root.rotation.y=-.4;const cameraProp=block(officer.root,0x293640,.12,1.12,.47,.24,.16,.14);cyl(cameraProp,0x192b39,0,0,0,.045,.09).rotation.x=Math.PI/2;
  const inspect={};
  function resize(){const width=Math.max(1,canvas.clientWidth),height=Math.max(1,canvas.clientHeight);renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();}
- function view(pos,target){camera.position.set(...pos);camera.lookAt(...target);}
+ let activeBounds=null;
+ function subjectBounds(s){
+  if(s.chapter==='night')return [[-5.3,0,-3.6],[5.3,4.3,1]];
+  if(s.chapter==='line')return [[-2.3,0,-.85],[1.8,2.5,1.6]];
+  if(s.chapter==='incident')return [[-3.3,0,-1.3],[1.1,3.3,1]];
+  if(s.chapter==='rescue')return [[-2.1,0,-.8],[1.7,2,1.4]];
+  if(s.chapter==='flight'){
+   if(s.time<60)return [[-4.5,0,-1.5],[4.3,4.3,3.3]];
+   if(s.time<69){const lift=smooth((s.time-62)/7);return [[-2.5+lift*2,lift*2.5,-2.3],[2.5+lift*2,2.7+lift*2.5,2.3]];}
+   return [[-5.3,0,-3.6],[5.3,4.3,1]];
+  }
+  return [[-2.7,0,-.85],[1.8,2.5,1.6]];
+ }
+ function corners(bounds){const [min,max]=bounds,result=[];for(const x of [min[0],max[0]])for(const y of [min[1],max[1]])for(const z of [min[2],max[2]])result.push(new THREE.Vector3(x,y,z));return result;}
+ function view(pos,target){
+  camera.position.set(...pos);camera.lookAt(...target);
+  if(camera.aspect<1){
+   // Fit the authored subject box in both FOV axes, with space for the frame labels.
+   const points=corners(activeBounds),center=new THREE.Vector3().addVectors(points[0],points.at(-1)).multiplyScalar(.5);
+   const direction=new THREE.Vector3(...pos).sub(new THREE.Vector3(...target)).normalize();
+   const right=new THREE.Vector3().crossVectors(camera.up,direction).normalize(),up=new THREE.Vector3().crossVectors(direction,right).normalize();
+   const tanY=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*.84,tanX=tanY*camera.aspect;
+   let distance=1;
+   for(const point of points){const offset=point.clone().sub(center),depth=offset.dot(direction);distance=Math.max(distance,depth+Math.abs(offset.dot(right))/tanX,depth+Math.abs(offset.dot(up))/tanY);}
+   camera.position.copy(center).addScaledVector(direction,distance);camera.lookAt(center);scene.fog.near=distance+12;scene.fog.far=distance+50;
+  }else{scene.fog.near=22;scene.fog.far=55;}
+ }
+
  function render(s,speaker=null){
   for(const [id,set]of Object.entries(sets))set.visible=id===s.chapter;
-  const t=s.time,p=s.progress,wide=camera.aspect<1.5?1.16:1;
+  const t=s.time,p=s.progress,wide=camera.aspect<1.5?1.16:1;activeBounds=subjectBounds(s);
   scene.background.set(s.chapter==='night'?0x172d45:0x53717e);scene.fog.color.copy(scene.background);
   if(s.chapter==='night'){view([10.5*wide-p,6.1,12*wide-p],[0,1.5,-1]);}
   if(s.chapter==='line'){line.cans.forEach((c,i)=>{c.position.x=((i*.65+t*.35)%7.8)-3.9;});worker.pose(t,0,false);worker.arms[0].rotation.x=-.6;view([7.7*wide-p*.6,5,9.6*wide],[0,1.35,0]);}
@@ -97,6 +124,7 @@ export function createNightStage(canvas) {
   }
   if(s.chapter==='investigation'){stopped.cans.forEach((c,i)=>{c.position.x=i*.65-3.6;});officer.pose(t);officer.arms[0].rotation.x=-1.1;officer.arms[1].rotation.x=-1.1;view([8.5*wide+p,5.2+p*.5,10.5*wide+p],[0,1.4,0]);}
   inspect.chapter=s.chapter;inspect.cansMoving=s.chapter==='line';inspect.people=s.chapter==='rescue'?2:s.chapter==='line'||s.chapter==='incident'||s.chapter==='investigation'?1:0;
+  camera.updateMatrixWorld();inspect.aspect=camera.aspect;inspect.subjectCorners=corners(activeBounds).map(point=>{const p=point.project(camera);return {x:p.x,y:p.y,z:p.z};});
   renderer.render(scene,camera);
  }
  resize();return {render,resize,inspect:()=>({...inspect}),dispose(){geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());renderer.dispose();}};
