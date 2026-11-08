@@ -1,0 +1,3 @@
+Independent plan review: PASS; retain source fidelity, captiontoggle, fallbacklayering, longlines/narrowphone/fullscreen coverage and DOMtext accessibility.
+Independent code review: CHANGES_REQUIRED CAP-001. Reproduced rotated852×393 fullscreen portrait caption escaping picture due viewport-relative font20px on image150px wide. Fixed with container-relative font sizing and scrollable minimum480px portrait fullscreen picture when width permits. Added PL/EN longcue rotatedfullscreen regression.
+Independent follow-up: PASS, CAP-001 verified closed by reviewer reproduction of PL/EN13,33,65s at852×393; image exact9:16, text15px, all caption panels contained and separated from notes. No remaining blockers.

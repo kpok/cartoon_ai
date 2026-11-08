@@ -13,7 +13,7 @@ const lines = [
   [13,20,'narrator','Według policji, pięćdziesięciotrzyletnia pracownica obsługiwała maszynę do zamykania puszek.','According to police, a fifty-three-year-old worker was operating a can-sealing machine.'],
   [20.5,26.5,'narrator','Wygląd urządzenia w tej animacji jest umowny.','The machine shown in this animation is illustrative.'],
   [28,32,'coworker','Zatrzymajcie linię! Wezwijcie pomoc!','Stop the line! Call for help!'],
-  [32.5,38.5,'narrator','Doszło do poważnego wypadku. Jego dokładny przebieg nie jest znany.','A serious accident occurred. Its exact sequence is not known.'],
+  [32.5,38.5,'narrator','Według relacji maszyna wciągnęła kobietę. Nie wiadomo, jak doszło do pochwycenia.','The report says the machine pulled her in. The exact mechanism remains unknown.'],
   [40,46,'narrator','Ratownicy z Krokowej udzielili poszkodowanej pomocy.','Paramedics from Krokowa provided emergency care.'],
   [46.5,50.5,'paramedic','Jesteśmy przy pani. Udzielamy pomocy.','We are here with you. We are helping you.'],
   [51,56.5,'narrator','W relacji opisano poważne obrażenia klatki piersiowej.','The report described serious chest injuries.'],
