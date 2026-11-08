@@ -15,7 +15,7 @@ function draw(){
  $('play').textContent=clock.playing?l.pause:l.play;$('play').setAttribute('aria-pressed',String(clock.playing));$('seek').value=String(clock.time);$('time').textContent=`${format(clock.time)} / 1:30`;
  $('chapter-title').textContent=chapter[locale];$('scene-number').textContent=`0${CHAPTERS.indexOf(chapter)+1} / 06`;
  $('scene-note').textContent=s.chapter==='night'?l.date:s.chapter==='line'?l.illustration:s.chapter==='incident'?l.offscreen:s.chapter==='flight'&&s.time>=69?l.hospital:s.chapter==='investigation'?l.final:l.notice;
- $('caption-speaker').textContent=cue?`${cue.speaker}: `:'';$('caption-text').textContent=cue?.text||chapter[locale];$('caption').hidden=!$('captions').checked||clock.time>=DURATION;$('ending').hidden=clock.time<DURATION;
+ $('caption-speaker').textContent=cue?`${cue.speaker}: `:'';$('caption-text').textContent=cue?.text||chapter[locale];$('caption').hidden=!$('captions').checked||clock.time>=DURATION;$('ending').hidden=clock.time<DURATION;$('caption-track').hidden=!$('captions').checked&&clock.time<DURATION;
  for(const b of $('chapters').children)b.setAttribute('aria-current',String(b.dataset.chapter===s.chapter));
 }
 function cancelFrame(){if(frame!==null)cancelAnimationFrame(frame);frame=null;}
@@ -31,6 +31,7 @@ function translate(){const l=labels[locale];document.documentElement.lang=locale
 }
 function fail(){if(disposed)return;clock.pause();sound.stop();cancelFrame();ready=false;disposed=true;canvas.dataset.ready='false';canvas.hidden=true;$('failure-box').hidden=false;for(const id of ['play','restart','seek','fullscreen','speech','music','volume'])$(id).disabled=true;stage?.dispose();translate();}
 function applyFormat(){
+ const track=$('caption-track');if(pictureFormat==='portrait')$('picture').append(track);else $('notice').after(track);
  $('player').dataset.format=pictureFormat;document.documentElement.dataset.filmFormat=pictureFormat;$('format').value=pictureFormat;
  if(ready&&!disposed){stage.resize();draw();}
 }

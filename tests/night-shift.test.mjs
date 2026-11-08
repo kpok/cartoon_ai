@@ -18,3 +18,7 @@ test('format choice respects URL overrides and only defaults by initial screen s
  const {initialFormat}=await import('../src/night-shift-story.js');
  assert.equal(initialFormat(null,true),'portrait');assert.equal(initialFormat(null,false),'landscape');assert.equal(initialFormat('landscape',true),'landscape');assert.equal(initialFormat('portrait',false),'portrait');assert.equal(initialFormat('invalid',true),'portrait');
 });
+test('incident narration states reported entanglement explicitly while leaving only the mechanism unknown',()=>{
+ assert.match(cueAt(33,'pl').text,/maszyna wciągnęła kobietę/);assert.match(cueAt(33,'pl').text,/jak doszło do pochwycenia/);
+ assert.match(cueAt(33,'en').text,/machine pulled her in/);assert.match(cueAt(33,'en').text,/mechanism remains unknown/);
+});
