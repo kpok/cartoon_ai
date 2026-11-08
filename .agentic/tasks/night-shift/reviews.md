@@ -1,3 +1,4 @@
 # Independent reviews
 Plan reviewer: PASS. Retain static allowlist/CSP inventory, short bilingual cue budgets, language changes at end/failure, visible illustrative/staged disclosures and live Pages verification.
 Implementation reviewer: initially REQUIRED_FIX for mouth mesh scaling (authored thickness .015 was overwritten by 1). Corrected to multiply authored thickness. Reviewer observed correction and returned PASS with no remaining blockers. Reviewed player lifecycle, six-scene renderer, bilingual text, gallery integration and static build rules. Reviewer independently ran 3 story tests and diff whitespace check. Browser rendering and live publication remain delivery gates.
+Final regression adaptation reviewed independently: PASS. Gallery count updated from 6 to 7 and new card explicitly asserted visible, with all previous silent playback, CSP, navigation and rendering assertions retained.
