@@ -113,6 +113,11 @@ Podstawą tych wartości jest konserwatywny preset tego projektu i analiza dosta
 
 ## Co dalej
 
+### AIpokalypse — nowy film w przygotowaniu
+
+[Polski scenariusz i propozycje realizacji AIpokalypse](docs/aipocalypse/README.md).
+Planowany film 14:30 ma osobny scenariusz i porównanie wariantów Three.js, Blender oraz Unreal z renderowaniem sterowanym przez CI/CD. To etap dokumentacji; animacja i podgląd filmu nie są jeszcze zaimplementowane.
+
 Każdą animację rozwijam iteracyjnie w rozmowie: od pomysłu, przez pierwszą działającą wersję, po poprawki ruchu, tempa i wyglądu. Repozytorium zachowuje kod, z którego można odtworzyć i dalej rozwijać te sceny.
 
 - [Roadmapa eksperymentu](docs/ROADMAP_PL.md)
