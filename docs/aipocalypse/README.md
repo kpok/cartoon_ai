@@ -16,7 +16,7 @@ Scenariusz jest inscenizacją hipotetycznego najgorszego przypadku, nie dokument
 
 [Warianty technologiczne, praca z telefonu i plan CI/CD](IMPLEMENTACJA.md)
 
-Rozpatrujemy trzy podejścia: animację przeglądarkową Three.js, renderowanie w Blenderze oraz Unreal Engine z przygotowaną maszyną GPU. Technika końcowa nie została wybrana. Następnym proponowanym krokiem jest krótka próba renderowania i ocena jakości, czasu oraz kosztu.
+[Wynik rady technologicznej — DEC-AIP-002](RADA_TECHNOLOGICZNA.md). Po dopuszczeniu gotowej aplikacji EXE głównym kandydatem jest Godot z modelami generowanymi w Blenderze na CPU CI. Three.js pozostaje alternatywą dla priorytetu przeglądarkowego. Wykluczone są płatne runnery GPU i generowanie wideo przez AI. Ostateczny wybór wymaga krótkiej próby aplikacji i wygodnej ścieżki oceny z telefonu.
 
 ## Status tego brancha
 
@@ -29,7 +29,7 @@ Branch: `feat/aipocalypse-film`. Zapis `aipocalypse` jest identyfikatorem techni
 - Obsługa przez ChatGPT na telefonie, GitHub i skrypty; lokalny komputer użytkownika nie jest wymagany, ale silnik musi działać na odpowiedniej zdalnej maszynie.
 - Małe, przeglądalne etapy: próba techniczna, próbka wizualna, animatik, pojedyncze sekwencje, montaż końcowy.
 - Scenariusz PL jest wersją obowiązującą. Starego, łagodniejszego scenariusza EN nie importujemy jako podstawy produkcji.
-- Konfiguracja płatnej infrastruktury wymaga wybranego wariantu i zaakceptowanego limitu kosztów. Draft PR nie oznacza zgody na wydatki ani publikację filmu.
+- Bez zakupu runnerów GPU i bez usług generowania wideo. CI przygotowuje modele i aplikację; animację renderuje urządzenie odbiorcy. Na komputerze użytkownika nie są wymagane edytory produkcyjne. GitHub Pages jest opcjonalne; dopuszczamy gotowy Windows EXE/ZIP.
 
 ## Pochodzenie
 
