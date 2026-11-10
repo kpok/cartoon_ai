@@ -15,3 +15,11 @@ Reuse existing GLB and Kalinka costume with an explicit bare-head option; a sepa
 Independent plan review identified missing branch CI and premature deployment before regression; both corrected. Independent implementation review identified anatomical hand ordering and phrase-boundary discontinuity; fixes in progress. Local tests: 70 passed, build and workflow policy passed, desktop/mobile Macarena browser tests passed before gesture review fixes. Existing GLB validation, generation reproduction and sync checks passed. First remote CI found unregistered new media; provenance inventory corrected and license-gate tests passed.
 
 Authority: user explicitly authorized branch commits, draft PR, main merge after successful CI, and Pages deployment. Git CLI push is unavailable; commits are transferred with GitHub Git database API and compare-and-swap branch updates. Remote commit IDs differ from local IDs but file contents match.
+
+## Review and verification update
+
+Implementation fixes passed fresh independent review at local be5379d (remote cee41655). Actual GLB tests verify all held wrist targets, right-hand-first sequencing, continuous phrase boundaries, grounded boots and full vertex projection inside portrait/landscape cameras. Full unit suite: 70/70 passed. Macarena browser tests: desktop/mobile passed after fixes. Existing Kalinka focused regression passed.
+
+Remote run42903062497: public audit/build/unit checks passed, browser regression103/106 passed. Failures were an outdated seven-tile gallery inventory (new requirement is eight) on both devices and one30-second software-rendering timeout. Gallery expectations now include explicit Macarena visibility; the affected camera test retains all assertions with a bounded60-second timeout. A local follow-up exposed an existing page-readiness race in the gallery test; language is now asserted after the destination player reports readiness. No behavior assertion was removed.
+
+Private preview deployed successfully at https://cartoon-ai-macarena-preview.dancingpark8.chatgpt.site/robot.html?dance=macarena using the corrected implementation. Final exact-head CI and authorized main merge/Pages deployment remain pending.

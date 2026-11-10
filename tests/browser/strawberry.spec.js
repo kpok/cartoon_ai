@@ -9,8 +9,8 @@ test('library preserves earlier stories beside the shelter film and opens a sile
  await expect(gallery.locator('a[href="./robot.html?dance=macarena"]')).toBeVisible();
   await expect(gallery.locator('.night-card')).toBeVisible();
  await expect(gallery.locator('button[data-story="meadow"]')).toBeVisible();await expect(gallery.locator('button[data-story="garden"]')).toBeVisible();await expect(gallery.locator('a[href="./robot.html"]')).toBeVisible();await expect(gallery.locator('a[href="./robot.html?dance=kalinka"]')).toBeVisible();
- await page.getByRole('link',{name:/The Last Strawberry/}).click();await expect(page.locator('html')).toHaveAttribute('lang','en');
- const canvas=page.locator('#strawberry-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await expect(canvas).toHaveAttribute('data-playing','false');
+ await page.getByRole('link',{name:/The Last Strawberry/}).click();
+ const canvas=page.locator('#strawberry-canvas');await expect(canvas).toHaveAttribute('data-ready','true',{timeout:30000});await expect(page.locator('html')).toHaveAttribute('lang','en');await expect(canvas).toHaveAttribute('data-playing','false');
  await page.locator('#watch').click();await expect.poll(async()=>Number(await canvas.getAttribute('data-time'))).toBeGreaterThan(.1);
  await page.locator('#play').click();const time=await canvas.getAttribute('data-time');await page.waitForTimeout(180);await expect(canvas).toHaveAttribute('data-time',time);
  const first=await canvas.screenshot();await seek(page,90);await expect(canvas).toHaveAttribute('data-chapter','ride');const ride=await canvas.screenshot();expect(ride.equals(first)).toBe(false);
