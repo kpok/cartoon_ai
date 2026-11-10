@@ -45,3 +45,7 @@ https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL
   certification of legal exclusivity. No new asset-specific reuse license is granted.
 
 - A Shelter Before the Rain: project-authored300-second story and bilingual dialogue, procedural kitten/squirrel adapted from the existing garden recipes, procedural butterfly/shelter/wheelbarrow/cloud/rain geometry. Browser-provided SpeechSynthesis voices (local preferred; some may require network) and existing procedural melody. No new binary assets, audio samples, image/video/model-generation API or prerecorded voice. This records technical origin, not a claim of legal exclusivity or guaranteed voice availability.
+
+## Macarena fiesta references
+
+`assets/macarena/fiesta-courtyard-ai.png` and `assets/macarena/robot-costume-concept.png` were generated with ChatGPT for the owner-requested fiesta scene and supplied on `feat/robot-macarena`. They are synthetic visual assets, not documentary photographs. Exact hashes are recorded in `.security/assets.json`; no additional reuse license or exclusivity certification is granted. The scene uses the courtyard as a distant matte and the robot concept as its preview. The actual animated robot is the existing procedural GLB with runtime costume and skeletal gestures. No commercial Macarena recording is bundled; playback is silent.
