@@ -28,6 +28,8 @@ test('manual Kalinka camera changes the rendered view and original dance remains
 });
 
 test('automatic Kalinka camera restores the exact image after manual rotation',async({page,baseURL})=>{
+ // Four software-WebGL screenshots need a bounded budget on hosted mobile emulation.
+ test.setTimeout(60000);
  const {canvas,safe}=await monitored(page,baseURL);await seek(page,4);const initial=await canvas.screenshot(),camera=await canvas.getAttribute('data-camera-position');
  await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-camera','manual');
  await page.locator('#camera-auto').click();await expect(canvas).toHaveAttribute('data-camera','auto');expect((await canvas.screenshot()).equals(initial)).toBe(true);expect(await canvas.getAttribute('data-camera-position')).toBe(camera);await safe();
