@@ -40,5 +40,19 @@
     "attribution": "Kalinka background generated with ChatGPT; supplied by kpok",
     "origin": "Generated with ChatGPT image generation on 2026-10-29 for the owner-requested Kalinka background; no source photograph used",
     "review": "Synthetic photorealistic depiction, not a documentary photograph; no additional reuse license or exclusivity certification."
+  },
+  "assets/macarena/fiesta-courtyard-ai.png": {
+    "sha256": "8a671e2d6f2e54db1a49083555841e70945ec25e03c5e3c5cad91ad9170ad55e",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Concept image generated with ChatGPT; supplied by kpok",
+    "origin": "Owner-supplied ChatGPT-generated Macarena visual reference committed on feat/robot-macarena",
+    "review": "Synthetic image used for the owner-requested animation; no additional reuse license or exclusivity certification."
+  },
+  "assets/macarena/robot-costume-concept.png": {
+    "sha256": "4c7b8d3b6a677cc3339d85365a12acca6bb95571b085f9050d9334d79b9516d6",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "Concept image generated with ChatGPT; supplied by kpok",
+    "origin": "Owner-supplied ChatGPT-generated Macarena visual reference committed on feat/robot-macarena",
+    "review": "Synthetic image used for the owner-requested animation; no additional reuse license or exclusivity certification."
   }
 }

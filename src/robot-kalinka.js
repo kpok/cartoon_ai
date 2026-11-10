@@ -59,7 +59,7 @@ export function kalinkaPose(time){
   mode:flight>.15?'split':squat>.5?'kicks':'hops'};
 }
 
-export function createKalinka(model,THREE){
+export function createKalinka(model,THREE,{bareHead=false}={}){
  const root=model.getObjectByName('DanceRoot'),torso=model.getObjectByName('TorsoPivot'),head=model.getObjectByName('HeadPivot');
  const leather=new THREE.MeshStandardMaterial({color:0x302c32,roughness:.48,metalness:.08});
  const felt=new THREE.MeshStandardMaterial({color:0x394654,roughness:.96});
@@ -92,6 +92,7 @@ export function createKalinka(model,THREE){
   for(const child of foot.children)if(child.isMesh)child.material=leather;
   return {hip,knee,foot,arm:model.getObjectByName(side+'ArmPivot'),elbow:model.getObjectByName(side+'ElbowPivot'),wrist:model.getObjectByName(side+'WristPivot')};
  });
+ if(bareHead){head.traverse(o=>{if(o.name.startsWith('Kalinka_'))o.visible=false;});for(const child of head.children)if(/^(Antenna_|Spoon_|Candy_crown_|Candy_pearl|Suspended_candy_droplet002)/.test(child.name))child.visible=true;}
  model.updateMatrixWorld(true);
  const slime=decorateKalinkaSlime(model,THREE);
  const qz=new THREE.Quaternion(),qx=new THREE.Quaternion(),axisX=new THREE.Vector3(1,0,0),axisY=new THREE.Vector3(0,1,0),axisZ=new THREE.Vector3(0,0,1),desired=new THREE.Quaternion();

@@ -2,6 +2,7 @@ import {rm,mkdir,cp} from 'node:fs/promises';
 await import('./vendor.mjs');
 await rm('dist',{recursive:true,force:true});await mkdir('dist');
 await mkdir('dist/assets/kalinka',{recursive:true});await cp('assets/kalinka/red-square-ai.png','dist/assets/kalinka/red-square-ai.png');
+await cp('assets/macarena','dist/assets/macarena',{recursive:true});
 await cp('night-shift.html','dist/night-shift.html');
 await cp('shelter.html','dist/shelter.html');
 await cp('strawberry.html','dist/strawberry.html');
