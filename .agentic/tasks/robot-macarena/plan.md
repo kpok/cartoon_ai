@@ -27,3 +27,7 @@ Private preview deployed successfully at https://cartoon-ai-macarena-preview.dan
 ## User visual correction
 
 User review of private preview rejected stretched arm slime, bent forward arms, Kalinka boots and missing hip/knee dance. Reopened IMPLEMENT; no merge authorized until corrected implementation passes checks. Updated AC2: match fiesta concept with teal flamingo/lightning shirt, coral shorts, waist pouch, yellow sunglasses and light neon sneakers. Updated AC3: visible pelvic sway and gentle alternating knee flex/footwork, anatomically straight forward arms, compact surface-following slime rather than stretched blades. Motion and costume work are isolated by file ownership; visual checks must compare actual rendered poses against the concept.
+
+## Pelvic circle before hop
+
+User requested the characteristic complete hip roll before the hop. Added a closed ellipse from phrase seconds6–7.25 (pelvis x±.26m, z0–.30m), smooth approach/settle and waist rotation; takeoff remains at7.5seconds. Both feet remain planted during the roll. Tests cover ellipse area in all four phrases, no early takeoff, continuous transitions, actual model floor contact, knee bounds and portrait/landscape framing. Auto-merge watch paused during this correction; final CI must use the new head.

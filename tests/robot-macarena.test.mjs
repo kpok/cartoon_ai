@@ -28,3 +28,16 @@ test('Macarena actual model keeps bare head, sneakers, grounded soles and fits p
  for(const aspect of [390/844,16/9]){const p=kalinkaCameraPose(0,aspect),camera=new THREE.PerspectiveCamera(40,aspect,.05,150);camera.position.set(p.position.x,p.position.y,p.position.z);camera.lookAt(p.target.x,p.target.y,p.target.z);camera.updateMatrixWorld();for(let t=0;t<32;t+=.5){v.update(t+.4);model.traverseVisible(mesh=>{if(!mesh.isMesh)return;const positions=mesh.geometry.attributes.position;for(let i=0;i<positions.count;i++){const point=new THREE.Vector3().fromBufferAttribute(positions,i).applyMatrix4(mesh.matrixWorld).project(camera);assert.ok(Math.abs(point.x)<.97&&Math.abs(point.y)<.97,`visible robot leaves camera at ${t}, aspect ${aspect}`);}});}}
  v.update(3);const before=model.getObjectByName('RightWristPivot').matrixWorld.clone();v.update(28);v.update(3);assert.deepEqual(model.getObjectByName('RightWristPivot').matrixWorld.elements,before.elements);v.dispose();
 });
+
+test('pelvis completes an ellipse before each jump with continuous entry and exit',()=>{
+ for(let phrase=0;phrase<4;phrase++){
+  const offset=phrase*8,points=Array.from({length:201},(_,i)=>macarenaPose(offset+6+i*1.25/200));
+  assert.ok(Math.max(...points.map(p=>p.hipX))>.255);assert.ok(Math.min(...points.map(p=>p.hipX))<-.255);
+  assert.ok(Math.max(...points.map(p=>p.hipZ))>.295);
+  let area=0;for(let i=1;i<points.length;i++)area+=points[i-1].hipX*points[i].hipZ-points[i].hipX*points[i-1].hipZ;
+  assert.ok(area>.23,'pelvis must circle, rather than only rock sideways');
+  for(const p of points)assert.equal(p.jump,0,'roll must finish before takeoff');
+  assert.ok(macarenaPose(offset+7.75).jump>.2);
+  for(const boundary of [5.8,6,7.25,7.5]){const a=macarenaPose(offset+boundary-1e-7),b=macarenaPose(offset+boundary+1e-7);for(const key of ['hipX','hipZ','height','yaw','sway'])assert.ok(Math.abs(a[key]-b[key])<1e-5,`pelvis snaps at ${boundary}`);}
+ }
+});

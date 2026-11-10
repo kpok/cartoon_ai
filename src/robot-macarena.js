@@ -1,7 +1,7 @@
 import {createKalinka} from './robot-kalinka.js';
 import {decorateMacarena} from './macarena-costume.js';
 export const MACARENA_DURATION=32;
-export const MACARENA_CUES=['Prawa ręka do przodu','Lewa ręka do przodu','Prawa dłoń do góry','Lewa dłoń do góry','Prawa na ramię','Lewa na ramię','Prawa za głowę','Lewa za głowę','Prawa na biodro','Lewa na biodro','Prawa z tyłu','Lewa z tyłu','Biodra w lewo','Biodra w prawo','Kołysanie','Podskok i obrót'];
+export const MACARENA_CUES=['Prawa ręka do przodu','Lewa ręka do przodu','Prawa dłoń do góry','Lewa dłoń do góry','Prawa na ramię','Lewa na ramię','Prawa za głowę','Lewa za głowę','Prawa na biodro','Lewa na biodro','Prawa z tyłu','Lewa z tyłu','Kółko biodrami','Kółko biodrami','Kółko biodrami','Podskok i obrót'];
 const smooth=u=>u*u*(3-2*u);
 // Targets are in torso coordinates. Mirroring keeps the original asymmetric head intact.
 const gestures=[[.99,.69,1.75,0],[.99,.69,1.75,0],[.99,.69,1.75,Math.PI],[.99,.69,1.75,Math.PI],[-.55,.85,.5,0],[-.55,.85,.5,0],[.98,2.22,-.72,0],[.98,2.22,-.72,0],[.58,.05,.42,0],[.58,.05,.42,0],[.55,.05,-.45,0],[.55,.05,-.45,0]];
@@ -11,8 +11,18 @@ export function macarenaPose(time){
  // Left is index zero in the actual GLB, while the dance starts with the right hand.
  const arms=[0,1].map(side=>{const parity=1-side,previous=armAt(beat===0?15:beat-1,parity),next=armAt(beat,parity);return u===1?[...next]:next.map((v,i)=>previous[i]+(v-previous[i])*u);});
  const turn=smooth(Math.max(0,Math.min(1,(local-7.5)/.5)));
- const rhythm=local*Math.PI*2,hipX=.22*Math.sin(rhythm),hipZ=.06*(1-Math.cos(rhythm)),bounce=.09*(.5-.5*Math.cos(rhythm*2));
- return {time:t,beat,arms,yaw:(phrase+turn)*Math.PI/2+.08*Math.sin(rhythm),footYaw:(phrase+turn)*Math.PI/2,sway:Math.sin(rhythm)*.12,hipX,hipZ,height:1.99-bounce,jump:beat===15?Math.sin(turn*Math.PI)*.24:0};
+ const rhythm=local*Math.PI*2;
+ let hipX=.22*Math.sin(rhythm),hipZ=.06*(1-Math.cos(rhythm)),bounce=.09*(.5-.5*Math.cos(rhythm*2));
+ let waistYaw=.08*Math.sin(rhythm),sway=Math.sin(rhythm)*.12;
+ const circleStart=6,circleEnd=7.25;
+ // One complete pelvic circle precedes the jump; both feet stay planted through the roll.
+ if(local>=5.8&&local<circleStart){const fade=1-smooth((local-5.8)/.2);hipX*=fade;hipZ*=fade;bounce*=fade;waistYaw*=fade;sway*=fade;}
+ if(local>=circleStart&&local<=circleEnd){
+  const phase=smooth((local-circleStart)/(circleEnd-circleStart))*Math.PI*2;
+  hipX=.26*Math.sin(phase);hipZ=.15*(1-Math.cos(phase));
+  bounce=.06*(1-Math.cos(phase))*.5;waistYaw=.18*Math.sin(phase);sway=.17*Math.sin(phase);
+ }else if(local>circleEnd&&local<7.5){const settle=smooth((local-circleEnd)/.25);hipX*=settle;hipZ*=settle;bounce*=settle;waistYaw*=settle;sway*=settle;}
+ return {time:t,beat,arms,yaw:(phrase+turn)*Math.PI/2+waistYaw,footYaw:(phrase+turn)*Math.PI/2,sway,hipX,hipZ,height:1.99-bounce,jump:beat===15?Math.sin(turn*Math.PI)*.24:0};
 }
 export function createMacarena(model,THREE){
  const body=createKalinka(model,THREE,{bareHead:true}),torso=model.getObjectByName('TorsoPivot'),head=model.getObjectByName('HeadPivot'),geometries=[];
