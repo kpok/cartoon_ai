@@ -55,6 +55,7 @@ export function checkPolicy(workflows,pins){
     if(step.run)assert.doesNotMatch(step.run,/\$\{\{/,`${label}: pass inputs through quoted environment variables`);
     if(step.uses){
      const [action,sha]=step.uses.split('@');assert.match(sha||'',/^[a-f0-9]{40}$/,`${label}: immutable action SHA required`);assert.equal(sha,pins[action],`${label}: unreviewed action pin`);
+     if(['actions/upload-artifact','actions/upload-pages-artifact'].includes(action))assert.equal(step.with?.['retention-days'],1,`${label}: uploaded artifacts must explicitly expire after 1 day`);
      if(action==='actions/checkout'){assert.equal(step.with?.['persist-credentials'],false);assert.equal(step.with?.ref,'${{ github.sha }}');assert.equal(step.with.repository,undefined);}
     }
    }

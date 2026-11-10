@@ -40,3 +40,26 @@ test('gate evaluator fails closed on unsupported syntax and missing identities',
  assert.throws(()=>evaluateGate('always() || true',ownerContext()));
  assert.throws(()=>evaluateGate('github.actor_id ==',ownerContext()));
 });
+
+// Check every upload, including Pages, so omissions cannot fall back to repository defaults.
+test('all artifact uploads require an explicit one-day retention',()=>{
+ let uploads=0;
+ for(const [file,workflow] of Object.entries(workflows)){
+  for(const [jobName,job] of Object.entries(workflow.jobs)){
+   for(const [stepIndex,step] of job.steps.entries()){
+    const action=step.uses?.split('@')[0];
+    if(!['actions/upload-artifact','actions/upload-pages-artifact'].includes(action))continue;
+    uploads++;
+    assert.equal(step.with?.['retention-days'],1);
+    for(const value of [undefined,0,2,90,'1','${{ vars.ARTIFACT_RETENTION_DAYS }}']){
+     const copy=structuredClone(workflows);
+     const changed=copy[file].jobs[jobName].steps[stepIndex];
+     if(value===undefined)delete changed.with['retention-days'];
+     else changed.with['retention-days']=value;
+     assert.throws(()=>checkPolicy(copy,pins),/uploaded artifacts must explicitly expire after 1 day/);
+    }
+   }
+  }
+ }
+ assert.ok(uploads>0,'The policy must cover existing uploads');
+});

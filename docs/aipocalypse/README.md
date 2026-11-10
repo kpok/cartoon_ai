@@ -12,11 +12,15 @@
 
 Scenariusz jest inscenizacją hipotetycznego najgorszego przypadku, nie dokumentacją potwierdzonych zdolności dzisiejszego AI. Wersja źródłowa została zaimportowana bez zmian; zawiera dialogi, czasy, uwagi reżyserskie, granice założenia i źródła.
 
+## Plan działania
+
+[Android APK najpierw; EXE później; artefakty wszystkich workflow na 1 dzień](PLAN_DZIALANIA.md). Początkowy pipeline ma generować wyłącznie APK, oceniany bezpośrednio na telefonie.
+
 ## Propozycje wykonania
 
 [Warianty technologiczne, praca z telefonu i plan CI/CD](IMPLEMENTACJA.md)
 
-[Wynik rady technologicznej — DEC-AIP-002](RADA_TECHNOLOGICZNA.md). Po dopuszczeniu gotowej aplikacji EXE głównym kandydatem jest Godot z modelami generowanymi w Blenderze na CPU CI. Three.js pozostaje alternatywą dla priorytetu przeglądarkowego. Wykluczone są płatne runnery GPU i generowanie wideo przez AI. Ostateczny wybór wymaga krótkiej próby aplikacji i wygodnej ścieżki oceny z telefonu.
+[Wynik rady technologicznej — DEC-AIP-002](RADA_TECHNOLOGICZNA.md). Po dopuszczeniu aplikacji natywnej głównym kandydatem jest Godot z modelami generowanymi w Blenderze na CPU CI. Najnowsza decyzja: najpierw wyłącznie Android APK, Windows EXE później. Three.js pozostaje alternatywą dla priorytetu przeglądarkowego. Wykluczone są płatne runnery GPU i generowanie wideo przez AI. Kierunek weryfikujemy krótką próbą APK na telefonie.
 
 ## Status tego brancha
 
@@ -29,7 +33,7 @@ Branch: `feat/aipocalypse-film`. Zapis `aipocalypse` jest identyfikatorem techni
 - Obsługa przez ChatGPT na telefonie, GitHub i skrypty; lokalny komputer użytkownika nie jest wymagany, ale silnik musi działać na odpowiedniej zdalnej maszynie.
 - Małe, przeglądalne etapy: próba techniczna, próbka wizualna, animatik, pojedyncze sekwencje, montaż końcowy.
 - Scenariusz PL jest wersją obowiązującą. Starego, łagodniejszego scenariusza EN nie importujemy jako podstawy produkcji.
-- Bez zakupu runnerów GPU i bez usług generowania wideo. CI przygotowuje modele i aplikację; animację renderuje urządzenie odbiorcy. Na komputerze użytkownika nie są wymagane edytory produkcyjne. GitHub Pages jest opcjonalne; dopuszczamy gotowy Windows EXE/ZIP.
+- Bez zakupu runnerów GPU i bez usług generowania wideo. CI przygotowuje modele i aplikację; animację renderuje urządzenie odbiorcy. Na komputerze użytkownika nie są wymagane edytory produkcyjne. GitHub Pages i Windows EXE/ZIP odkładamy na później; pierwszy pipeline publikuje tylko APK z retencją 1 dnia.
 
 ## Pochodzenie
 

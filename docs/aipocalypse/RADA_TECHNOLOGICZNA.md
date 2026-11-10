@@ -2,6 +2,10 @@
 
 **Data:** 10 listopada 2026. **Status:** warunkowa rekomendacja; wymaga próby technicznej i artystycznej. **Rewizja analizowana:** `2256f5e0796a5adb91d4e5436180c1a50ebdae5b`.
 
+## Aktualizacja produktu — Android jako pierwszy cel
+
+Po zakończeniu rady użytkownik wybrał **wyłącznie Android APK na pierwszy etap pipeline; EXE później**. Poniższe opinie dokumentują historyczny wybór silnika po dopuszczeniu aplikacji natywnej. Nie stanowią obecnie polecenia budowania Windows. Obowiązuje [plan APK i retencji artefaktów](PLAN_DZIALANIA.md). Rekomendację Godot + Blender zachowano, a cel pierwszego eksportu zmieniono na Android. Wszystkie przesyłane artefakty workflow mają retencję 1 dnia.
+
 ## Pytanie i granice
 
 Jak zrealizować film 14:30, sterując pracą z telefonu, gdy CI generuje modele i przygotowuje animację, bez płatnych runnerów GPU, wynajmu sprzętu i generowania wideo przez AI? Użytkownik dopuszcza obrazy z ChatGPT oraz kod. Dopuszcza również gotowy EXE zamiast Pages, ale nie chce instalować narzędzi deweloperskich i edytorów na swoim komputerze.
