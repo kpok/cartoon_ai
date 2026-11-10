@@ -14,7 +14,7 @@ Scenariusz jest inscenizacją hipotetycznego najgorszego przypadku, nie dokument
 
 ## Plan działania
 
-[Android APK najpierw; EXE później; artefakty wszystkich workflow na 1 dzień](PLAN_DZIALANIA.md). Początkowy pipeline ma generować wyłącznie APK, oceniany bezpośrednio na telefonie.
+[Android APK najpierw; EXE później; artefakty wszystkich workflow na 1 dzień](PLAN_DZIALANIA.md). Początkowy pipeline ma generować wyłącznie APK, oceniany bezpośrednio na telefonie. Rada zaleciła rozpocząć od minimalnego APK z prostą animacją i sterowaniem; generator Blendera i pierwsze filmowe ujęcie dodajemy dopiero po sprawdzeniu instalacji oraz aktualizacji na urządzeniu.
 
 ## Propozycje wykonania
 

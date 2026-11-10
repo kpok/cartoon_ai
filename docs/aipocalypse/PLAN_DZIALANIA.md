@@ -14,7 +14,33 @@ To plan wdrożenia, nie informacja o istniejącym już workflow APK. W tym commi
 - Zachować [scenariusz PL](SCENARIUSZ_PL.md), logo, 22 sekwencje i plan 14:30. Pierwsza próbka jest fragmentem, nie ukończonym filmem.
 - Wszystkie przesyłane artefakty Actions w repozytorium: jawne `retention-days: 1`, również artefakt Pages. Zasada obejmuje obecne i przyszłe uploady, nie tylko APK.
 
-## Etap 1 — minimalny projekt i próbka 5–10 sekund
+## Od czego zaczynamy — wynik rady wykonawczej
+
+Trzy niezależne opinie agentów AI (architekt 3D, inżynier CI/renderingu, reżyser artystyczny) zaleciły **najpierw minimalny instalowalny APK, potem generator GLB**. Wcześniejszy Etap 1 łączył eksport Androida, modelowanie, animację i ocenę obrazu w jedną próbę. Rozdzielamy je, aby błąd jednej warstwy nie blokował rozpoznania pozostałych.
+
+### Etap 0 — pierwsza zamknięta pętla pracy
+
+1. Izolowany projekt Godot standard/GDScript: ekran z istniejącym logo, prosty obiekt 3D tworzony kodem Godota, kamera, ekran z Hacked by AIpokalypse oraz Start/Pauza/Restart. Bez Blendera, rigowania człowieka, tłumu, zderzeń i efektów katastroficznych.
+2. Jeden Android preset ARM64 i przygotowane wyłącznie w CI przypięte narzędzia. Najpierw sprawdzić import i eksport pakietu; ewentualny pakiet bez podpisu służy jedynie wewnętrznej walidacji i nie jest przedstawiany jako instalowalny rezultat.
+3. Przed pierwszym APK dla użytkownika przygotować stabilne application ID, numerowanie wersji i stały testowy klucz podpisujący poza Git. Nie generować nowego klucza w każdym zadaniu. Brak klucza ma zatrzymywać podpisywanie czytelnym błędem; nie wolno publikować sekretów w logach, cache i artefaktach.
+4. Osobny, kontrolowany workflow dla zatwierdzonej rewizji i uprawnionego właściciela. Nie kopiować bez sprawdzenia blokady main, która uniemożliwi próbę brancha; nie osłabiać pozostałych workflow repo. Przyszły workflow musi przejść istniejącą kontrolę polityki i jej jawne rozszerzenie.
+5. Udostępnić wyłącznie podpisany APK i ewentualną sumę kontrolną w jednym artefakcie z retencją 1 dnia. Użytkownik instaluje go na telefonie i sprawdza obraz, dotyk, krótki dźwięk, pauzę, restart oraz powrót po przełączeniu aplikacji.
+6. Drugi build aktualizuje pierwszy APK bez odinstalowania. Dopiero to domyka pętlę **commit → CI → APK → telefon → poprawka**.
+
+**Pierwszy konkretny rezultat:** instalowalna aplikacja techniczna, nie gotowy fragment filmu. Zielony CI i poprawny pakiet nie zastępują instalacji na rzeczywistym telefonie. Emulator nie blokuje tego pierwszego etapu.
+
+### Kolejność dalszych próbek
+
+- **Po Etapie 0:** jeden samochód generowany w Blenderze do GLB i importowany w miejsce bryły próbnej. Bez postaci i szkieletów na tej pierwszej próbie generatora.
+- **Następnie 5–10 sekund:** droga, auto, przestrzenna tablica i niewielki ruch kamery. Ocenić kontakt opon z podłożem, paralaksę i podpis czytelny w ciągu trzech sekund bez przybliżania.
+- **Następnie 20–30 sekund:** to samo skrzyżowanie, człowiek przy telefonie oraz krótki kontrastujący kadr orbitalny. Dopiero tutaj ocena sylwetek, emocji, stylu i montażu.
+- **Po zaakceptowanej próbce:** pełny animatik 14:30, a później dopracowanie sekwencji. Jeżeli próbka nie spełnia kryteriów, poprawiamy ją zamiast budować kolejne lokalizacje.
+
+Cel próby na urządzeniu: stabilne około 30 kl./s w odtwarzaniu, bez narastających przycięć po powtórzeniach, skończone i spójne ruchy oraz pauza/restart bez rozstrajania dźwięku. To cel wydajności runtime; nie zmienia wcześniejszej propozycji 24 kl./s dla ewentualnego późniejszego eksportu wideo. Wyniki trzeba zmierzyć, nie zadeklarować na podstawie builda.
+
+**Pochodzenie rekomendacji:** role `web_tech_council`, `cpu_render_council`, `film_visual_council`; niezależne odczytanie aktualnego planu, następnie synteza prowadzącego. Wspólny wniosek dotyczy kolejności. Inżynier CI dodatkowo zalecił oddzielenie wewnętrznej próby eksportu bez podpisu od dystrybucji podpisanego APK; nie jest to propozycja udostępniania nieinstalowalnego pliku użytkownikowi. Nie przeprowadzono jeszcze implementacji ani prób aplikacji.
+
+## Etap 1 — generator modeli i próbka 5–10 sekund, po technicznym APK
 
 1. Przypiąć zgodne wersje Godota, szablonów eksportu, Blendera, JDK i Android SDK; narzędzia instalowane tylko na runnerze. Zweryfikować sumy pobieranych plików i reguły obecnego audytu repo.
 2. Dodać izolowany projekt Godot i prosty generator GLB: auto, jedna postać, przestrzenny ekran, kamera. Bez dodatkowych binarnych modeli z niewyjaśnionym pochodzeniem.
