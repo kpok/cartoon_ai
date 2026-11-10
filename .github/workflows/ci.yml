@@ -1,7 +1,7 @@
 name: Film checks and Pages
 on:
   push:
-    branches: [main]
+    branches: [main, feat/robot-macarena]
     paths-ignore:
       - '**/*.md'
       - 'docs/**'
@@ -16,7 +16,7 @@ jobs:
       github.actor_id == '10676481' &&
       github.actor == 'kpok' &&
       github.triggering_actor == 'kpok' &&
-      github.ref == 'refs/heads/main' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/robot-macarena') &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     permissions:
       contents: read
@@ -53,7 +53,7 @@ jobs:
           path: dist/
           retention-days: 1
       - name: Package tested build for Pages
-        if: vars.ENABLE_GITHUB_PAGES == 'true'
+        if: github.ref == 'refs/heads/main' && vars.ENABLE_GITHUB_PAGES == 'true'
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
         with:
           path: dist/
@@ -66,7 +66,7 @@ jobs:
       github.actor_id == '10676481' &&
       github.actor == 'kpok' &&
       github.triggering_actor == 'kpok' &&
-      github.ref == 'refs/heads/main' &&
+      (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feat/robot-macarena') &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     needs: test
     permissions:
@@ -101,7 +101,7 @@ jobs:
           if-no-files-found: ignore
   deploy:
     name: Deploy tested film to GitHub Pages
-    needs: test
+    needs: [test, regression]
     if: >-
       github.repository == 'kpok/cartoon_ai' &&
       github.repository_id == '1433681495' &&
@@ -112,6 +112,7 @@ jobs:
       github.ref == 'refs/heads/main' &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       needs.test.result == 'success' &&
+      needs.regression.result == 'success' &&
       vars.ENABLE_GITHUB_PAGES == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10

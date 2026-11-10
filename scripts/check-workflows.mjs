@@ -24,7 +24,7 @@ export function evaluateGate(expression,context){
  const result=or();assert.equal(index,tokens.length,'Unexpected authorization tokens');return Boolean(result);
 }
 export function ownerContext(overrides={}){
- return {github:{repository:'kpok/cartoon_ai',repository_id:'1433681495',repository_owner_id:'10676481',actor_id:'10676481',actor:'kpok',triggering_actor:'kpok',ref:'refs/heads/main',ref_type:'branch',event_name:'push',...overrides},needs:{test:{result:'success'}},vars:{ENABLE_GITHUB_PAGES:'true'}};
+ return {github:{repository:'kpok/cartoon_ai',repository_id:'1433681495',repository_owner_id:'10676481',actor_id:'10676481',actor:'kpok',triggering_actor:'kpok',ref:'refs/heads/main',ref_type:'branch',event_name:'push',...overrides},needs:{test:{result:'success'},regression:{result:'success'}},vars:{ENABLE_GITHUB_PAGES:'true'}};
 }
 export function checkPolicy(workflows,pins){
  assert.deepEqual(Object.keys(workflows).sort(),['ci.yml','export-mp4.yml','public-audit.yml','repo-diagnostics.yml','robot-model.yml','robot-mp4.yml'],'New or administrative workflows need a security policy review');
@@ -33,7 +33,7 @@ export function checkPolicy(workflows,pins){
   assert.deepEqual(workflow.permissions,{},`${file}: default token must have no permissions`);
   assert.equal(workflow.concurrency,undefined,'Authorization must happen before concurrency allocation');
   assert.deepEqual(Object.keys(workflow.on).sort(),['ci.yml','public-audit.yml'].includes(file)?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
-  if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main'],'paths-ignore':['**/*.md','docs/**']});
+  if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main','feat/robot-macarena'],'paths-ignore':['**/*.md','docs/**']});
   if(file==='public-audit.yml')assert.deepEqual(workflow.on.push,{branches:['**'],tags:['**']});
   assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','regression','test']:file==='public-audit.yml'?['audit']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:file==='robot-model.yml'?['generate']:file==='robot-mp4.yml'?['render']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
@@ -46,7 +46,7 @@ export function checkPolicy(workflows,pins){
    assert.equal(job.uses,undefined,'No implicit reusable workflow execution');assert.equal(job.secrets,undefined,'No job-wide secret inheritance');assert.equal(job.env,undefined,'No job-wide credentials');
    assert.deepEqual(job.permissions,name==='deploy'?{pages:'write','id-token':'write'}:{contents:'read'},`${label}: permissions exceed policy`);
    if(name==='deploy'){
-    assert.equal(job.needs,'test');assert.equal(job.environment?.name,'github-pages');
+    assert.deepEqual(job.needs,['test','regression']);assert.equal(job.environment?.name,'github-pages');
     assert.deepEqual(job.steps.map(s=>s.uses),[`actions/configure-pages@${pins['actions/configure-pages']}`,`actions/deploy-pages@${pins['actions/deploy-pages']}`],'Deployment must not run project code or checkout');
    }
    for(const step of job.steps){
@@ -62,11 +62,18 @@ export function checkPolicy(workflows,pins){
    for(const event_name of ['push','workflow_dispatch']){
     assert.equal(evaluateGate(job.if,ownerContext({event_name})),['ci.yml','public-audit.yml'].includes(file)||event_name==='workflow_dispatch',`${label}: trusted owner event`);
    }
+   const macarenaContext=ownerContext({ref:'refs/heads/feat/robot-macarena'});
+   assert.equal(evaluateGate(job.if,macarenaContext),file==='public-audit.yml'||file==='ci.yml'&&name!=='deploy',`${label}: exact trusted feature branch`);
+   if(file==='ci.yml'&&name==='test'){
+    const packaging=job.steps.find(s=>s.uses?.startsWith('actions/upload-pages-artifact@'));
+    assert.equal(evaluateGate(packaging.if,macarenaContext),false,'Feature builds must not package Pages');
+    assert.equal(evaluateGate(packaging.if,ownerContext()),true,'Main may package Pages');
+   }
    const denied=[{repository:'attacker/cartoon_ai'},{repository_id:'999'},{repository_owner_id:'999'},{actor_id:'999'},{actor:'collaborator'},{triggering_actor:'collaborator'},{actor:'dependabot[bot]',actor_id:'49699333'},{ref:'refs/heads/feature'},{ref:'refs/tags/main',ref_type:'tag'}];
    for(const event_name of ['pull_request','pull_request_target','issue_comment','workflow_run','workflow_call','repository_dispatch','schedule','release'])denied.push({event_name});
    for(const key of ['repository','repository_id','repository_owner_id','actor_id','actor','triggering_actor','ref','event_name'])denied.push({[key]:undefined});
    for(const bad of denied.filter(b=>!(file==='public-audit.yml'&&(b.ref==='refs/heads/feature'||Object.hasOwn(b,'ref')&&b.ref===undefined||b.ref==='refs/tags/main'))))assert.equal(evaluateGate(job.if,ownerContext({...bad,event_name:bad.event_name??'workflow_dispatch',...bad})),false,`${label}: unauthorized context ${JSON.stringify(bad)}`);
-   if(name==='deploy')for(const status of ['failure','cancelled','skipped','']){const c=ownerContext();c.needs.test.result=status;assert.equal(evaluateGate(job.if,c),false,`${label}: failed build must not deploy`);}
+   if(name==='deploy')for(const dependency of ['test','regression'])for(const status of ['failure','cancelled','skipped','']){const c=ownerContext();c.needs[dependency].result=status;assert.equal(evaluateGate(job.if,c),false,`${label}: failed ${dependency} must not deploy`);}
    if(name==='deploy')for(const flag of ['false','',undefined]){const c=ownerContext();c.vars.ENABLE_GITHUB_PAGES=flag;assert.equal(evaluateGate(job.if,c),false,`${label}: disabled Pages must not deploy`);}
   }
  }
