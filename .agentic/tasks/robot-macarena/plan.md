@@ -23,3 +23,7 @@ Implementation fixes passed fresh independent review at local be5379d (remote ce
 Remote run42903062497: public audit/build/unit checks passed, browser regression103/106 passed. Failures were an outdated seven-tile gallery inventory (new requirement is eight) on both devices and one30-second software-rendering timeout. Gallery expectations now include explicit Macarena visibility; the affected camera test retains all assertions with a bounded60-second timeout. A local follow-up exposed an existing page-readiness race in the gallery test; language is now asserted after the destination player reports readiness. No behavior assertion was removed.
 
 Private preview deployed successfully at https://cartoon-ai-macarena-preview.dancingpark8.chatgpt.site/robot.html?dance=macarena using the corrected implementation. Final exact-head CI and authorized main merge/Pages deployment remain pending.
+
+## User visual correction
+
+User review of private preview rejected stretched arm slime, bent forward arms, Kalinka boots and missing hip/knee dance. Reopened IMPLEMENT; no merge authorized until corrected implementation passes checks. Updated AC2: match fiesta concept with teal flamingo/lightning shirt, coral shorts, waist pouch, yellow sunglasses and light neon sneakers. Updated AC3: visible pelvic sway and gentle alternating knee flex/footwork, anatomically straight forward arms, compact surface-following slime rather than stretched blades. Motion and costume work are isolated by file ownership; visual checks must compare actual rendered poses against the concept.

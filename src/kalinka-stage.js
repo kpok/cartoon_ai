@@ -16,14 +16,14 @@ export async function createKalinkaStage(THREE,{backdrop='../assets/kalinka/red-
  function mesh(name,g,m,x,y,z){const o=new THREE.Mesh(g,m);o.name=name;o.position.set(x,y,z);group.add(o);o.castShadow=true;o.receiveShadow=true;return o;}
  const base=material(new THREE.MeshStandardMaterial({color:warm?0xb78159:0x777572,roughness:1}));
  const floor=mesh('Kalinka_Ground',geometry(new THREE.PlaneGeometry(100,100)),base,0,-.04,0);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
- const stone=material(new THREE.MeshStandardMaterial({color:0x98958f,roughness:.92}));
+ const stone=material(new THREE.MeshStandardMaterial({color:warm?0xd4a47a:0x98958f,roughness:.92}));
  const rows=176,columns=88,paving=new THREE.InstancedMesh(geometry(new THREE.BoxGeometry(.43,.035,.28)),stone,rows*columns);
  paving.name='Kalinka_Individual_Paving_Stones';paving.receiveShadow=true;
  const matrix=new THREE.Matrix4(),color=new THREE.Color();let seed=97531,index=0;
  const random=()=>{seed=(seed*16807)%2147483647;return seed/2147483647;};
  for(let row=0;row<rows;row++)for(let col=0;col<columns;col++){
   matrix.makeScale(.94+random()*.06,1,.94+random()*.06);matrix.setPosition((col-columns/2)*.455+(row%2)*.2275,-.0175,(row-rows/2)*.30);
-  paving.setMatrixAt(index,matrix);color.setHSL(.09+random()*.025,.06+random()*.07,.42+random()*.17);paving.setColorAt(index,color);index++;
+  paving.setMatrixAt(index,matrix);color.setHSL(warm?.055+random()*.025:.09+random()*.025,warm?.42+random()*.14:.06+random()*.07,warm?.42+random()*.15:.42+random()*.17);paving.setColorAt(index,color);index++;
  }group.add(paving);
  let backgroundReady=false;
  try{
