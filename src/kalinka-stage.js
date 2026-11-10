@@ -8,13 +8,13 @@ export function kalinkaCameraPose(time,aspect=1){
  return {target,position:{x:target.x+Math.sin(yaw)*distance,y:target.y+1.65+.35*Math.sin(phase),z:target.z+Math.cos(yaw)*distance}};
 }
 
-export async function createKalinkaStage(THREE){
+export async function createKalinkaStage(THREE,{backdrop='../assets/kalinka/red-square-ai.png',warm=false}={}){
  const group=new THREE.Group();group.name='Kalinka_Spatial_Square';
  const resources=[],materials=[],textures=[];
  const geometry=g=>{resources.push(g);return g;};
  const material=m=>{materials.push(m);return m;};
  function mesh(name,g,m,x,y,z){const o=new THREE.Mesh(g,m);o.name=name;o.position.set(x,y,z);group.add(o);o.castShadow=true;o.receiveShadow=true;return o;}
- const base=material(new THREE.MeshStandardMaterial({color:0x777572,roughness:1}));
+ const base=material(new THREE.MeshStandardMaterial({color:warm?0xb78159:0x777572,roughness:1}));
  const floor=mesh('Kalinka_Ground',geometry(new THREE.PlaneGeometry(100,100)),base,0,-.04,0);floor.rotation.x=-Math.PI/2;floor.castShadow=false;
  const stone=material(new THREE.MeshStandardMaterial({color:0x98958f,roughness:.92}));
  const rows=176,columns=88,paving=new THREE.InstancedMesh(geometry(new THREE.BoxGeometry(.43,.035,.28)),stone,rows*columns);
@@ -27,7 +27,7 @@ export async function createKalinkaStage(THREE){
  }group.add(paving);
  let backgroundReady=false;
  try{
-  const texture=await new THREE.TextureLoader().loadAsync(new URL('../assets/kalinka/red-square-ai.png',import.meta.url).href);texture.colorSpace=THREE.SRGBColorSpace;textures.push(texture);
+  const texture=await new THREE.TextureLoader().loadAsync(new URL(backdrop,import.meta.url).href);texture.colorSpace=THREE.SRGBColorSpace;textures.push(texture);
   const matte=mesh('Kalinka_Distant_AI_Matte',geometry(new THREE.PlaneGeometry(64,36)),material(new THREE.MeshBasicMaterial({map:texture,toneMapped:false})),0,3.6,-24);
   matte.castShadow=false;matte.receiveShadow=false;backgroundReady=true;
  }catch{
