@@ -40,5 +40,12 @@
     "attribution": "Kalinka background generated with ChatGPT; supplied by kpok",
     "origin": "Generated with ChatGPT image generation on 2026-10-29 for the owner-requested Kalinka background; no source photograph used",
     "review": "Synthetic photorealistic depiction, not a documentary photograph; no additional reuse license or exclusivity certification."
+  },
+  "docs/aipocalypse/assets/logo.jpg": {
+    "sha256": "8db6a0f24da3249e3a6b44645f2beb10b11e88a3ae00582de4da7548f33d0d64",
+    "license": "LicenseRef-All-Rights-Reserved",
+    "attribution": "AIpokalypse logo supplied by kpok",
+    "origin": "Logo image supplied by the project owner in ChatGPT with an explicit request to publish it in this repository.",
+    "review": "Original supplied bytes inspected: JPEG, 1536x864, ICC/JFIF, no EXIF. Stored as .jpg to match the actual format; no re-encoding or image edits. No additional reuse license granted; ownership/exclusivity not independently certified."
   }
 }

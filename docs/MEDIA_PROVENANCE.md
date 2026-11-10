@@ -45,3 +45,5 @@ https://www.gnu.org/licenses/gpl-faq.html#WhatCaseIsOutputGPL
   certification of legal exclusivity. No new asset-specific reuse license is granted.
 
 - A Shelter Before the Rain: project-authored300-second story and bilingual dialogue, procedural kitten/squirrel adapted from the existing garden recipes, procedural butterfly/shelter/wheelbarrow/cloud/rain geometry. Browser-provided SpeechSynthesis voices (local preferred; some may require network) and existing procedural melody. No new binary assets, audio samples, image/video/model-generation API or prerecorded voice. This records technical origin, not a claim of legal exclusivity or guaranteed voice availability.
+
+- AIpokalypse logo: supplied by the project owner with an explicit request to add it to the film branch. Stored unchanged at `docs/aipocalypse/assets/logo.jpg` (JPEG, 1536×864, no EXIF). Original upload used a `.png` name despite containing JPEG bytes. The asset inventory records its SHA-256. No additional reuse license or ownership/exclusivity certification is granted.

@@ -1,5 +1,7 @@
 # AIpokalypse — Ostatnie polecenie
 
+![Logo AIpokalypse z napisem Hacked by AIpokalypse](assets/logo.jpg)
+
 **Nowy film w przygotowaniu • draft • 14:30 • język polski • 16:9.**
 
 ## Najpierw scenariusz
@@ -32,3 +34,7 @@ Branch: `feat/aipocalypse-film`. Zapis `aipocalypse` jest identyfikatorem techni
 ## Pochodzenie
 
 Import: `AIpokalypse_scenariusz_PL_v2.md`, wersja zapisu źródłowego `1`, odczytana 10 listopada 2026. Treść scenariusza pozostaje w `SCENARIUSZ_PL.md`; nie trzeba odtwarzać jej z historii rozmów.
+
+## Logo
+
+[Oryginalne logo dostarczone przez autora projektu](assets/logo.jpg), 1536 × 864. Plik zachowuje oryginalne bajty; mimo rozszerzenia przesłanego załącznika jego formatem jest JPEG. W repo zapisano go jako `logo.jpg`. Pochodzenie i suma kontrolna znajdują się w `.security/assets.json`; zasady wykorzystania opisuje [mapa licencji](../../LICENSING.md).
