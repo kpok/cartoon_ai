@@ -15,7 +15,7 @@ export function createMacarena(model,THREE){
  const body=createKalinka(model,THREE,{bareHead:true}),torso=model.getObjectByName('TorsoPivot'),head=model.getObjectByName('HeadPivot');
  function update(time){
   // Reuse the long-legged costume and grounded standing pose, never Kalinka travel.
-  body.update(0);const p=macarenaPose(time);body.root.position.set(0,body.root.position.y+p.jump,0);body.root.rotation.set(0,p.yaw,p.sway*.25);torso.rotation.set(0,0,p.sway);head.rotation.set(0,-p.sway*.5,-p.sway*.5);
+  body.update(0);const p=macarenaPose(time);body.root.position.set(0,body.root.position.y+p.jump,0);body.root.rotation.set(0,p.yaw,0);torso.rotation.set(0,0,p.sway);head.rotation.set(0,-p.sway*.5,-p.sway*.5);
   body.limbs.forEach(({arm,elbow,wrist},i)=>{const [pitch,spread,bend,roll]=p.arms[i],sign=i===0?-1:1;arm.rotation.set(pitch,0,sign*spread);elbow.rotation.set(bend,0,0);wrist.rotation.set(0,0,sign*roll);});
   model.updateMatrixWorld(true);return p;
  }

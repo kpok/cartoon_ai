@@ -34,6 +34,7 @@ test('build inventory rejects unexpected files, symlinks and unresolved module d
   await cp(new URL('../published/',import.meta.url),join(dir,'published'),{recursive:true});
   await mkdir(join(dir,'assets/kalinka'),{recursive:true});
   await cp(new URL('../assets/kalinka/red-square-ai.png',import.meta.url),join(dir,'assets/kalinka/red-square-ai.png'));
+  await cp(new URL('../assets/macarena/',import.meta.url),join(dir,'assets/macarena'),{recursive:true});
   await verifyBuild(dir);
   await writeFile(join(dir,'credentials.json'),'private');await assert.rejects(verifyBuild(dir),/Unexpected build file/);await unlink(join(dir,'credentials.json'));
   await unlink(join(dir,'src','app.js'));await symlink(new URL('../src/app.js',import.meta.url),join(dir,'src','app.js'));await assert.rejects(verifyBuild(dir),/symlink/);await unlink(join(dir,'src','app.js'));
