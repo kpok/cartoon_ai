@@ -9,7 +9,7 @@ function armAt(beat,side){let value=gestures[11];for(let i=side;i<=Math.min(beat
 export function macarenaPose(time){
  const t=((Number.isFinite(time)?time:0)%32+32)%32,phrase=Math.floor(t/8),local=t%8,beat=Math.floor(local*2),u=smooth(Math.min(1,(local*2-beat)/.65));
  // Left is index zero in the actual GLB, while the dance starts with the right hand.
- const arms=[0,1].map(side=>{const parity=1-side,previous=armAt(beat===0?15:beat-1,parity),next=armAt(beat,parity);return next.map((v,i)=>previous[i]+(v-previous[i])*u);});
+ const arms=[0,1].map(side=>{const parity=1-side,previous=armAt(beat===0?15:beat-1,parity),next=armAt(beat,parity);return u===1?[...next]:next.map((v,i)=>previous[i]+(v-previous[i])*u);});
  const turn=smooth(Math.max(0,Math.min(1,(local-7.5)/.5)));
  const rhythm=local*Math.PI*2,hipX=.22*Math.sin(rhythm),hipZ=.06*(1-Math.cos(rhythm)),bounce=.15*(.5-.5*Math.cos(rhythm*2));
  return {time:t,beat,arms,yaw:(phrase+turn)*Math.PI/2+.08*Math.sin(rhythm),footYaw:(phrase+turn)*Math.PI/2,sway:Math.sin(rhythm)*.12,hipX,hipZ,height:1.79-bounce,jump:beat===15?Math.sin(turn*Math.PI)*.24:0};
