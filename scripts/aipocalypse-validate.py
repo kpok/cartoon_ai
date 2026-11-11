@@ -19,6 +19,8 @@ def validate(path: Path) -> None:
                 raise ValueError(f"Missing APK member: {required}")
         if not any(name.startswith("assets/") for name in names):
             raise ValueError("APK has no application assets")
+        if not any(name.endswith("/GODOT_LICENSE.txt") for name in names):
+            raise ValueError("APK must include the engine license notice")
         timelines = [name for name in names if name.endswith("/animatic.json")]
         if len(timelines) != 1:
             raise ValueError("APK must contain exactly one compiled film timeline")
