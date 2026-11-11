@@ -1,0 +1,60 @@
+name: AIpokalypse Android APK
+on:
+  push:
+    branches: [feat/aipocalypse-film]
+  workflow_dispatch:
+permissions: {}
+jobs:
+  android:
+    if: >-
+      github.repository == 'kpok/cartoon_ai' &&
+      github.repository_id == '1433681495' &&
+      github.repository_owner_id == '10676481' &&
+      github.actor_id == '10676481' &&
+      github.actor == 'kpok' &&
+      github.triggering_actor == 'kpok' &&
+      github.ref_type == 'branch' &&
+      ((github.ref == 'refs/heads/feat/aipocalypse-film' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')) ||
+      (github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch'))
+    permissions:
+      contents: read
+    concurrency:
+      group: trusted-aipocalypse-android
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Public repository audit before publication
+        run: bash scripts/run-public-audit.sh
+        env:
+          PRIVATE_TERMS: ${{ secrets.PRIVATE_TERMS }}
+      - name: Install verified Godot and Android tools
+        run: bash scripts/aipocalypse-setup.sh
+      - name: Test and export unsigned APK
+        run: bash scripts/aipocalypse-build.sh
+      - name: Sign Android APK
+        id: sign-apk
+        run: bash scripts/aipocalypse-sign.sh
+        env:
+          AIPOCALYPSE_KEYSTORE_BASE64: ${{ secrets.AIPOCALYPSE_KEYSTORE_BASE64 }}
+          AIPOCALYPSE_KEYSTORE_PASSWORD: ${{ secrets.AIPOCALYPSE_KEYSTORE_PASSWORD }}
+          AIPOCALYPSE_KEY_ALIAS: ${{ secrets.AIPOCALYPSE_KEY_ALIAS }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aipocalypse-android
+          path: |
+            ${{ runner.temp }}/aipocalypse-build/AIpokalypse.apk
+            ${{ runner.temp }}/aipocalypse-build/AIpokalypse.apk.sha256
+          if-no-files-found: error
+          retention-days: 1

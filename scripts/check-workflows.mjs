@@ -27,15 +27,16 @@ export function ownerContext(overrides={}){
  return {github:{repository:'kpok/cartoon_ai',repository_id:'1433681495',repository_owner_id:'10676481',actor_id:'10676481',actor:'kpok',triggering_actor:'kpok',ref:'refs/heads/main',ref_type:'branch',event_name:'push',...overrides},needs:{test:{result:'success'}},vars:{ENABLE_GITHUB_PAGES:'true'}};
 }
 export function checkPolicy(workflows,pins){
- assert.deepEqual(Object.keys(workflows).sort(),['ci.yml','export-mp4.yml','public-audit.yml','repo-diagnostics.yml','robot-model.yml','robot-mp4.yml'],'New or administrative workflows need a security policy review');
+ assert.deepEqual(Object.keys(workflows).sort(),['aipocalypse-android.yml','ci.yml','export-mp4.yml','public-audit.yml','repo-diagnostics.yml','robot-model.yml','robot-mp4.yml'],'New or administrative workflows need a security policy review');
  const jobs=[];
  for(const [file,workflow] of Object.entries(workflows)){
   assert.deepEqual(workflow.permissions,{},`${file}: default token must have no permissions`);
   assert.equal(workflow.concurrency,undefined,'Authorization must happen before concurrency allocation');
-  assert.deepEqual(Object.keys(workflow.on).sort(),['ci.yml','public-audit.yml'].includes(file)?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
+  assert.deepEqual(Object.keys(workflow.on).sort(),['aipocalypse-android.yml','ci.yml','public-audit.yml'].includes(file)?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
+  if(file==='aipocalypse-android.yml')assert.deepEqual(workflow.on.push,{branches:['feat/aipocalypse-film']});
   if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main'],'paths-ignore':['**/*.md','docs/**']});
   if(file==='public-audit.yml')assert.deepEqual(workflow.on.push,{branches:['**'],tags:['**']});
-  assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','regression','test']:file==='public-audit.yml'?['audit']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:file==='robot-model.yml'?['generate']:file==='robot-mp4.yml'?['render']:['export']);
+  assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='aipocalypse-android.yml'?['android']:file==='ci.yml'?['deploy','regression','test']:file==='public-audit.yml'?['audit']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:file==='robot-model.yml'?['generate']:file==='robot-mp4.yml'?['render']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
    const label=`${file}/${name}`;jobs.push({file,name,job});
    const browserJob=(file==='ci.yml'&&name==='regression')||['export-mp4.yml','robot-mp4.yml'].includes(file);
@@ -51,7 +52,11 @@ export function checkPolicy(workflows,pins){
    }
    for(const step of job.steps){
     if(step.env?.PRIVATE_TERMS){assert.equal(step.run,'bash scripts/run-public-audit.sh');assert.deepEqual(step.env,{PRIVATE_TERMS:'${{ secrets.PRIVATE_TERMS }}'});const copy={...step};delete copy.env;assert.doesNotMatch(JSON.stringify(copy),/secrets\.|secrets\[/,'Only private terms may be passed');}
-    else assert.doesNotMatch(JSON.stringify(step),/secrets\.|secrets\[/,`${label}: unreviewed secrets`);
+    else if(file==='aipocalypse-android.yml'&&step.id==='sign-apk'){
+     assert.equal(step.run,'bash scripts/aipocalypse-sign.sh');
+     assert.deepEqual(step.env,Object.fromEntries(['AIPOCALYPSE_KEYSTORE_BASE64','AIPOCALYPSE_KEYSTORE_PASSWORD','AIPOCALYPSE_KEY_ALIAS'].map(key=>[key,'${{ secrets.'+key+' }}'])));
+     const copy={...step};delete copy.env;assert.doesNotMatch(JSON.stringify(copy),/secrets\.|secrets\[/,'Signing secrets may only be passed as environment values');
+    }else assert.doesNotMatch(JSON.stringify(step),/secrets\.|secrets\[/,`${label}: unreviewed secrets`);
     if(step.run)assert.doesNotMatch(step.run,/\$\{\{/,`${label}: pass inputs through quoted environment variables`);
     if(step.uses){
      const [action,sha]=step.uses.split('@');assert.match(sha||'',/^[a-f0-9]{40}$/,`${label}: immutable action SHA required`);assert.equal(sha,pins[action],`${label}: unreviewed action pin`);
@@ -63,6 +68,17 @@ export function checkPolicy(workflows,pins){
    for(const event_name of ['push','workflow_dispatch']){
     assert.equal(evaluateGate(job.if,ownerContext({event_name})),['ci.yml','public-audit.yml'].includes(file)||event_name==='workflow_dispatch',`${label}: trusted owner event`);
    }
+   if(file==='aipocalypse-android.yml'){
+    const signing=job.steps.filter(step=>step.id==='sign-apk');
+    assert.equal(signing.length,1,`${label}: exactly one signing step required`);
+    assert.equal(signing[0].if,undefined,`${label}: signing must not be conditional`);
+    assert.equal(signing[0]['continue-on-error'],undefined,`${label}: signing must fail closed`);
+    const signingIndex=job.steps.indexOf(signing[0]);
+    assert.ok(job.steps.slice(0,signingIndex).every(step=>!step.uses?.startsWith('actions/upload-')),`${label}: no upload before signing`);
+    for(const ref_type of ['',undefined,'tag'])assert.equal(evaluateGate(job.if,ownerContext({ref_type,event_name:'workflow_dispatch'})),false,`${label}: branch type required`);
+    for(const event_name of ['push','workflow_dispatch'])assert.equal(evaluateGate(job.if,ownerContext({ref:'refs/heads/feat/aipocalypse-film',event_name})),true,`${label}: authorized feature build`);
+    assert.equal(evaluateGate(job.if,ownerContext({ref:'refs/heads/feat/aipocalypse-film',ref_type:'tag',event_name:'push'})),false,`${label}: branch type required`);
+   }
    const denied=[{repository:'attacker/cartoon_ai'},{repository_id:'999'},{repository_owner_id:'999'},{actor_id:'999'},{actor:'collaborator'},{triggering_actor:'collaborator'},{actor:'dependabot[bot]',actor_id:'49699333'},{ref:'refs/heads/feature'},{ref:'refs/tags/main',ref_type:'tag'}];
    for(const event_name of ['pull_request','pull_request_target','issue_comment','workflow_run','workflow_call','repository_dispatch','schedule','release'])denied.push({event_name});
    for(const key of ['repository','repository_id','repository_owner_id','actor_id','actor','triggering_actor','ref','event_name'])denied.push({[key]:undefined});
@@ -72,7 +88,7 @@ export function checkPolicy(workflows,pins){
   }
  }
  assert.ok(workflows['ci.yml'].jobs.test.steps.some(s=>s.run==='npm run check:workflows'),'CI must enforce workflow policy');
- for(const file of ['ci.yml','export-mp4.yml','robot-model.yml','robot-mp4.yml','public-audit.yml']){
+ for(const file of ['aipocalypse-android.yml','ci.yml','export-mp4.yml','robot-model.yml','robot-mp4.yml','public-audit.yml']){
   const job=Object.values(workflows[file].jobs)[0];
   const auditIndex=job.steps.findIndex(s=>s.run==='bash scripts/run-public-audit.sh');assert.ok(auditIndex>=0,`${file}: publication requires public audit`);
   assert.equal(job.steps[auditIndex].if,undefined,'Audit cannot be conditional');assert.equal(job.steps[auditIndex]['continue-on-error'],undefined);assert.equal(job['continue-on-error'],undefined);

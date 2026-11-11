@@ -4,9 +4,16 @@ import {readFile} from 'node:fs/promises';
 import {readWorkflows,checkPolicy,evaluateGate,ownerContext} from '../scripts/check-workflows.mjs';
 const workflows=await readWorkflows();
 const pins=JSON.parse(await readFile(new URL('../.github/action-pins.json',import.meta.url),'utf8'));
-test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),9);});
+test('actual workflow guards deny external actors, forks, reruns and unexpected events',()=>{assert.equal(checkPolicy(workflows,pins),10);});
 test('security regressions in YAML are caught before delivery',()=>{
  const mutations=[
+  w=>{w['aipocalypse-android.yml'].jobs.android.steps.find(s=>s.id==='sign-apk')['continue-on-error']=true;},
+  w=>{w['aipocalypse-android.yml'].jobs.android.steps.find(s=>s.id==='sign-apk').if="${{ false }}";},
+  w=>{w['aipocalypse-android.yml'].on.push={branches:['**']};},
+  w=>{w['aipocalypse-android.yml'].jobs.android.if=w['aipocalypse-android.yml'].jobs.android.if.replace("github.actor_id == '10676481' &&",'');},
+  w=>{w['aipocalypse-android.yml'].jobs.android.steps.find(s=>s.id==='sign-apk').env.EXTRA='${{ secrets.EXTRA }}';},
+  w=>{w['aipocalypse-android.yml'].jobs.android.steps.find(s=>s.id==='sign-apk').run='echo unsafe';},
+  w=>{w['aipocalypse-android.yml'].jobs.android.steps.push({run:'echo other',env:{KEY:'${{ secrets.AIPOCALYPSE_KEYSTORE_PASSWORD }}'}});},
   w=>{w["public-audit.yml"].on.push["paths-ignore"]=["docs/**"];},
   w=>{w["ci.yml"].jobs.test.steps=w["ci.yml"].jobs.test.steps.filter(s=>s.run!=="bash scripts/run-public-audit.sh");},
   w=>{w["robot-mp4.yml"].jobs.render.steps.find(s=>s.run==="bash scripts/run-public-audit.sh")["continue-on-error"]=true;},
@@ -62,4 +69,17 @@ test('all artifact uploads require an explicit one-day retention',()=>{
   }
  }
  assert.ok(uploads>0,'The policy must cover existing uploads');
+});
+
+// Exercise the feature branch as well as main so owner checks cannot hide behind a ref denial.
+test('Android signing authorization denies untrusted feature-branch contexts',()=>{
+ const gate=workflows['aipocalypse-android.yml'].jobs.android.if;
+ const allowed={ref:'refs/heads/feat/aipocalypse-film',event_name:'push'};
+ assert.equal(evaluateGate(gate,ownerContext(allowed)),true);
+ for(const override of [
+  {repository:'attacker/cartoon_ai'},{repository_id:'999'},{repository_owner_id:'999'},
+  {actor_id:'999'},{actor:'collaborator'},{triggering_actor:'collaborator'},
+  {event_name:'pull_request'},{event_name:'pull_request_target'},{ref_type:'tag'},
+  {actor_id:undefined},{repository_owner_id:undefined},{ref_type:undefined},
+ ])assert.equal(evaluateGate(gate,ownerContext({...allowed,...override})),false,JSON.stringify(override));
 });

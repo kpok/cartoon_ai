@@ -22,5 +22,6 @@ __pycache__/
 # Generated Android build inputs and outputs.
 /experiments/aipocalypse-android/.godot/
 /experiments/aipocalypse-android/assets/logo.jpg
+/experiments/aipocalypse-android/assets/logo.jpg.import
 /aipocalypse-output/
 /aipocalypse-tools/
