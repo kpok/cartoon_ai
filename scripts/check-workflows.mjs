@@ -33,7 +33,7 @@ export function checkPolicy(workflows,pins){
   assert.deepEqual(workflow.permissions,{},`${file}: default token must have no permissions`);
   assert.equal(workflow.concurrency,undefined,'Authorization must happen before concurrency allocation');
   assert.deepEqual(Object.keys(workflow.on).sort(),['ci.yml','public-audit.yml'].includes(file)?['push','workflow_dispatch']:['workflow_dispatch'],'Unexpected public trigger');
-  if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main','feat/robot-macarena'],'paths-ignore':['**/*.md','docs/**']});
+  if(file==='ci.yml')assert.deepEqual(workflow.on.push,{branches:['main','feat/robot-macarena','feat/macarena-music-sync'],'paths-ignore':['**/*.md','docs/**']});
   if(file==='public-audit.yml')assert.deepEqual(workflow.on.push,{branches:['**'],tags:['**']});
   assert.deepEqual(Object.keys(workflow.jobs).sort(),file==='ci.yml'?['deploy','regression','test']:file==='public-audit.yml'?['audit']:file==='repo-diagnostics.yml'?['actions-smoke','diagnostics']:file==='robot-model.yml'?['generate']:file==='robot-mp4.yml'?['render']:['export']);
   for(const [name,job] of Object.entries(workflow.jobs)){
@@ -62,12 +62,14 @@ export function checkPolicy(workflows,pins){
    for(const event_name of ['push','workflow_dispatch']){
     assert.equal(evaluateGate(job.if,ownerContext({event_name})),['ci.yml','public-audit.yml'].includes(file)||event_name==='workflow_dispatch',`${label}: trusted owner event`);
    }
-   const macarenaContext=ownerContext({ref:'refs/heads/feat/robot-macarena'});
+   for(const featureRef of ['refs/heads/feat/robot-macarena','refs/heads/feat/macarena-music-sync']){
+   const macarenaContext=ownerContext({ref:featureRef});
    assert.equal(evaluateGate(job.if,macarenaContext),file==='public-audit.yml'||file==='ci.yml'&&name!=='deploy',`${label}: exact trusted feature branch`);
    if(file==='ci.yml'&&name==='test'){
     const packaging=job.steps.find(s=>s.uses?.startsWith('actions/upload-pages-artifact@'));
     assert.equal(evaluateGate(packaging.if,macarenaContext),false,'Feature builds must not package Pages');
     assert.equal(evaluateGate(packaging.if,ownerContext()),true,'Main may package Pages');
+   }
    }
    const denied=[{repository:'attacker/cartoon_ai'},{repository_id:'999'},{repository_owner_id:'999'},{actor_id:'999'},{actor:'collaborator'},{triggering_actor:'collaborator'},{actor:'dependabot[bot]',actor_id:'49699333'},{ref:'refs/heads/feature'},{ref:'refs/tags/main',ref_type:'tag'}];
    for(const event_name of ['pull_request','pull_request_target','issue_comment','workflow_run','workflow_call','repository_dispatch','schedule','release'])denied.push({event_name});
