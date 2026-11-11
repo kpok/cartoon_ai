@@ -156,6 +156,8 @@ func _build(index: int) -> void:
 	for i in range(characters.size()):
 		var actor: Dictionary = factory.actor(scene_root, characters[i])
 		actor["home"] = Vector3(0.65 + (i % 3) * 0.85 - (0.8 if i > 2 else 0), 0, -0.2 - int(i / 3) * 0.9)
+		if current_shot["environment"] == "car_interior":
+			actor["home"] = Vector3(-0.65 if i % 2 == 0 else 0.65, 0, -0.5)
 		actor["node"].position = actor["home"]
 		actors.append(actor)
 	for i in range(current_shot["models"].size()):
@@ -222,6 +224,12 @@ func _has(fragment: String) -> bool:
 			return true
 	return false
 
+func _leg_pose(skeleton: Skeleton3D, bone_name: String, angle: float) -> void:
+	var index := skeleton.find_bone(bone_name)
+	# Imported bone poses include their rest orientation, not only the motion delta.
+	var rest := skeleton.get_bone_rest(index).basis.get_rotation_quaternion()
+	skeleton.set_bone_pose_rotation(index, rest * Quaternion(Vector3.RIGHT, angle))
+
 func apply_time(time: float) -> void:
 	var index: int = timeline.index_at(time)
 	if index != current_index:
@@ -246,13 +254,13 @@ func apply_time(time: float) -> void:
 		if _has("kneel") or current_shot["environment"] == "car_interior":
 			node.position.y = -0.45
 			for side in ["right", "left"]:
-				skeleton.set_bone_pose_rotation(skeleton.find_bone(side + "_thigh"), Quaternion(Vector3.RIGHT, 1.1))
-				skeleton.set_bone_pose_rotation(skeleton.find_bone(side + "_shin"), Quaternion(Vector3.RIGHT, -1.5))
+				_leg_pose(skeleton, side + "_thigh", -1.35)
+				_leg_pose(skeleton, side + "_shin", 1.35)
 		if _has("walk") or _has("run") or _has("carry"):
 			node.position.x += progress * (2.0 if _has("run") else 0.8)
 			for side in ["right", "left"]:
 				var phase := 0.0 if side == "right" else PI
-				skeleton.set_bone_pose_rotation(skeleton.find_bone(side + "_thigh"), Quaternion(Vector3.RIGHT, sin(local * 7 + phase) * 0.4))
+				_leg_pose(skeleton, side + "_thigh", sin(local * 7 + phase) * 0.4)
 		if current_shot["environment"] == "orbit":
 			node.position.y = 0.25 + 0.04 * sin(local)
 			node.rotation.z = 0.03 * sin(local * 0.7)

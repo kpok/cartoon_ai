@@ -34,6 +34,14 @@ func _test() -> void:
 				counts.append(scene.world.node_count())
 			else:
 				assert(scene.world.node_count() == counts[int(seq["number"]) - 1])
+	scene.clock.seek(140.5)
+	scene._update_frame()
+	for actor in scene.world.actors:
+		var rig: Skeleton3D = actor["skeleton"]
+		for side in ["right", "left"]:
+			var hip: Vector3 = rig.get_bone_global_pose(rig.find_bone(side + "_thigh")).origin
+			var foot: Vector3 = rig.get_bone_global_pose(rig.find_bone(side + "_foot")).origin
+			assert(foot.y < hip.y and foot.z > hip.z, "Seated legs must bend forwards and feet stay below hips")
 	# Critical cues must change rendered state and reset when seeking backwards.
 	scene.clock.seek(413.1)
 	scene._update_frame()
