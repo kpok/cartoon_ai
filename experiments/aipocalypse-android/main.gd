@@ -45,7 +45,7 @@ func _build_ui() -> void:
 		button.pressed.connect(_control.bind(title))
 		buttons.add_child(button)
 	var credits := Label.new()
-	credits.text = "Próbka postaci • 25 s • Godot Engine (MIT) • Logo: kpok"
+	credits.text = "Próbka postaci • 25 s • Godot Engine (MIT) • Modele/logo: kpok"
 	credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(credits)
 	var license_button := Button.new()

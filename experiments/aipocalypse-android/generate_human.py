@@ -65,7 +65,7 @@ def generate(output, role):
         for polygon in obj.data.polygons: polygon.use_smooth = True
         return obj
     def oval(name, center, scale, material, bone):
-        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=1, location=center)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, radius=1, location=center)
         obj = bpy.context.object
         obj.scale = scale
         bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
@@ -75,7 +75,31 @@ def generate(output, role):
         obj=oval(name,(start+end)/2,(radius,radius,(end-start).length/2+radius*0.25),material,bone)
         obj.rotation_euler=(end-start).to_track_quat('Z','Y').to_euler()
         return obj
-    oval('Torso',(0,0,1.23),(0.225 if not female else 0.20,0.125,0.26),cloth,'spine')
+    # A continuous tapered garment avoids disconnected ellipsoids at the shoulders/waist.
+    rings = [(0.94,0.16,0.11),(1.05,0.18,0.125),(1.08,0.185,0.127),
+             (1.105,0.19,0.128),(1.26,0.215,0.13),(1.40,0.23,0.12),(1.47,0.17,0.09)]
+    vertices=[]
+    for z,width,depth in rings:
+        for index in range(24):
+            angle=2*math.pi*index/24
+            vertices.append((width*(0.91 if female else 1)*math.cos(angle),depth*math.sin(angle),z))
+    faces=[]
+    for row in range(len(rings)-1):
+        for index in range(24):
+            next_index=(index+1)%24
+            faces.append((row*24+index,row*24+next_index,(row+1)*24+next_index,(row+1)*24+index))
+    faces += [tuple(reversed(range(24))),tuple((len(rings)-1)*24+i for i in range(24))]
+    mesh=bpy.data.meshes.new('JacketMesh')
+    mesh.from_pydata(vertices,[],faces)
+    obj=bpy.data.objects.new('Jacket',mesh)
+    bpy.context.collection.objects.link(obj)
+    bind(obj,'Jacket',cloth,'spine')
+    obj.data.materials.append(reflective)
+    obj.data.materials.append(dark)
+    if not female:
+        for polygon in obj.data.polygons:
+            if polygon.index//24==2:polygon.material_index=1
+            if polygon.index//24==5:polygon.material_index=2
     oval('Pelvis',(0,0,0.96),(0.16,0.115,0.13),cloth,'root')
     oval('Neck',(0,0,1.48),(0.065,0.06,0.085),skin,'head')
     oval('Face',(0,-0.012,1.65),(0.106,0.09,0.14),skin,'head')
@@ -84,7 +108,7 @@ def generate(output, role):
     oval('Nose',(0,-0.102,1.65),(0.019,0.023,0.032),skin,'head')
     oval('Mouth',(0,-0.098,1.596),(0.033,0.008,0.005),dark,'head')
     for sign in (-1,1):
-        oval('Eye white',(sign*0.043,-0.089,1.68),(0.025,0.009,0.012),white,'head')
+        oval('Eye white',(sign*0.043,-0.089,1.68),(0.019,0.009,0.009),white,'head')
         oval('Pupil',(sign*0.043,-0.098,1.68),(0.008,0.005,0.009),eye,'head')
         oval('Brow',(sign*0.043,-0.089,1.705),(0.03,0.012,0.006),hair,'head')
         oval('Ear',(sign*0.106,0,1.65),(0.017,0.025,0.04),skin,'head')
@@ -99,12 +123,16 @@ def generate(output, role):
         oval('Palm',(sign*0.29,-0.002,0.835),(0.042,0.024,0.052),skin,side+'_hand')
         for finger in range(4):
             x=sign*0.29+(finger-1.5)*0.017
-            oval('Finger',(x,-0.005,0.78),(0.009,0.016,0.045),skin,side+'_hand')
-        oval('Thumb',(sign*0.337,-0.018,0.835),(0.013,0.023,0.033),skin,side+'_hand')
+            if side=='right':
+                limb('Finger base',(x,-0.012,0.80),(x,-0.06,0.765),0.009,skin,side+'_hand')
+                limb('Curled fingertip',(x,-0.06,0.765),(x,-0.065,0.80),0.009,skin,side+'_hand')
+            else:
+                oval('Finger',(x,-0.005,0.78),(0.009,0.016,0.045),skin,side+'_hand')
+        oval('Thumb',(sign*0.337,-0.05 if side=='right' else -0.018,0.835),(0.013,0.023,0.033),skin,side+'_hand')
         if not female:
             oval('Reflective shin',(sign*0.10,0,0.35),(0.067,0.068,0.028),reflective,side+'_shin')
             oval('Reflective sleeve',(sign*0.28,0,1.19),(0.065,0.063,0.025),reflective,side+'_upper_arm')
-    if not female: oval('Reflective waist',(0,-0.006,1.08),(0.209,0.128,0.026),reflective,'spine')
+
     bpy.context.scene.render.fps=24
     bpy.context.scene.frame_start=0
     bpy.context.scene.frame_end=120

@@ -54,6 +54,7 @@ func _test() -> void:
 	assert(device.global_position.is_equal_approx(held_position))
 	world.apply_time(15.0)
 	assert(world.current_shot == 2 and world.orbit.visible and not world.street.visible)
+	assert(world.orbit_screen.text == "Hacked by\nAIpokalypse")
 	world.apply_time(20.0)
 	var orbit_pose: Transform3D = world.actors["astronaut"]["device"].global_transform
 	world.apply_time(25.0)

@@ -5,6 +5,7 @@ var street: Node3D
 var orbit: Node3D
 var actors: Dictionary = {}
 var current_shot: int = 0
+var orbit_screen: Label3D
 
 func _ready() -> void:
 	var environment := WorldEnvironment.new()
@@ -108,13 +109,13 @@ func _build_orbit() -> void:
 	_box(orbit, Vector3(30, 0.3, -1.8), Vector3(4, 0.6, 0.2), Color("76838d"))
 	_sphere(orbit, Vector3(30.7, 1.3, -3), 0.85, Color("247fc1"))
 	# Restrained geometric land/cloud patches are a placeholder for the later Earth asset.
-	_sphere(orbit, Vector3(30.5, 1.45, -2.23), 0.25, Color("557d65"))
-	_sphere(orbit, Vector3(30.95, 1.1, -2.27), 0.18, Color("b7d3db"))
+	_sphere(orbit, Vector3(30.5, 1.45, -2.23), 0.25, Color("557d65")).scale = Vector3(1.0, 1.5, 0.05)
+	_sphere(orbit, Vector3(30.95, 1.1, -2.27), 0.18, Color("b7d3db")).scale = Vector3(1.5, 0.6, 0.05)
 	var console := Node3D.new()
 	orbit.add_child(console)
 	console.position = Vector3(28.95, 1.0, 0.1)
 	_box(console, Vector3.ZERO, Vector3(0.85, 0.65, 0.25), Color("344251"))
-	_screen(console, Vector3(0, 0.03, 0.14), Vector2(0.7, 0.43), 0.00085)
+	orbit_screen = _screen(console, Vector3(0, 0.03, 0.14), Vector2(0.7, 0.43), 0.00155)
 	for index in range(4):
 		_box(orbit, Vector3(28.2, 0.6 + index * 0.45, -1.0), Vector3(0.3, 0.3, 0.45), Color("98a5af"))
 
@@ -159,8 +160,8 @@ func apply_time(time: float) -> void:
 		camera.position = device.global_position + device.global_basis.z.normalized() * 0.30
 		camera.look_at(device.global_position, device.global_basis.y.normalized())
 	else:
-		camera.position = Vector3(31.4, 1.55, 3.5)
-		camera.look_at(Vector3(29.8, 1.2, -0.1))
+		camera.position = Vector3(30.8, 1.45, 2.65)
+		camera.look_at(Vector3(29.65, 1.2, -0.1))
 
 func _pose(actor: Dictionary, time: float) -> void:
 	var player: AnimationPlayer = actor["player"]

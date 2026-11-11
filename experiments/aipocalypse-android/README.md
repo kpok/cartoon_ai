@@ -1,34 +1,39 @@
-# AIpokalypse — Android, etap 0
+# AIpokalypse — próbka postaci Android0.3
 
-To techniczna próbka, nie gotowy film: logo użytkownika, model samochodu 3D, przestrzenny napis i osiem sekund ruchu. Model powstaje skryptem Blendera w CI, a ruch i interfejs w GDScript; bez usług generowania wideo.
+APK zawiera25sekund próby, nie pełny film ani zatwierdzoną finalną stylistykę:
 
-- Start uruchamia lub wznawia animację i krótki sygnał testowy. Po zakończeniu Start odtwarza od początku.
-- Pauza zatrzymuje zegar i sygnał. Restart ustawia początek i pozostawia pauzę.
+| Czas | Ujęcie |
+|---|---|
+|0–10s| Ratownik obok uproszczonej karetki, podnosi telefon |
+|10–15s| Stabilny detal fizycznego telefonu i napisu Hacked by AIpokalypse |
+|15–25s| Postać w module orbitalnym, ręczne radio, terminal i schematyczna Ziemia |
+
+Generatory Blendera tworzą modele postaci z rzeczywistym szkieletem, skórą i5sekundowym klipem. Godot ustawia animację z jednego zegara; telefon/radio mocuje do right_hand. Astronautka lekko unosi się i obraca, bez kroku po podłodze. To uproszczone postacie i dekoracje. Twarze, naturalność chwytu, mimika, materiały i szczegóły wymagają dalszej pracy; ilustracja koncepcyjna jest znacznie bardziej szczegółowa od tej próbki.
+
+## Sterowanie i odbiór
+
+- Start uruchamia/wznawia, po zakończeniu odtwarza od początku. Krótki sygnał testowy; bez finalnych dialogów i muzyki.
+- Pauza zatrzymuje zegar i sygnał. Restart ustawia0s i pozostawia pauzę.
 - Przejście w tło zatrzymuje odtwarzanie; powrót wymaga Start.
-- Telefon: orientacja pozioma, ARM64, renderer Compatibility.
+- Orientacja pozioma, ARM64, Compatibility. LicznikFPS pomaga obserwować działanie na telefonie; pojedyncza klatka lub screenshot nie jest pomiarem wydajności.
+- Zainstalować jako aktualizację, bez odinstalowania. Sprawdzić ruch ręki, mocowanie telefonu, ekran przez5s, zmianę ujęć przy10/15s, koniec25s, pauzę/restart i powrót z tła. Ocena wyglądu i przenikania wymaga obrazu oraz urządzenia.
 
-Logo jest kopiowane z `docs/aipocalypse/assets/logo.jpg` podczas przygotowania. Silnik Godot jest dostępny na licencji MIT; pełna treść w `GODOT_LICENSE.txt` jest dołączona do projektu. Logo: kpok, wszystkie prawa zastrzeżone.
+## Narzędzia i zasoby
 
-## Odbiór na telefonie
+CPU CI pobiera przypięty Blender4.2.0 i Godot4.6.3, sprawdzaSHA256. Najpierw generuje car.glb, paramedic.glb i astronaut.glb, potem importuje do Godota. Generowane pliki są ignorowane wGit. Generator postaci:GPL-3.0-or-later (pełna licencja w `../dancing-robot/LICENSE`); modele proceduralne projektu:CC-BY-4.0, autor kpok. Logo:kpok, wszystkie prawa zastrzeżone. Godot:MIT, licencja wGODOT_LICENSE.txt i linku w aplikacji.
 
-Po pobraniu podpisanego APK z Actions sprawdź logo i czytelność napisu, wszystkie trzy przyciski, dźwięk, automatyczny koniec po 8 s, pauzę po przełączeniu aplikacji i instalację kolejnego builda bez odinstalowania. Testy headless nie potwierdzają wyglądu, wydajności ani działania na urządzeniu.
+Źródło stylu i kontrakt postaci: `../../docs/aipocalypse/references/RATOWNIK.md`. Obrazy referencyjne nie są automatycznie używane jako tła.
 
-## Konfiguracja podpisu w repozytorium
+Kontrole: testy całego planu filmu, import, test zachowanego podwozia auta, zegar25s, szkielet15kości/klip5s/skinning, budżet50tys.trójkątów na postać, telefon w3pozach, powtarzalny seek, stały detal, przejścia i restart. WalidacjaAPK sprawdza ARM64/applicationID/versionCode/offlinepermissions, następnie podpis i wyrównanie. Headless nie potwierdza jakości artystycznej; lokalnie sprawdzono również3kadry w Compatibility/Mesa llvmpipe.
 
-W Settings → Secrets and variables → Actions dodaj trzy repository secrets:
+## Stały podpis i publikacja
 
-- `AIPOCALYPSE_KEYSTORE_BASE64`: zawartość stałego keystore zakodowana Base64.
-- `AIPOCALYPSE_KEYSTORE_PASSWORD`: hasło magazynu i prywatnego klucza (muszą być takie same).
+Settings → Secrets and variables → Actions:
+
+- `AIPOCALYPSE_KEYSTORE_BASE64`: stały keystore wBase64.
+- `AIPOCALYPSE_KEYSTORE_PASSWORD`: to samo hasło magazynu i prywatnego klucza.
 - `AIPOCALYPSE_KEY_ALIAS`: alias klucza.
 
-Klucz należy utworzyć raz, zachować jego bezpieczną kopię i używać we wszystkich aktualizacjach. Nie umieszczać go w Git, artefaktach ani cache. Pipeline nie tworzy zastępczego klucza. Bez sekretów przeprowadza eksport unsigned, a potem zatrzymuje publikację. Stały identyfikator: `org.cartoonai.aipocalypse`; versionCode rośnie według numeru uruchomienia workflow. Ponowienie tego samego run ma ten sam numer.
+Nie generować nowego klucza do aktualizacji, nie dodawać go doGit/artefaktów/cache. Bez sekretów publikacja zatrzymuje się. ApplicationID `org.cartoonai.aipocalypse`; versionCode rośnie według numeru uruchomieniaworkflow, rerun zachowuje numer.
 
-Workflow uruchamia push właściciela na `feat/aipocalypse-film` lub ręczne uruchomienie właściciela na tym branchu/main. Artefakt `aipocalypse-android` zawiera APK i SHA256 przez jeden dzień. W razie wygaśnięcia uruchom build ponownie.
-
-## Próbka 0.2 — model samochodu
-
-Klocek zastępuje czerwone auto generowane przez `generate_car.py` w Blenderze. Nadwozie pozostaje pionowo, cztery koła obracają się według przebytej drogi. Start/Pauza/Restart i osiem sekund odtwarzania działają jak poprzednio. To nadal próba modelu; droga i ujęcie skrzyżowania są następnym etapem.
-
-Pipeline pobiera Blender 4.2.0 ze sprawdzeniem SHA256, tworzy samowystarczalny GLB przed importem Godota i nie przechowuje modelu w Git. Generator: GPL-3.0-or-later (pełna licencja w `../dancing-robot/LICENSE`); model proceduralny projektu: CC-BY-4.0, autor kpok. Model nie zawiera zewnętrznych tekstur ani modeli. Budżety sprawdzane podczas generacji/importu: 2 MB i 20 tys. trójkątów.
-
-Nowy APK instaluje się jako aktualizacja poprzedniej próbki: ten sam application ID i klucz, większy versionCode. Potwierdzenie aktualizacji oraz wyglądu auta wymaga telefonu.
+Workflow właściciela na feat/aipocalypse-film lub ręcznie na tymbranchu/main. Publikuje podpisany APK+SHA256 w artefakcie aipocalypse-android przez1dzień. EXE/web/MP4 nie są częścią tej próbki.
