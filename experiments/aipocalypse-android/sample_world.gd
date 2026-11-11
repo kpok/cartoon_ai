@@ -140,7 +140,8 @@ func _actor(role: String, parent: Node3D, position: Vector3) -> Dictionary:
 	phone.name = "Phone" if role == "paramedic" else "Radio"
 	attachment.add_child(phone)
 	phone.position = Vector3(0, 0.045, 0.045)
-	phone.rotation.z = PI
+	# Portrait top follows the fingers when the raised forearm bends toward the face.
+	phone.rotation.z = 0.0
 	_box(phone, Vector3.ZERO, Vector3(0.075, 0.145, 0.012), Color("111821"))
 	var screen := _screen(phone, Vector3(0, 0, 0.008), Vector2(0.067, 0.127), 0.00022)
 	if role == "astronaut":
@@ -158,8 +159,9 @@ func apply_time(time: float) -> void:
 	astronaut.position.y = 0.25 + 0.035 * sin(maxf(t - 15, 0) * 0.7)
 	astronaut.rotation.z = 0.035 * sin(maxf(t - 15, 0) * 0.5)
 	if current_shot == 0:
-		camera.position = Vector3(2.2 - t * 0.018, 1.5, 4.1)
-		camera.look_at(Vector3(-0.1, 1.0, 0))
+		var push := smoothstep(1.5, 3.0, t)
+		camera.position = Vector3(2.2, 1.5, 4.1).lerp(Vector3(1.0, 1.55, 2.2), push)
+		camera.look_at(Vector3(-0.1, 1.0, 0).lerp(Vector3(0.5, 1.35, 0.35), push))
 	elif current_shot == 1:
 		var device: Node3D = actors["paramedic"]["device"]
 		camera.position = device.global_position + device.global_basis.z.normalized() * 0.30
@@ -170,7 +172,9 @@ func apply_time(time: float) -> void:
 
 func _pose(actor: Dictionary, time: float) -> void:
 	var player: AnimationPlayer = actor["player"]
-	player.seek(time, true)
+	# Pin the reading pause: imported animation compression can introduce tiny key drift.
+	var sample_time := 3.0 if time >= 3.0 and time <= 3.5 else time
+	player.seek(sample_time, true)
 	var skeleton: Skeleton3D = actor["skeleton"]
 	skeleton.force_update_all_bone_transforms()
 	var attachment: BoneAttachment3D = actor["attachment"]

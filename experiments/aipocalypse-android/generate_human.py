@@ -110,12 +110,14 @@ def generate(output, role):
     if female: oval('Hair bun',(0,0.10,1.70),(0.06,0.05,0.055),hair,'head')
     oval('Nose bridge',(0,-0.101,1.657),(0.015,0.017,0.030),skin,'head')
     oval('Nose tip',(0,-0.116,1.64),(0.019,0.015,0.014),skin,'head')
-    oval('Mouth',(0,-0.09,1.587),(0.029,0.005,0.003),dark,'head')
+    mouth=oval('Mouth',(0,-0.09,1.587),(0.029,0.005,0.003),dark,'head')
+    expressions=[(mouth,'MouthTension',0)]
     for sign in (-1,1):
         oval('Eye white',(sign*0.043,-0.089,1.68),(0.019,0.009,0.009),white,'head')
         oval('Pupil',(sign*0.043+0.002,-0.099,1.678),(0.0065,0.004,0.007),eye,'head')
         oval('Upper eyelid',(sign*0.043,-0.096,1.688),(0.022,0.007,0.004),skin,'head')
-        oval('Brow',(sign*0.043,-0.089,1.705),(0.03,0.012,0.006),hair,'head')
+        brow=oval('Brow',(sign*0.043,-0.089,1.705),(0.03,0.012,0.006),hair,'head')
+        expressions.append((brow,'BrowFrown',sign))
         oval('Ear',(sign*0.106,0,1.65),(0.017,0.025,0.04),skin,'head')
     for side, sign in [('right',1),('left',-1)]:
         limbs(rig,side,sign,cloth,reflective,female)
@@ -170,9 +172,25 @@ def generate(output, role):
             bone.keyframe_insert(data_path='rotation_euler',frame=frame)
     for curve in rig.animation_data.action.fcurves:
         for point in curve.keyframe_points:point.interpolation='LINEAR'
+    for obj,key_name,sign in expressions:
+        obj.shape_key_add(name='Basis')
+        key=obj.shape_key_add(name=key_name)
+        for vertex in key.data:
+            if key_name=='BrowFrown':
+                vertex.co.z += -0.005 + sign*vertex.co.x*0.15
+            else:
+                vertex.co.x *= 1.04
+                vertex.co.z *= 0.45
+        for frame,value in EXPRESSION:
+            key.value=value
+            key.keyframe_insert(data_path='value',frame=frame)
+        for curve in obj.data.shape_keys.animation_data.action.fcurves:
+            for point in curve.keyframe_points:point.interpolation='LINEAR'
     output.parent.mkdir(parents=True,exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=str(output),export_format='GLB',export_yup=True,
                               export_animations=True,export_frame_range=True,export_force_sampling=True,
+                              export_animation_mode='ACTIVE_ACTIONS',
+                              export_nla_strips_merged_animation_name='PhoneGesture',
                               export_cameras=False,export_lights=False)
     if output.stat().st_size>3_000_000:raise RuntimeError('Human GLB exceeds3MB')
     print('HUMAN_GENERATED',role,output.stat().st_size)

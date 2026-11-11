@@ -20,6 +20,7 @@ timeout 120 godot --headless --path "$project" --editor --import
 timeout 60 godot --headless --path "$project" --script tests/car_test.gd
 timeout 60 godot --headless --path "$project" --script tests/playback_test.gd
 timeout 60 godot --headless --path "$project" --script tests/scene_test.gd
+timeout 60 godot --headless --path "$project" --script tests/acting_test.gd
 timeout 60 godot --headless --path "$project" --quit-after 5
 # A monotonically increasing CI run number permits installing the next APK as an update.
 version_code="${GITHUB_RUN_NUMBER:-1}"
