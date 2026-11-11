@@ -93,7 +93,17 @@ func _build_ui() -> void:
 	column.add_child(spacer)
 	var bottom := VBoxContainer.new()
 	_panel(column).add_child(bottom)
-	subtitle = _label(bottom, 26)
+	var captions := MarginContainer.new()
+	captions.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	captions.offset_top = -230
+	captions.offset_bottom = -170
+	captions.offset_left = 40
+	captions.offset_right = -40
+	captions.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer.add_child(captions)
+	subtitle = _label(captions, 26)
+	subtitle.add_theme_color_override("font_outline_color", Color.BLACK)
+	subtitle.add_theme_constant_override("outline_size", 6)
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	slider = HSlider.new()
 	slider.max_value = 870
@@ -193,6 +203,9 @@ func _update_frame() -> void:
 	if int(shot["seq"]) == 20 and shot["location"] in ["warsaw_center", "manila_shop", "nairobi_shop"] and ("distant_flash" in shot["effects"] or "distant_detonation" in shot["effects"]):
 		var p: float = (clock.elapsed - shot["start"]) / float(shot["end"] - shot["start"])
 		flash = 0.88 * clampf(1 - absf(p - 0.55) * 8, 0, 1)
+	if "offscreen_impact_light" in shot["effects"]:
+		var impact_p: float = (clock.elapsed - shot["start"]) / float(shot["end"] - shot["start"])
+		flash = maxf(flash, 0.75 * clampf(1 - absf(impact_p - 0.65) * 10, 0, 1))
 	flash_panel.color.a = flash
 	world.visible = not black
 

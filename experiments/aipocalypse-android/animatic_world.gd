@@ -16,6 +16,8 @@ var signature_label: Label3D
 var environment: Environment
 var fx_nodes: Array[Node3D] = []
 var rebuild_count := 0
+var key_light: DirectionalLight3D
+var window_nodes: Array[MeshInstance3D] = []
 
 func _ready() -> void:
 	var world := WorldEnvironment.new()
@@ -28,6 +30,7 @@ func _ready() -> void:
 	world.environment = environment
 	add_child(world)
 	var light := DirectionalLight3D.new()
+	key_light = light
 	light.rotation_degrees = Vector3(-40, -30, 0)
 	light.light_energy = 1.1
 	add_child(light)
@@ -44,13 +47,17 @@ func _kit(kind: String) -> void:
 	var floor_color := Color("7d969f") if cold else Color("454c55")
 	_box(Vector3(0, -0.08, 0), Vector3(16, 0.12, 12), floor_color)
 	environment.background_color = Color("153b50") if kind == "habitat" else (Color("9aafb9") if kind == "polar" else Color("253142"))
+	if kind in ["polar_exterior", "habitat_exterior"]:
+		environment.background_color = Color("a8bec7") if kind == "polar_exterior" else Color("103d56")
+		_box(Vector3(0, -0.01, 0), Vector3(16, 0.04, 12), Color("d3e2e7") if kind == "polar_exterior" else Color("355c68"))
+		return
 	if kind in ["street", "port", "launch", "air"]:
 		if kind == "street":
 			for index in range(5):
 				var x := float(index * 3 - 6)
 				_box(Vector3(x, 2, -4), Vector3(2.7, 4, 1.5), Color("8b8a80"))
 				for level in range(3):
-					_box(Vector3(x, 0.8 + level, -3.23), Vector3(1.8, 0.5, 0.03), Color("34495d"))
+					window_nodes.append(_box(Vector3(x, 0.8 + level, -3.23), Vector3(1.8, 0.5, 0.03), Color("d6be7e")))
 			for index in range(6):
 				_box(Vector3(index * 0.55 - 1.5, -0.005, 1.5), Vector3(0.3, 0.025, 2.0), Color("c7c9bd"))
 		elif kind == "port":
@@ -126,6 +133,7 @@ func _build(index: int) -> void:
 	actors.clear()
 	props.clear()
 	fx_nodes.clear()
+	window_nodes.clear()
 	signature_label = null
 	focus_node = null
 	if is_instance_valid(scene_root):
@@ -140,6 +148,9 @@ func _build(index: int) -> void:
 	var kind: String = current_shot["environment"]
 	if current_shot["physical_space"] == "military_drone_flight":
 		kind = "air"
+	for descriptor in current_shot["models"]:
+		if descriptor["name"] in ["habitat_exterior", "polar_station_exterior"]:
+			kind = "habitat_exterior" if descriptor["name"] == "habitat_exterior" else "polar_exterior"
 	_kit(kind)
 	var characters: Array = current_shot["characters"]
 	for i in range(characters.size()):
@@ -165,6 +176,11 @@ func _build(index: int) -> void:
 		if focus_node == null and descriptor["kind"] not in ["environment", "counter", "chair", "shelf"]:
 			focus_node = prop
 			focus_kind = descriptor["kind"]
+	if current_shot["id"] == "S01-U001":
+		for prop in props:
+			if prop["name"] == "traffic_signal":
+				focus_node = prop["node"]
+				focus_kind = "signal"
 	var signature = current_shot.get("signature")
 	if signature is Dictionary and signature["mode"] == "screen":
 		var device: Node3D
@@ -187,6 +203,12 @@ func _build(index: int) -> void:
 			if prop["kind"] == "cup":
 				prop["node"].rotation.z = PI / 2
 				prop["home"] = prop["node"].transform
+	if "engine_flame" in current_shot["effects"]:
+		for prop in props:
+			if prop["kind"] == "rocket":
+				var flame := factory.sphere(prop["node"], Vector3(0, -0.5, 0), 0.25, Color("ffb637"))
+				flame.name = "IgnitionFlame"
+				flame.scale = Vector3(1, 3, 1)
 	for effect in current_shot["effects"]:
 		if effect in ["smoke", "snowstorm", "fire", "brief_dust", "dust_burst", "underwater_haze", "launch_smoke"]:
 			for i in range(8):
@@ -208,6 +230,11 @@ func apply_time(time: float) -> void:
 		return
 	var local := clampf(time - float(current_shot["start"]), 0, float(current_shot["end"] - current_shot["start"]))
 	var progress := local / float(current_shot["end"] - current_shot["start"])
+	var blackout := _has("district_blackout") and progress >= 0.35
+	key_light.light_energy = 0.12 if blackout else 1.1
+	environment.ambient_light_energy = 0.08 if blackout else 0.7
+	for i in range(window_nodes.size()):
+		window_nodes[i].visible = not blackout or i >= (10 if progress >= 0.65 else 5)
 	for actor in actors:
 		var node: Node3D = actor["node"]
 		var home: Vector3 = actor["home"]
@@ -235,6 +262,8 @@ func apply_time(time: float) -> void:
 	for prop in props:
 		var node: Node3D = prop["node"]
 		node.transform = prop["home"]
+		if prop["name"] == "robotaxi_headlights":
+			node.position.x += minf(progress, 0.65) * 4
 		match prop["kind"]:
 			"vehicle":
 				if _has("drive") or _has("collision") or _has("car_spin"):
@@ -291,6 +320,9 @@ func _camera(local: float, progress: float) -> void:
 				camera.position = target + focus_node.global_basis.z.normalized() * 0.35
 				camera.look_at(target, focus_node.global_basis.y.normalized())
 				return
+		elif focus_kind == "signal":
+			target.y += 2.55
+			distance = 1.5
 		elif focus_kind in ["vehicle", "rocket"]:
 			target.y += 1.0
 			distance = 3.8

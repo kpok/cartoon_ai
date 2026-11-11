@@ -52,7 +52,7 @@ func device(parent: Node3D, name: String) -> Node3D:
 	var size := Vector3(0.10, 0.19, 0.018) if handheld else Vector3(1.0, 0.62, 0.10)
 	box(root, Vector3.ZERO, size, Color("202b36"))
 	box(root, Vector3(0, 0, size.z * 0.5 + 0.001), size * Vector3(0.90, 0.86, 0.1), Color("050d17"))
-	var screen := label(root, Vector3(0, 0, size.z * 0.5 + 0.004), "", 0.00024 if handheld else 0.0013)
+	var screen := label(root, Vector3(0, 0, size.z * 0.55 + 0.004), "", 0.00024 if handheld else 0.0013)
 	screen.modulate = Color("ff344b")
 	root.set_meta("screen", screen)
 	if not handheld:
@@ -171,6 +171,10 @@ func build(parent: Node3D, descriptor: Dictionary) -> Node3D:
 			if name.contains("stairs") or name.contains("underground"):
 				for index in range(6):
 					box(root, Vector3(0, index * 0.15, -index * 0.25), Vector3(1.3, 0.15, 0.3), Color("73808b"))
+			elif name == "robotaxi_headlights":
+				for x in [-0.5, 0.5]:
+					var beam := box(root, Vector3(x, 0.4, 0), Vector3(0.3, 0.08, 2.6), Color("fff0bd"))
+					beam.material_override.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 			elif name.contains("signal"):
 				box(root, Vector3(0, 1.4, 0), Vector3(0.08, 2.8, 0.08), Color("555d64"))
 				box(root, Vector3(0, 2.65, 0), Vector3(0.35, 0.8, 0.25), Color("171f28"))

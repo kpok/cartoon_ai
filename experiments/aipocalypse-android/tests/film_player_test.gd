@@ -17,6 +17,9 @@ func _test() -> void:
 			scene.clock.seek(float(shot["signature"]["start"]) + 0.01)
 			scene._update_frame()
 			assert(scene.world.signature_label != null and scene.world.signature_label.visible)
+			var label: Label3D = scene.world.signature_label
+			var screen_mesh: MeshInstance3D = label.get_parent().get_child(1)
+			assert(label.position.z > screen_mesh.position.z + screen_mesh.mesh.size.z / 2, "Screen text must lie in front of opaque display surface")
 		if shot["environment"] == "black":
 			assert(scene.card_panel.visible and not scene.world.visible and not scene.ui.visible)
 	assert(maximum_nodes < 1800)
@@ -31,6 +34,41 @@ func _test() -> void:
 				counts.append(scene.world.node_count())
 			else:
 				assert(scene.world.node_count() == counts[int(seq["number"]) - 1])
+	# Critical cues must change rendered state and reset when seeking backwards.
+	scene.clock.seek(413.1)
+	scene._update_frame()
+	var daylight: float = scene.world.key_light.light_energy
+	scene.clock.seek(417.5)
+	scene._update_frame()
+	assert(scene.world.key_light.light_energy < daylight)
+	assert(not scene.world.window_nodes[0].visible and scene.world.window_nodes[14].visible)
+	scene.clock.seek(413.1)
+	scene._update_frame()
+	assert(scene.world.key_light.light_energy == daylight and scene.world.window_nodes[0].visible)
+	for t in [476.0, 521.0, 554.0]:
+		scene.clock.seek(t)
+		scene._update_frame()
+		assert(scene.world.scene_root.get_child_count() > 0)
+		# Exterior kits have no room walls: floor slabs are thin.
+		for child in scene.world.scene_root.get_children():
+			if child is MeshInstance3D and child.mesh is BoxMesh:
+				assert(child.mesh.size.y < 0.2)
+	scene.clock.seek(712.0)
+	scene._update_frame()
+	assert(scene.world.scene_root.find_children("IgnitionFlame", "", true, false).size() == 1)
+	scene.clock.seek(171.6)
+	scene._update_frame()
+	assert(scene.flash_panel.color.a > 0.7)
+	scene.clock.seek(1.0)
+	scene._update_frame()
+	assert(scene.world.focus_kind == "signal")
+	for dialogue in scene.timeline.data["dialogues"]:
+		if dialogue["start"] < 845:
+			scene.clock.seek(dialogue["start"] + 0.01)
+			scene._update_frame()
+			scene._control("Obraz")
+			assert(scene.subtitle.is_visible_in_tree() and not scene.ui.visible)
+			break
 	scene._control("Restart")
 	scene._control("Start")
 	scene._scrub_start()
