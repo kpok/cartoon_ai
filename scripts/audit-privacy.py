@@ -47,7 +47,56 @@ def png_chunks(data):
         yield data[pos+4:pos+8], data[pos+8:pos+8+length]
         pos += 12 + length
 
+def jpeg_metadata(data):
+    """Read JPEG metadata segments, excluding entropy-coded image bytes."""
+    if not data.startswith(b'\xff\xd8'):
+        raise ValueError('invalid JPEG')
+    pos = 2
+    texts = []
+    in_scan = False
+    while pos < len(data):
+        if in_scan:
+            # Entropy streams escape FF as FF00 and may contain restart markers.
+            pos = data.find(b'\xff', pos)
+            if pos < 0:
+                raise ValueError('unterminated JPEG scan')
+        elif data[pos] != 0xff:
+            raise ValueError('invalid JPEG marker')
+        while pos < len(data) and data[pos] == 0xff:
+            pos += 1
+        if pos >= len(data):
+            raise ValueError('truncated JPEG marker')
+        marker = data[pos]
+        pos += 1
+        if in_scan and (marker == 0 or 0xd0 <= marker <= 0xd7):
+            continue
+        in_scan = False
+        if marker == 0xd9:
+            if pos != len(data):
+                raise ValueError('unreviewed trailing JPEG data')
+            return '\n'.join(texts)
+        if marker == 0 or marker == 0xd8 or 0xd0 <= marker <= 0xd7:
+            raise ValueError('unexpected JPEG marker')
+        if marker == 0x01:
+            continue
+        if pos + 2 > len(data):
+            raise ValueError('truncated JPEG segment')
+        length = int.from_bytes(data[pos:pos+2], 'big')
+        if length < 2 or pos + length > len(data):
+            raise ValueError('invalid JPEG segment length')
+        value = data[pos+2:pos+length]
+        pos += length
+        if marker == 0xfe or 0xe0 <= marker <= 0xef:
+            # EXIF/XMP/comments can contain UTF-8 or either UTF-16 byte order.
+            texts.extend(value.decode(encoding, errors='replace')
+                         for encoding in ('utf-8', 'utf-16-le', 'utf-16-be'))
+        if marker == 0xda:
+            in_scan = True
+    raise ValueError('missing JPEG end marker')
+
 def metadata(data, strict=False):
+    if data.startswith(b'\xff\xd8'):
+        return jpeg_metadata(data)
     if data[:4] == b'glTF':
         if len(data) < 20:
             raise ValueError('truncated GLB')

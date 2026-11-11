@@ -60,6 +60,27 @@ class PrivacyTests(unittest.TestCase):
         png=b'\x89PNG\r\n\x1a\n'+chunk(b'zTXt',b'Comment\0\0'+zlib.compress(b'SyntheticHiddenPhrase'))+chunk(b'IEND',b'')
         with self.assertRaises(ValueError):privacy.metadata(png,strict=True)
         self.assertIn('SyntheticHiddenPhrase',privacy.metadata(png))
+    def test_jpeg_scan_bytes_are_not_text_but_metadata_is_checked(self):
+        segment=lambda marker,value:b'\xff'+bytes([marker])+struct.pack('>H',len(value)+2)+value
+        synthetic_email=('person'+'@'+'example.invalid').encode()
+        scan=segment(0xda,b'')+synthetic_email+b'\xff\x00'+b'pixels'+b'\xff\xd0'
+        jpeg=b'\xff\xd8'+segment(0xe0,b'JFIF\0')+scan+b'\xff\xd9'
+        privacy.check_text(privacy.metadata(jpeg,strict=True),[])
+        for marker in (0xe1,0xed,0xfe):
+            for encoding in ('utf-8','utf-16-le','utf-16-be'):
+                value=synthetic_email.decode().encode(encoding)
+                image=b'\xff\xd8'+segment(marker,value)+scan+b'\xff\xd9'
+                with self.assertRaises(ValueError):
+                    privacy.check_text(privacy.metadata(image),[])
+        image=b'\xff\xd8'+scan+segment(0xfe,b'SyntheticHiddenPhrase')+segment(0xda,b'')+b'pixels'+b'\xff\xd9'
+        with self.assertRaises(ValueError):
+            privacy.check_text(privacy.metadata(image),['SyntheticHiddenPhrase'])
+    def test_invalid_jpeg_fails_closed(self):
+        for image in (b'\xff\xd8',b'\xff\xd8\xff\xe1\x00',
+                      b'\xff\xd8\xff\xe1\x00\x01',
+                      b'\xff\xd8\xff\xda\x00\x02pixels',
+                      b'\xff\xd8\xff\xd9trailing'):
+            with self.assertRaises(ValueError):privacy.metadata(image)
     def test_encoded_private_terms_fail(self):
         for text in ['Synthetic\\u0048iddenPhrase','%53yntheticHiddenPhrase','Synthetic&#72;iddenPhrase']:
             with self.assertRaises(ValueError):privacy.check_text(text,['SyntheticHiddenPhrase'])
