@@ -47,7 +47,66 @@ def png_chunks(data):
         yield data[pos+4:pos+8], data[pos+8:pos+8+length]
         pos += 12 + length
 
+def jpeg_metadata(data):
+    """Walk JPEG framing without treating compressed image samples as text."""
+    if not data.startswith(b'\xff\xd8'):
+        raise ValueError('invalid JPEG')
+    pos, entropy, scanned = 2, False, False
+    texts = []
+    while pos < len(data):
+        if entropy:
+            # Every iteration advances; stuffed bytes and restart markers stay in the scan.
+            marker_start = data.find(b'\xff', pos)
+            if marker_start < 0:
+                raise ValueError('unterminated JPEG scan')
+            pos = marker_start
+        if data[pos] != 0xff:
+            raise ValueError('invalid JPEG marker')
+        while pos < len(data) and data[pos] == 0xff:
+            pos += 1
+        if pos == len(data):
+            raise ValueError('truncated JPEG marker')
+        marker = data[pos]
+        pos += 1
+        if entropy and (marker == 0 or 0xd0 <= marker <= 0xd7):
+            continue
+        if marker == 0xd9:
+            if not scanned or pos != len(data):
+                raise ValueError('invalid JPEG end or trailing data')
+            return '\n'.join(texts)
+        if marker == 0 or marker == 0xd8 or 0xd0 <= marker <= 0xd7:
+            raise ValueError('unexpected JPEG marker')
+        if marker == 1:
+            continue
+        if marker < 0xc0:
+            raise ValueError('reserved JPEG marker')
+        if pos + 2 > len(data):
+            raise ValueError('truncated JPEG segment length')
+        length = int.from_bytes(data[pos:pos+2], 'big')
+        if length < 2 or pos + length > len(data):
+            raise ValueError('invalid JPEG segment length')
+        value = data[pos+2:pos+length]
+        pos += length
+        if 0xe0 <= marker <= 0xef or marker == 0xfe:
+            # APP covers EXIF/XMP/ICC/IPTC and vendor metadata; COM is free text.
+            for encoding in ('utf-8', 'latin-1'):
+                texts.append(value.decode(encoding, errors='replace'))
+            # EXIF and vendor fields need not start on an even byte boundary.
+            for encoding in ('utf-16-le', 'utf-16-be'):
+                for offset in (0, 1):
+                    texts.append(value[offset:].decode(encoding, errors='replace'))
+        if marker == 0xda:
+            if not value or not 1 <= value[0] <= 4 or len(value) != 4 + 2 * value[0]:
+                raise ValueError('invalid JPEG scan header')
+            entropy, scanned = True, True
+        elif marker != 0xdc:
+            # DNL may be embedded inside an entropy-coded scan; other segments end it.
+            entropy = False
+    raise ValueError('missing JPEG end')
+
 def metadata(data, strict=False):
+    if data.startswith(b'\xff\xd8'):
+        return jpeg_metadata(data)
     if data[:4] == b'glTF':
         if len(data) < 20:
             raise ValueError('truncated GLB')
