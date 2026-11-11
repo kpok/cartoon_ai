@@ -51,13 +51,15 @@ try{
  for(const [position,color] of [[[0,3,4],0xffffff],[[-4,1,0],0x87c9e8],[[4,1,0],0xe8a1d8],[[0,-4,0],0x1a2336]]){const panel=new THREE.Mesh(panelGeometry,new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide}));panel.position.set(...position);panel.lookAt(0,0,0);environment.add(panel);}
  const pmrem=new THREE.PMREMGenerator(renderer),target=pmrem.fromScene(environment,.1,.1,50);scene.environment=target.texture;pmrem.dispose();
  controls=new OrbitControls(camera,canvas);controls.enableDamping=!exporting&&!kalinka;controls.enabled=!exporting;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.92;controls.minPolarAngle=Math.PI*.08;
- let frame=null;
+ let frame=null,renderRevision=0;
+ // Publish submitted-frame state only after WebGL rendering succeeds, not after seeking.
+ function renderScene(){renderer.render(scene,camera);if(clock){canvas.dataset.renderedTime=clock.time.toFixed(3);canvas.dataset.renderRevision=String(++renderRevision);}}
  function syncCamera(){cameraButton.textContent=autoCamera?'Kamera: automatyczna':'Kamera: ręczna';cameraButton.setAttribute('aria-pressed',String(autoCamera));canvas.dataset.camera=kalinka?(autoCamera?'auto':'manual'):'orbit';}
  function updateCamera(time){if(!kalinka||!autoCamera)return;const p=kalinkaCameraPose(macarena?0:time,camera.aspect);camera.position.set(p.position.x,p.position.y,p.position.z);controls.target.set(p.target.x,p.target.y,p.target.z);camera.lookAt(controls.target);canvas.dataset.cameraPosition=camera.position.toArray().map(n=>n.toFixed(4)).join(',');}
  function manualCamera(){if(!kalinka)return;autoCamera=false;syncCamera();}
  controls.addEventListener('start',manualCamera);
  cameraButton.addEventListener('click',()=>{if(unavailable||!clock)return;autoCamera=!autoCamera;syncCamera();updateCamera(clock.time);controls.update();requestRender();});
- function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){pose(clock.tick(now));stage?.update(clock.time);updateCamera(clock.time);syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
+ function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){pose(clock.tick(now));stage?.update(clock.time);updateCamera(clock.time);syncDance();}controls.update();renderScene();if(clock?.playing)requestRender();});}
  controls.addEventListener('change',requestRender);
  document.addEventListener('visibilitychange',()=>{clock?.suspend();if(document.hidden){if(frame!==null)cancelAnimationFrame(frame);frame=null;}else requestRender();});
  function resize(){renderer.setSize(viewport.clientWidth,viewport.clientHeight,false);camera.aspect=viewport.clientWidth/viewport.clientHeight;camera.updateProjectionMatrix();requestRender();}
@@ -91,7 +93,7 @@ try{
   if(exporting){
    window.renderRobotFrame=time=>{
     if(unavailable||!Number.isFinite(time)||time<0||time>=clock.duration)throw new Error('Invalid robot export frame');
-    clock.seek(time);pose(time);stage.update(time);updateCamera(time);syncDance();controls.update();renderer.render(scene,camera);
+    clock.seek(time);pose(time);stage.update(time);updateCamera(time);syncDance();controls.update();renderScene();
     return {time,width:canvas.width,height:canvas.height};
    };
    window.robotExportReady=true;
