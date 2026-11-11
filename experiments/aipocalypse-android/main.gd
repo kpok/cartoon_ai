@@ -21,6 +21,8 @@ var finale_revealed := false
 var manual_hidden := false
 var previous_black := false
 var black_revealed := false
+var entered_opening_card := false
+var opening_card_revealed := false
 
 func _ready() -> void:
 	world = preload("res://animatic_world.gd").new()
@@ -205,6 +207,13 @@ func _update_frame() -> void:
 	entered_finale = finale
 	if finale and not finale_revealed:
 		ui.hide()
+	if opening_card and not entered_opening_card:
+		opening_card_revealed = false
+	if opening_card and not opening_card_revealed:
+		ui.hide()
+	elif not opening_card and entered_opening_card and not manual_hidden and not finale and not black:
+		ui.show()
+	entered_opening_card = opening_card
 	# No explosion audio is fabricated. Light is a rough cue only at the scripted sites.
 	var flash := 0.0
 	if int(shot["seq"]) == 20 and shot["location"] in ["warsaw_center", "manila_shop", "nairobi_shop"] and ("distant_flash" in shot["effects"] or "distant_detonation" in shot["effects"]):
@@ -220,6 +229,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	var touched: bool = event is InputEventScreenTouch and event.pressed
 	var clicked: bool = event is InputEventMouseButton and event.pressed
 	if (touched or clicked) and is_instance_valid(ui) and not ui.visible:
+		opening_card_revealed = true
 		finale_revealed = true
 		black_revealed = true
 		manual_hidden = false
