@@ -4,6 +4,10 @@
 
 Etap 0 jest zaimplementowany w `experiments/aipocalypse-android` oraz workflow `aipocalypse-android.yml`. Bieżące wyniki i ograniczenia: `.agentic/tasks/aipocalypse-android/STATE.md`. Podpisany APK i odbiór na telefonie wymagają osobnego potwierdzenia; kod nie oznacza ukończenia filmu.
 
+## Przygotowanie całego filmu — nowa propozycja
+
+Użytkownik potwierdził działanie APK i modelu samochodu. Dalsza rekomendacja rady obejmuje przygotowanie całych22sekwencji przed masową produkcją zasobów: [plan produkcji całości](PLAN_PRODUKCJI_CALOSCI.md). To propozycja do omówienia; historyczna kolejność prób poniżej pozostaje zapisem wcześniejszego planu.
+
 ## Stałe wymagania
 
 - Kodowanie i ocena postępów z telefonu przez ChatGPT i GitHub.
