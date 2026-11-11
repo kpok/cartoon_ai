@@ -1,6 +1,6 @@
 # AIpokalypse — przygotowanie i produkcja całego filmu
 
-**Status: rekomendacja rady do omówienia, nie rozpoczęta masowa produkcja.**
+**Status: plan zaakceptowany przez użytkownika11listopada2026. Trwa EtapA; masowa produkcja docelowych zasobów jeszcze nie rozpoczęta.**
 
 11 listopada 2026. Podstawa: `SCENARIUSZ_PL.md` wersja2, 22 sekwencje,870sekund; kod3c1cc31c9d22dbb5d75ff295152b002026414384. Użytkownik potwierdził uruchomienie APK z klockiem, a następnie z poruszającym się autem. To dowód działania podstawowego pipeline’u, nie zatwierdzenie docelowego stylu, ludzi, wydajności całego filmu ani pomiar instalacji aktualizacji.
 
@@ -120,7 +120,7 @@ CI sprawdza manifest, kompletność generacji, budżety, import, oś870s, logik�
 
 ## Rada — pochodzenie i decyzja
 
-DEC-PRODUCTION-01: przygotować całość przed produkcją szczegółowych zasobów; strategia mieszana. Status: rekomendacja prowadzącego do przedstawienia użytkownikowi. Zmienia szczegółową kolejność dalszej produkcji w poprzednim PLAN_DZIALANIA.md, nie cofa technicznego APK/auta i nie zmienia scenariusza.
+DEC-PRODUCTION-01: przygotować całość przed produkcją szczegółowych zasobów; strategia mieszana. Status: zaakceptowana przez użytkownika. Zmienia szczegółową kolejność dalszej produkcji w poprzednim PLAN_DZIALANIA.md, nie cofa technicznego APK/auta i nie zmienia scenariusza.
 
 Trzy niezależne opinie agentówAI, role analityczne, nie konsultacje z zatrudnionymi ludzkimi filmowcami:
 
