@@ -26,7 +26,17 @@ func _test() -> void:
 			for surface in range(mesh.mesh.get_surface_count()):
 				var arrays: Array = mesh.mesh.surface_get_arrays(surface)
 				triangles += arrays[Mesh.ARRAY_INDEX].size() / 3
-		assert(skinned_meshes >= 20 and triangles > 1000 and triangles < 50000)
+				if mesh.skin != null:
+					var weights: PackedFloat32Array = arrays[Mesh.ARRAY_WEIGHTS]
+					var vertices: PackedVector3Array = arrays[Mesh.ARRAY_VERTEX]
+					assert(weights.size() == vertices.size() * 4)
+					for vertex in range(vertices.size()):
+						var total := 0.0
+						for weight in range(4):
+							assert(weights[vertex * 4 + weight] >= 0)
+							total += weights[vertex * 4 + weight]
+						assert(absf(total - 1.0) < 0.001)
+		assert(skinned_meshes >= 8 and triangles > 1000 and triangles < 50000)
 		assert(actor["screen"].text == "Hacked by\nAIpokalypse")
 	var attachment = world.actors["paramedic"]["attachment"]
 	var device = world.actors["paramedic"]["device"]

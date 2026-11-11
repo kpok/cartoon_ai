@@ -7,6 +7,9 @@ import sys
 from mathutils import Vector
 import bpy
 
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from human_shapes import limbs
+
 
 def generate(output, role):
     bpy.ops.object.select_all(action='SELECT')
@@ -76,7 +79,7 @@ def generate(output, role):
         obj.rotation_euler=(end-start).to_track_quat('Z','Y').to_euler()
         return obj
     # A continuous tapered garment avoids disconnected ellipsoids at the shoulders/waist.
-    rings = [(0.94,0.16,0.11),(1.05,0.18,0.125),(1.08,0.185,0.127),
+    rings = [(0.90,0.17,0.115),(1.05,0.18,0.125),(1.08,0.185,0.127),
              (1.105,0.19,0.128),(1.26,0.215,0.13),(1.40,0.23,0.12),(1.47,0.17,0.09)]
     vertices=[]
     for z,width,depth in rings:
@@ -113,12 +116,7 @@ def generate(output, role):
         oval('Brow',(sign*0.043,-0.089,1.705),(0.03,0.012,0.006),hair,'head')
         oval('Ear',(sign*0.106,0,1.65),(0.017,0.025,0.04),skin,'head')
     for side, sign in [('right',1),('left',-1)]:
-        for part,radius in [('upper_arm',0.065),('forearm',0.052),('thigh',0.09),('shin',0.065)]:
-            bone=side+'_'+part
-            start,end,_=bone_specs[bone]
-            limb(bone+'_mesh',start,end,radius,cloth,bone)
-        oval('Elbow',(sign*0.29,0,1.13),(0.057,0.055,0.06),cloth,side+'_forearm')
-        oval('Knee',(sign*0.10,0,0.53),(0.067,0.07,0.07),cloth,side+'_shin')
+        limbs(rig,side,sign,cloth,reflective,female)
         oval('Boot',(sign*0.10,-0.05,0.075),(0.075,0.135,0.075),dark,side+'_foot')
         oval('Palm',(sign*0.29,-0.002,0.835),(0.042,0.024,0.052),skin,side+'_hand')
         for finger in range(4):
@@ -129,9 +127,6 @@ def generate(output, role):
             else:
                 oval('Finger',(x,-0.005,0.78),(0.009,0.016,0.045),skin,side+'_hand')
         oval('Thumb',(sign*0.337,-0.05 if side=='right' else -0.018,0.835),(0.013,0.023,0.033),skin,side+'_hand')
-        if not female:
-            oval('Reflective shin',(sign*0.10,0,0.35),(0.067,0.068,0.028),reflective,side+'_shin')
-            oval('Reflective sleeve',(sign*0.28,0,1.19),(0.065,0.063,0.025),reflective,side+'_upper_arm')
 
     bpy.context.scene.render.fps=24
     bpy.context.scene.frame_start=0
