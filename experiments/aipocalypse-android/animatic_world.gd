@@ -2,6 +2,8 @@ extends Node3D
 
 const Timeline = preload("res://film_timeline.gd")
 const Proxies = preload("res://animatic_proxies.gd")
+const Opening = preload("res://opening_set.gd")
+var opening: Node3D
 var timeline = Timeline.new()
 var factory = Proxies.new()
 var camera: Camera3D
@@ -130,6 +132,7 @@ func _position(kind: String, name: String, index: int) -> Vector3:
 		_: return Vector3(float(index % 3) * 1.8 - 1.8, 0, -2.2)
 
 func _build(index: int) -> void:
+	opening = null
 	actors.clear()
 	props.clear()
 	fx_nodes.clear()
@@ -144,6 +147,17 @@ func _build(index: int) -> void:
 	current_shot = timeline.shots[index]
 	rebuild_count += 1
 	if current_shot["environment"] == "black":
+		return
+	if int(current_shot["seq"]) == 1:
+		opening = Opening.new()
+		scene_root.add_child(opening)
+		opening.build(factory)
+		for descriptor in current_shot["models"]:
+			var prop: Node3D = opening.references[descriptor["name"]]
+			props.append({"node":prop,"name":descriptor["name"],"kind":descriptor["kind"],"home":prop.transform})
+		if current_shot.get("signature") is Dictionary:
+			signature_label = opening.display_text
+		focus_kind = "signal" if current_shot["id"] == "S01-U001" else ""
 		return
 	var kind: String = current_shot["environment"]
 	if current_shot["physical_space"] == "military_drone_flight":
@@ -236,6 +250,13 @@ func apply_time(time: float) -> void:
 		_build(index)
 	if current_shot["environment"] == "black":
 		return
+	if is_instance_valid(opening):
+		environment.background_color = Color("53657e")
+		environment.ambient_light_energy = 0.65
+		key_light.light_energy = 1.1
+		opening.apply_time(time, current_shot["id"], camera)
+		return
+	camera.fov = 48
 	var local := clampf(time - float(current_shot["start"]), 0, float(current_shot["end"] - current_shot["start"]))
 	var progress := local / float(current_shot["end"] - current_shot["start"])
 	var blackout := _has("district_blackout") and progress >= 0.35
