@@ -1,4 +1,4 @@
-# AIpokalypse — próbka postaci Android0.4
+# AIpokalypse — próbka postaci Android0.5
 
 APK zawiera25sekund próby, nie pełny film ani zatwierdzoną finalną stylistykę:
 
@@ -44,3 +44,11 @@ Workflow właściciela na feat/aipocalypse-film lub ręcznie na tymbranchu/main.
 Ciągłe siatki rękawów i spodni z płynnym przejściem wag na łokciach/kolanach zastępują osobne elipsoidy. Głowa ma modelowany zarys szczęki i włosów, a ubranie kieszenie, zamek, kołnierz i podeszwy butów. Palce prawej dłoni są krzywymi zagiętymi wokół dolnej krawędzi telefonu. Gest obejmuje pochylenie i obrót głowy oraz mały ruch tułowia; stabilny detal10–15s zachowany.
 
 Test importu sprawdza normalizację wag każdego wierzchołka i obecność rzeczywistych wierzchołków z wpływem więcej niż jednej kości. Porównano kadry Godota w spoczynku, w trakcie ruchu i w ustalonej pozie. Cienie kontaktowe mają ograniczony zasięg12m; ich koszt musi zostać oceniony na telefonie. Tła i schematyczna Ziemia nie zostały w tej iteracji przebudowane. Model pozostaje stylizowany i mniej szczegółowy niż karta referencyjna.
+
+## Zmiany0.5 — reakcja i chwyt
+
+Klip ma fazy: podniesienie0–3s, odczyt3–3.5s, mały odrzut3.5–4s i ustalenie pozy do5s. Telefon jest bardziej pionowy; większe zgięcie łokcia i stałe mocowanie do dłoni zastępują zbyt płaską pozycję poprzedniej wersji. Kamera dochodzi do bliższego kadru przed odczytem/reakcją; detal10–15s pozostaje stabilny.
+
+Dwie deformacje brwi i napięcie ust są eksportowane z aktywnymi akcjami do tego samego PhoneGesture co kości. Ten sam seek steruje mimiką i ciałem. Pauza jest jawnie przypięta do3s, ponieważ optymalizacja importu potrafi wprowadzić minimalny dryf pomiędzy identycznymi kluczami.
+
+Nowy acting_test.gd sprawdza trzy zaimportowane ścieżki morphów, ich zmianę/reset, stałą pauzę, odrzut, powtarzalny kadr, pion telefonu i skierowanie ekranu ku twarzy. Przegląd kadrów potwierdził widoczną reakcję i czytelność podpisu; nie zastępuje sprawdzenia całego ruchu na telefonie. Palce i mimika nadal uproszczone. Zgłoszone dalsze ulepszenie: kontrast statusu odtwarzacza na jasnym tle karetki.
