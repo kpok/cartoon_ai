@@ -13,7 +13,7 @@ func _values(actor: Dictionary) -> Array[float]:
 	return values
 
 func _test() -> void:
-	var scene = load("res://main.tscn").instantiate()
+	var scene = load("res://sample.tscn").instantiate()
 	root.add_child(scene)
 	scene.set_process(false)
 	var world = scene.world

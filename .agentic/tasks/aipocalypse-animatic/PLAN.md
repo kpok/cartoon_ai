@@ -1,0 +1,9 @@
+# Full rough animatic
+
+Baselinef294aa91128c043ab96d4a71c21643c61f62e260. Userauthorized full870s149shot/22sequenceAPKwithscrubbing/sequencepicker,roughdialoguecaptionsandexactending. Samebranch/draftPR19,nomerge.
+
+AC1 canonicalruntimeplancompiledfromvalidatedproduction.json. AC2 one870sclock,deterministicseek,sequencejump/backgroundpause/terminalstate. AC3 all149shotsbuiltfromlocationkits+recognizableproceduralproxies/reusedrigs,majorstoryevents/camerasdeterministic; no claimfinalassetquality. AC4 onlycurrentshotnodeslive;boundedrevisitnodes. AC5 exactopeningcards/finalblack/cisza; noUIonfinale unlessexplicituserreveal. No inventedAIvoice/beeps; missingaudioexplicit. AC6 source/subtitle/timeline/tests,allshotbuildwalkthrough,representativeGodotframes andsignedCPUCIAPKretention1day.
+
+Planreview animatic_plan_review PASSwithconditions: trueindividualcompositions/actionsnotmerelynotes;exact870boundaryandsourceintervals;seeknostaleevents;exactfinalintervals;missingfinalvoiceunfulfilled;boundedscenefree/revisitmemory;framesallfamiliesandcriticalevents. Implementedproxiesmustremainexplicitroughversions. Old25ssamplekeptasseparatetestscene.
+
+Slices: compiler/timeline/clock -> scene/proxybuilders+majorcues -> playerUI/subtitles/cards -> allshotvalidation/review/fixes -> signedAPK. Realphoneperformance/fullviewingremainacceptance. No newgeneratedvoices,paidGPUorAIvideo.

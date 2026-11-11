@@ -1,0 +1,33 @@
+extends SceneTree
+const Timeline = preload("res://film_timeline.gd")
+const Playback = preload("res://playback.gd")
+func _init() -> void:
+	var timeline = Timeline.new()
+	for index in range(timeline.shots.size()):
+		var shot: Dictionary = timeline.shots[index]
+		assert(timeline.index_at(shot["start"]) == index)
+		assert(timeline.index_at(float(shot["end"]) - 0.001) == index)
+	assert(timeline.index_at(870) == 148)
+	assert(timeline.index_at(-1) == 0)
+	for seq in timeline.sequences:
+		assert(timeline.shot_at(seq["start"])["seq"] == seq["number"])
+	assert(timeline.caption_at(348) == "")
+	assert(timeline.caption_at(385).contains("Przecież"))
+	assert(timeline.caption_at(850) == "")
+	assert(timeline.card_at(852).contains("STWORZYLIŚMY"))
+	assert(timeline.card_at(860) == "")
+	assert(timeline.card_at(862).contains("KTO ZACHOWA"))
+	assert(timeline.card_at(869) == "")
+	var clock = Playback.new(870)
+	clock.start()
+	clock.seek(600)
+	assert(clock.playing and clock.elapsed == 600)
+	clock.advance(300)
+	assert(clock.elapsed == 870 and not clock.playing)
+	clock.start()
+	assert(clock.elapsed == 0 and clock.playing)
+	clock.pause()
+	clock.seek(400)
+	assert(not clock.playing and clock.elapsed == 400)
+	print("Film timeline149shots/870s passed")
+	quit()
