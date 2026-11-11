@@ -6,6 +6,10 @@ project=experiments/aipocalypse-android
 output="$RUNNER_TEMP/aipocalypse-build"
 mkdir -p "$output"
 bash scripts/aipocalypse-prepare.sh
+# Generate from source on every build; never silently reuse a stale model.
+rm -f "$project/assets/car.glb"
+timeout 120 blender --background --factory-startup --python-exit-code 1 --python "$project/generate_car.py" -- --output "$project/assets/car.glb"
+test -s "$project/assets/car.glb"
 timeout 120 godot --headless --path "$project" --editor --import
 timeout 60 godot --headless --path "$project" --script tests/playback_test.gd
 timeout 60 godot --headless --path "$project" --script tests/scene_test.gd

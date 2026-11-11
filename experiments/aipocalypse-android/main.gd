@@ -2,30 +2,31 @@ extends Node3D
 
 const Playback = preload("res://playback.gd")
 var clock = Playback.new()
-var object: MeshInstance3D
+var object: Node3D
+var wheels: Array[Node3D] = []
 var status: Label
 var sound: AudioStreamPlayer
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(Color("080b12"))
 	var camera := Camera3D.new()
-	camera.position = Vector3(0, 3, 9)
+	camera.position = Vector3(4, 3, 10)
 	add_child(camera)
-	camera.look_at(Vector3(0, 0, 0))
+	camera.look_at(Vector3(0, 0.65, 0))
 	var light := DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-45, -30, 0)
 	light.light_energy = 1.5
 	add_child(light)
-	object = MeshInstance3D.new()
-	object.mesh = BoxMesh.new()
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color("bd1527")
-	material.metallic = 0.4
-	object.material_override = material
+	var car_scene: PackedScene = load("res://assets/car.glb")
+	object = car_scene.instantiate()
+	object.name = "Car"
 	add_child(object)
+	for wheel in object.find_children("Wheel_*", "Node3D", true, false):
+		wheels.append(wheel)
+	assert(wheels.size() == 4, "Imported car must have four wheel pivots")
 	var board := Label3D.new()
 	board.text = "Hacked by AIpokalypse"
-	board.position = Vector3(0, 1.4, 0)
+	board.position = Vector3(0, 2.05, 0)
 	board.font_size = 64
 	board.pixel_size = 0.006
 	board.modulate = Color("ff344b")
@@ -66,7 +67,7 @@ func _build_ui() -> void:
 		button.pressed.connect(_control.bind(title))
 		buttons.add_child(button)
 	var credits := Label.new()
-	credits.text = "Próba techniczna • 8 s • Godot Engine (MIT) • Logo: kpok"
+	credits.text = "Model auta • 8 s • Godot Engine (MIT) • Logo: kpok"
 	credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(credits)
 	var license_button := Button.new()
@@ -111,8 +112,10 @@ func _update_frame() -> void:
 	if not is_instance_valid(object):
 		return
 	var progress: float = clock.elapsed / Playback.DURATION
-	object.position = Vector3(lerpf(-2.5, 2.5, progress), -0.3, 0)
-	object.rotation = Vector3(progress * PI, progress * TAU, 0)
+	object.position = Vector3(lerpf(-2.5, 2.5, progress), 0, 0)
+	# GLB wheel axles map from Blender Y to Godot Z. Distance fixes pause/reset drift.
+	for wheel in wheels:
+		wheel.rotation.z = -5.0 * progress / 0.34
 	status.text = "%s  %.1f / 8.0 s" % ["Odtwarzanie" if clock.playing else "Pauza", clock.elapsed]
 
 func _notification(what: int) -> void:

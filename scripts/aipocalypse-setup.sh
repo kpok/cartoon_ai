@@ -28,3 +28,10 @@ PY
 printf '%s\n' "$tools" "$android_sdk/build-tools/35.0.1" >> "$GITHUB_PATH"
 printf 'JAVA_HOME=%s\nANDROID_HOME=%s\n' "$java_sdk" "$android_sdk" >> "$GITHUB_ENV"
 "$tools/godot" --version
+
+# Reuse the repository's verified Blender release for CPU-only GLB generation.
+curl --fail --location --retry 2 --max-time 300 https://download.blender.org/release/Blender4.2/blender-4.2.0-linux-x64.tar.xz -o "$tools/blender.tar.xz"
+echo "4f4fd7646af01f6fee9d420408318381a6e52571268eb7cf9cd5033bd9e7a359  $tools/blender.tar.xz" | sha256sum --check --strict
+tar -xf "$tools/blender.tar.xz" -C "$tools"
+rm "$tools/blender.tar.xz"
+printf '%s\n' "$tools/blender-4.2.0-linux-x64" >> "$GITHUB_PATH"
