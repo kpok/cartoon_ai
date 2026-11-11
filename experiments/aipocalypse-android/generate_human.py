@@ -9,6 +9,7 @@ import bpy
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from human_shapes import limbs, shaped_head, finger_curve
+from human_motion import POSES, EXPRESSION
 
 
 def generate(output, role):
@@ -157,13 +158,18 @@ def generate(output, role):
     bpy.context.scene.frame_end=120
     rig.animation_data_create()
     rig.animation_data.action=bpy.data.actions.new('PhoneGesture')
-    for frame, lift in [(0,0),(24,0),(72,1),(120,1)]:
-        for name,angle in [('right_upper_arm',0.75),('right_forearm',1.35),('head',0.27),('spine',0.025)]:
+    for frame,values in POSES:
+        upper,forearm,wrist,pitch,yaw,spine,shoulder=values
+        rotations={'right_upper_arm':(upper,0,0),'right_forearm':(forearm,0,0),
+                   'right_hand':(wrist,0,0),'head':(pitch,yaw,0),
+                   'spine':(spine,0,0),'left_upper_arm':(shoulder,0,0)}
+        for name,rotation in rotations.items():
             bone=rig.pose.bones[name]
             bone.rotation_mode='XYZ'
-            bone.rotation_euler.x=angle*lift
-            if name=='head':bone.rotation_euler.y=0.12*lift
+            bone.rotation_euler=rotation
             bone.keyframe_insert(data_path='rotation_euler',frame=frame)
+    for curve in rig.animation_data.action.fcurves:
+        for point in curve.keyframe_points:point.interpolation='LINEAR'
     output.parent.mkdir(parents=True,exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=str(output),export_format='GLB',export_yup=True,
                               export_animations=True,export_frame_range=True,export_force_sampling=True,
