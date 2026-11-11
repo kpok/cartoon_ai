@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 project=experiments/aipocalypse-android
 output="$RUNNER_TEMP/aipocalypse-build"
 mkdir -p "$output"
+node --test tests/aipocalypse-production.test.mjs
 bash scripts/aipocalypse-prepare.sh
 # Generate from source on every build; never silently reuse a stale model.
 rm -f "$project/assets/car.glb"
