@@ -1,10 +1,18 @@
-# AIpokalypse — pełny animatik Android 0.6
+# AIpokalypse — pełny animatik Android 0.7
 
 Robocza wersja obejmuje cały film: **14:30, 22 sekwencje, 149 ujęć**. To narzędzie do oceny montażu i kolejności wydarzeń. Nie jest gotowym filmem ani finalną stylistyką.
 
 Walidowany plan `production.json` jest kompilowany do `assets/animatic.json` podczas przygotowania projektu i CI. Modele auta i dwóch postaci powstają z kodu Blendera; Godot tworzy dekoracje i proste modele zastępcze urządzeń, infrastruktury i rekwizytów. Nie wszystkie wymienione w planie modele lub animacje mają docelową, indywidualną realizację. Gesty i ruchy są uproszczone; materiały, mimika, chwyt, przenikanie i ciągłość dekoracji wymagają dalszej pracy.
 
 **Dźwięk pozostaje niegotowy:** dialogi i podpisy głosowe są napisami roboczymi, bez nagranych głosów, efektów i muzyki. Dotyczy to również końcowego „Hacked by AIpokalypse”: jego brak w ścieżce audio jest znanym brakiem, nie celową zmianą scenariusza. Czarne plansze i ich czasy są zachowane.
+
+## Otwarcie 0.7 — pierwsze 55 sekund
+
+Pierwsze 35 s używają jednego spójnego zestawu skrzyżowania: dwie osie ruchu, dwa pełne zielone sygnały, przejścia, linie zatrzymania, chodniki i kawiarnia. Żółta taksówka oraz biały dostawczak mają ciągłe trajektorie liczone z czasu sekwencji. Kolizja jest reżyserowaną animacją, bez symulacji fizycznej; po obrocie pojazdy pozostają w tym samym miejscu również w kolejnych ujęciach i po przewijaniu.
+
+Filiżanka przewraca się przy reakcji pracownicy. Przy oknie taksówki klęka przechodzień z telefonem zamocowanym do dłoni; kierowca pozostaje nieruchomy. Nie zastępuje go ratownik z późniejszej sekwencji. Osiem ujęć i ich czasy pochodzą z zatwierdzonego planu. Plansze 35–55 s mają tekst w dolnej części obrazu; sterowanie automatycznie znika i można je jawnie przywrócić dotknięciem. Po 55 s wraca poprzedni tryb oglądania.
+
+Kabiny, postacie, gesty i mokra nawierzchnia są nadal stylizowane i uproszczone. Ślady odbić są prostą geometrią, nie fizycznym odbiciem sceny. Dalsze sceny warszawskie wymagają osobnego dopasowania geografii do tego zestawu. Reszta filmu pozostaje pełnym roboczym animatikiem; audio nadal niegotowe.
 
 ## Sterowanie i odbiór
 
