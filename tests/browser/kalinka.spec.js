@@ -1,5 +1,6 @@
+import {captureRobotFrame} from './robot-frames.js';
 import {test,expect} from '@playwright/test';
-const seek=async(page,t)=>page.locator('#dance-time').evaluate((e,t)=>{e.value=t;e.dispatchEvent(new Event('input',{bubbles:true}));},t);
+const seek=async(page,t)=>{const c=page.locator('#robot-canvas'),revision=Number(await c.getAttribute('data-render-revision')||0);await page.locator('#dance-time').evaluate((e,t)=>{e.value=t;e.dispatchEvent(new Event('input',{bubbles:true}));},t);await expect(c).toHaveAttribute('data-rendered-time',Number(t).toFixed(3),{timeout:15000});await expect.poll(async()=>Number(await c.getAttribute('data-render-revision')),{timeout:15000}).toBeGreaterThan(revision);};
 async function load(page,path='/robot.html?dance=kalinka'){await page.goto(path);await expect(page.locator('#robot-canvas')).toHaveAttribute('data-ready','true',{timeout:30000});}
 
 async function monitored(page,baseURL){
@@ -43,14 +44,14 @@ test('reduced motion disables camera autoplay and an unavailable backdrop retain
 
 test('Kalinka export frames remain deterministic with their own camera and duration',async({page})=>{
  await page.setViewportSize({width:360,height:640});await page.goto('/robot.html?dance=kalinka&export=1');await page.waitForFunction(()=>window.robotExportReady===true);
- const canvas=page.locator('#robot-canvas');await page.evaluate(()=>window.renderRobotFrame(11));const split=await canvas.screenshot();await page.evaluate(()=>window.renderRobotFrame(4));expect((await canvas.screenshot()).equals(split)).toBe(false);await page.evaluate(()=>window.renderRobotFrame(11));expect((await canvas.screenshot()).equals(split)).toBe(true);
+ const canvas=page.locator('#robot-canvas');const split=await captureRobotFrame(page,11);expect((await captureRobotFrame(page,4)).equals(split)).toBe(false);expect((await captureRobotFrame(page,11)).equals(split)).toBe(true);
  await expect(page.evaluate(()=>window.renderRobotFrame(24))).rejects.toThrow('Invalid robot export frame');
 });
 
 
 test('faster turning dance renders distinct front, straight-kick and slime-covered back views',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/robot.html?dance=kalinka&export=1');await page.waitForFunction(()=>window.robotExportReady===true);const canvas=page.locator('#robot-canvas');
- const render=async t=>{await page.evaluate(t=>window.renderRobotFrame(t),t);return canvas.screenshot();};
+ const render=t=>captureRobotFrame(page,t);
  const front=await render(0),kick=await render(3.52),back=await render(6),otherSide=await render(8);
  expect(front.equals(kick)).toBe(false);expect(back.equals(front)).toBe(false);expect(otherSide.equals(back)).toBe(false);expect((await render(6)).equals(back)).toBe(true);
 });

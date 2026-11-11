@@ -60,6 +60,51 @@ class PrivacyTests(unittest.TestCase):
         png=b'\x89PNG\r\n\x1a\n'+chunk(b'zTXt',b'Comment\0\0'+zlib.compress(b'SyntheticHiddenPhrase'))+chunk(b'IEND',b'')
         with self.assertRaises(ValueError):privacy.metadata(png,strict=True)
         self.assertIn('SyntheticHiddenPhrase',privacy.metadata(png))
+    @staticmethod
+    def jpeg_segment(marker, value):
+        return bytes([255, marker]) + struct.pack('>H', len(value)+2) + value
+    def jpeg(self, entropy=b'compressed samples', before=b'', after=b''):
+        header=self.jpeg_segment(0xda,b'\x01\x01\x00\x00\x3f\x00')
+        return b'\xff\xd8'+before+header+entropy+after+b'\xff\xd9'
+    def test_jpeg_entropy_is_not_metadata_even_with_stuffing_restarts_and_multiple_scans(self):
+        email=('synthetic'+'@'+'example.invalid').encode()
+        header=self.jpeg_segment(0xda,b'\x01\x01\x00\x01\x3f\x00')
+        image=self.jpeg(email+b'\xff\x00more\xff\xd0samples',after=header+email+b'\xff\xd7end')
+        self.assertEqual(privacy.metadata(image),'')
+        (self.path/'image.jpg').write_bytes(image);self.commit();privacy.scan()
+    def test_all_jpeg_app_and_comment_metadata_remain_scanned(self):
+        email=('synthetic'+'@'+'example.invalid')
+        for marker in [*range(0xe0,0xf0),0xfe]:
+            for value in [email.encode(),email.encode('utf-16-le'),b'X'+email.encode('utf-16-be'),b'PrivateFixtureMarker']:
+                with self.subTest(marker=marker,value_type=len(value)):
+                    segment=self.jpeg_segment(marker,value)
+                    # Metadata after image samples is just as sensitive as metadata before them.
+                    for image in [self.jpeg(before=segment),self.jpeg(after=segment)]:
+                        for strict in [False,True]:
+                            with self.assertRaises(ValueError):
+                                privacy.check_text(privacy.metadata(image,strict),['PrivateFixtureMarker'])
+    def test_jpeg_public_metadata_is_retained(self):
+        image=self.jpeg(before=self.jpeg_segment(0xe0,b'JFIF\0Public label'),after=self.jpeg_segment(0xfe,b'Public comment'))
+        text=privacy.metadata(image,strict=True)
+        self.assertIn('Public label',text);self.assertIn('Public comment',text)
+        privacy.check_text(text,[])
+    def test_jpeg_malformed_framing_and_trailing_content_fail_closed(self):
+        valid=self.jpeg()
+        invalid=[b'\xff\xd8',valid[:-1],valid[:-2],valid+b'extra',
+                 b'\xff\xd8\xff\xd9',b'\xff\xd8garbage',
+                 b'\xff\xd8\xff',b'\xff\xd8\xff\xe1\x00',
+                 b'\xff\xd8\xff\xe1\x00\x01',b'\xff\xd8\xff\xe1\xff\xffshort',
+                 b'\xff\xd8\xff\xd0',b'\xff\xd8\xff\x02\x00\x02',self.jpeg(entropy=b'data\xff\xd8'),
+                 b'\xff\xd8'+self.jpeg_segment(0xda,b'bad')+b'\xff\xd9']
+        for image in invalid:
+            with self.subTest(size=len(image)):
+                with self.assertRaises(ValueError):privacy.metadata(image)
+    def test_jpeg_comment_on_deleted_branch_still_fails_privacy_scan(self):
+        self.git('checkout','-qb','jpeg-side')
+        image=self.jpeg(after=self.jpeg_segment(0xfe,b'HistoricalPrivateMarker'))
+        (self.path/'old.jpg').write_bytes(image);self.commit()
+        (self.path/'old.jpg').unlink();self.commit();self.git('checkout','-q','-')
+        with self.assertRaises(ValueError):privacy.scan(['HistoricalPrivateMarker'])
     def test_encoded_private_terms_fail(self):
         for text in ['Synthetic\\u0048iddenPhrase','%53yntheticHiddenPhrase','Synthetic&#72;iddenPhrase']:
             with self.assertRaises(ValueError):privacy.check_text(text,['SyntheticHiddenPhrase'])

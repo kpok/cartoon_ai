@@ -4,6 +4,7 @@ import {createRobotStage} from './robot-stage.js';
 import {createKalinka} from './robot-kalinka.js';
 import {createMacarena,MACARENA_CUES} from './robot-macarena.js';
 import {createKalinkaStage,kalinkaCameraPose} from './kalinka-stage.js';
+import {musicTiming} from './macarena-music.js';
 import {DanceClock} from './robot-playback.js';
 import {OrbitControls} from '../vendor/OrbitControls.js';
 const canvas=document.querySelector('#robot-canvas'),preview=document.querySelector('#preview'),status=document.querySelector('#model-status'),viewport=document.querySelector('#viewport');
@@ -12,15 +13,18 @@ let renderer,controls,model,homePosition,mixer,clock,stage;
 let unavailable=false;
 const dance=new URLSearchParams(location.search).get('dance'),macarena=dance==='macarena';
 const kalinka=dance==='kalinka'||macarena;
+const musicSync=macarena&&new URLSearchParams(location.search).get('sync')==='music';
+const musicGrid=musicTiming();
 let variant;
 let autoCamera=kalinka&&!reducedMotionCamera();
 function reducedMotionCamera(){return matchMedia('(prefers-reduced-motion: reduce)').matches;}
 const cameraButton=document.querySelector('#camera-auto');
 if(kalinka){cameraButton.hidden=false;viewport.classList.add('kalinka-viewport');}
-function pose(time){if(variant)variant.update(time);else mixer.setTime(time);}
+function pose(time){if(variant)variant.update(musicSync?musicGrid.choreographyTime(time):time);else mixer.setTime(time);}
 if(kalinka){document.title='Robot — Kalinka';document.querySelector('h1').innerHTML='Więcej energii.<br><span>Cały plac do tańca.</span>';document.querySelector('.intro > p:last-child').textContent='Eksperyment 02 · szybkie wykopy, bieganie i obroty w szlamowej odsłonie · 24 sekundy bez dźwięku';document.querySelector('.details').textContent='Robot w różowym i niebieskim szlamie, uszatce i wysokich kozakach tańczy po otwartym placu: podciąga kolano, prostuje nogę do przodu, biega, obraca się i skacze ze szpagatem. Przeciągnięcie wyłącza automatyczną kamerę; przycisk włącza ją ponownie. Bruk, cienie i bliskie rekwizyty są przestrzenne, a daleka architektura to pojedynczy obraz wygenerowany w AI — nie pełne otoczenie 360°. Pobierany GLB pozostaje oryginalnym wariantem.';document.querySelector('.studio-top strong').textContent='ROBOT / KALINKA — PLAC 3D';}
 
 if(macarena){document.title='Robot — Macarena';document.querySelector('h1').innerHTML='Fiesta na dziedzińcu.<br><span>Czas na Macarenę.</span>';document.querySelector('.intro > p:last-child').textContent='Eksperyment 03 · klasyczne gesty, biodra i ćwierćobroty · 32 sekundy bez dźwięku';document.querySelector('.details').textContent='Nasz robot bez czapki: turkusowa koszula, koralowe szorty, nerka i kolorowe sneakersy. Ręce do przodu, dłonie do góry, ramiona, głowa, kołysanie biodrami, ugięcia kolan i podskok z obrotem. Cztery frazy po 16 uderzeń. Przeciągnij, aby obrócić kamerę. Dalekie tło fiesty jest obrazem AI; bruk i robot są przestrzenne. Pobierany GLB pozostaje oryginalnym modelem.';document.querySelector('.studio-top strong').textContent='ROBOT / MACARENA — FIESTA';preview.src='./assets/macarena/robot-costume-concept.png';preview.alt='Koncepcja robota bez czapki na dziedzińcu fiesty';}
+if(musicSync)document.querySelector('.intro > p:last-child').textContent='Profil muzyczny: 103 BPM · faza nagrania jeszcze nieskalibrowana · podgląd bez audio';
 const exporting=new URLSearchParams(location.search).get('export')==='1';
 if(exporting)document.documentElement.classList.add('robot-export');
 let cues=[];
@@ -47,13 +51,15 @@ try{
  for(const [position,color] of [[[0,3,4],0xffffff],[[-4,1,0],0x87c9e8],[[4,1,0],0xe8a1d8],[[0,-4,0],0x1a2336]]){const panel=new THREE.Mesh(panelGeometry,new THREE.MeshBasicMaterial({color,side:THREE.DoubleSide}));panel.position.set(...position);panel.lookAt(0,0,0);environment.add(panel);}
  const pmrem=new THREE.PMREMGenerator(renderer),target=pmrem.fromScene(environment,.1,.1,50);scene.environment=target.texture;pmrem.dispose();
  controls=new OrbitControls(camera,canvas);controls.enableDamping=!exporting&&!kalinka;controls.enabled=!exporting;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.92;controls.minPolarAngle=Math.PI*.08;
- let frame=null;
+ let frame=null,renderRevision=0;
+ // Publish submitted-frame state only after WebGL rendering succeeds, not after seeking.
+ function renderScene(){renderer.render(scene,camera);if(clock){canvas.dataset.renderedTime=clock.time.toFixed(3);canvas.dataset.renderRevision=String(++renderRevision);}}
  function syncCamera(){cameraButton.textContent=autoCamera?'Kamera: automatyczna':'Kamera: ręczna';cameraButton.setAttribute('aria-pressed',String(autoCamera));canvas.dataset.camera=kalinka?(autoCamera?'auto':'manual'):'orbit';}
  function updateCamera(time){if(!kalinka||!autoCamera)return;const p=kalinkaCameraPose(macarena?0:time,camera.aspect);camera.position.set(p.position.x,p.position.y,p.position.z);controls.target.set(p.target.x,p.target.y,p.target.z);camera.lookAt(controls.target);canvas.dataset.cameraPosition=camera.position.toArray().map(n=>n.toFixed(4)).join(',');}
  function manualCamera(){if(!kalinka)return;autoCamera=false;syncCamera();}
  controls.addEventListener('start',manualCamera);
  cameraButton.addEventListener('click',()=>{if(unavailable||!clock)return;autoCamera=!autoCamera;syncCamera();updateCamera(clock.time);controls.update();requestRender();});
- function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){pose(clock.tick(now));stage?.update(clock.time);updateCamera(clock.time);syncDance();}controls.update();renderer.render(scene,camera);if(clock?.playing)requestRender();});}
+ function requestRender(){if(frame!==null||document.hidden||unavailable)return;frame=requestAnimationFrame(now=>{frame=null;if(mixer&&clock){pose(clock.tick(now));stage?.update(clock.time);updateCamera(clock.time);syncDance();}controls.update();renderScene();if(clock?.playing)requestRender();});}
  controls.addEventListener('change',requestRender);
  document.addEventListener('visibilitychange',()=>{clock?.suspend();if(document.hidden){if(frame!==null)cancelAnimationFrame(frame);frame=null;}else requestRender();});
  function resize(){renderer.setSize(viewport.clientWidth,viewport.clientHeight,false);camera.aspect=viewport.clientWidth/viewport.clientHeight;camera.updateProjectionMatrix();requestRender();}
@@ -66,7 +72,7 @@ try{
   if(unavailable)return;
   if(gltf.animations.length!==1||gltf.animations[0].name!=='ReferenceDance'||Math.abs(gltf.animations[0].duration-40)>.01||manifest.animation.duration!==40||!Array.isArray(cues)){failed();return;}
   model=gltf.scene;mixer=new THREE.AnimationMixer(model);mixer.clipAction(gltf.animations[0]).play();mixer.setTime(0);clock=new DanceClock(gltf.animations[0].duration);
-  if(kalinka){mixer.stopAllAction();variant=macarena?createMacarena(model,THREE):createKalinka(model,THREE);variant.update(0);clock=new DanceClock(macarena?32:24);cues=[[0,3,'Skoczne wejście'],[3,10,'Wędrujące wykopy'],[10,12,'Skok i szpagat'],[12,18,'Sprężyste przysiady'],[18,20,'Finałowy szpagat'],[20,24,'Skoczne kroki']];if(macarena)cues=Array.from({length:64},(_,i)=>[i*.5,(i+1)*.5,MACARENA_CUES[i%16]]);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});}
+  if(kalinka){mixer.stopAllAction();variant=macarena?createMacarena(model,THREE):createKalinka(model,THREE);variant.update(0);clock=new DanceClock(macarena?(musicSync?musicGrid.duration:32):24);cues=[[0,3,'Skoczne wejście'],[3,10,'Wędrujące wykopy'],[10,12,'Skok i szpagat'],[12,18,'Sprężyste przysiady'],[18,20,'Finałowy szpagat'],[20,24,'Skoczne kroki']];if(macarena)cues=Array.from({length:64},(_,i)=>[musicSync?musicGrid.beatTime(i):i*.5,musicSync?musicGrid.beatTime(i+1):(i+1)*.5,MACARENA_CUES[i%16]]);model.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;}});}
   const box=new THREE.Box3().setFromObject(model),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3());
   if(!Number.isFinite(size.length())||size.length()===0){failed();return;}
   if(!kalinka)model.position.sub(center);scene.add(model);
@@ -87,7 +93,7 @@ try{
   if(exporting){
    window.renderRobotFrame=time=>{
     if(unavailable||!Number.isFinite(time)||time<0||time>=clock.duration)throw new Error('Invalid robot export frame');
-    clock.seek(time);pose(time);stage.update(time);updateCamera(time);syncDance();controls.update();renderer.render(scene,camera);
+    clock.seek(time);pose(time);stage.update(time);updateCamera(time);syncDance();controls.update();renderScene();
     return {time,width:canvas.width,height:canvas.height};
    };
    window.robotExportReady=true;

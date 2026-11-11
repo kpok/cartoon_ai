@@ -1,3 +1,4 @@
+import {captureRobotFrame} from './robot-frames.js';
 import {test,expect} from '@playwright/test';
 test('robot loads locally with orbit controls and preserves story navigation',async({page,baseURL})=>{
  const external=[],violations=[],errors=[];
@@ -44,19 +45,28 @@ test('reduced motion pauses autoplay and context loss stops rendering',async({pa
 });
 
 test('timeline seeks to reference gestures while paused and orbit remains usable',async({page})=>{
- await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await page.locator('#dance-toggle').click();
- const seek=async time=>{await page.locator('#dance-time').evaluate((element,value)=>{element.value=value;element.dispatchEvent(new Event('input',{bubbles:true}));},time);};
+ test.setTimeout(60000);
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/robot.html');const canvas=page.locator('#robot-canvas');await expect(canvas).toHaveAttribute('data-ready','true');await expect(canvas).toHaveAttribute('data-playing','false');
+ const rendered=async(time,previous)=>{
+  await expect(canvas).toHaveAttribute('data-rendered-time',Number(time).toFixed(3),{timeout:15000});
+  await expect.poll(async()=>Number(await canvas.getAttribute('data-render-revision')),{timeout:15000}).toBeGreaterThan(previous);
+ };
+ const seek=async time=>{const previous=Number(await canvas.getAttribute('data-render-revision')||0);await page.locator('#dance-time').evaluate((element,value)=>{element.value=value;element.dispatchEvent(new Event('input',{bubbles:true}));},time);await rendered(time,previous);};
  await seek(2);await expect(canvas).toHaveAttribute('data-time','2.000');await expect(page.locator('#dance-readout')).toContainText('Powitanie');
  const wave=await canvas.screenshot();await seek(22.5);await expect(page.locator('#dance-readout')).toContainText('przysiad');
- await expect.poll(async()=>!(await canvas.screenshot()).equals(wave)).toBe(true);
- await page.getByRole('button',{name:'Obróć w lewo'}).click();await expect(canvas).toHaveAttribute('data-time','22.500');
- await page.locator('#dance-restart').click();await expect(canvas).toHaveAttribute('data-time','0.000');await expect(page.locator('#dance-time')).toHaveValue('0');
+ // Capture each acknowledged pose once; screenshot work must not consume a polling deadline.
+ const squat=await canvas.screenshot();expect(squat.equals(wave)).toBe(false);
+ let previous=Number(await canvas.getAttribute('data-render-revision'));
+ await page.getByRole('button',{name:'Obróć w lewo'}).click();await rendered(22.5,previous);await expect(canvas).toHaveAttribute('data-time','22.500');expect((await canvas.screenshot()).equals(squat)).toBe(false);
+ previous=Number(await canvas.getAttribute('data-render-revision'));
+ await page.locator('#dance-restart').click();await rendered(0,previous);await expect(canvas).toHaveAttribute('data-time','0.000');await expect(page.locator('#dance-time')).toHaveValue('0');
 });
 test('robot export renders exact repeatable frames without player controls',async({page})=>{
  await page.setViewportSize({width:360,height:640});await page.goto('/robot.html?export=1');
  await page.waitForFunction(()=>window.robotExportReady===true);const canvas=page.locator('#robot-canvas');
- expect(await page.evaluate(()=>window.renderRobotFrame(0))).toEqual({time:0,width:360,height:640});const first=await canvas.screenshot();
- await page.evaluate(()=>window.renderRobotFrame(22.5));expect((await canvas.screenshot()).equals(first)).toBe(false);
- await page.evaluate(()=>window.renderRobotFrame(0));expect((await canvas.screenshot()).equals(first)).toBe(true);
+ expect(await page.evaluate(()=>window.renderRobotFrame(0))).toEqual({time:0,width:360,height:640});const first=await captureRobotFrame(page,0);
+ expect((await captureRobotFrame(page,22.5)).equals(first)).toBe(false);
+ expect((await captureRobotFrame(page,0)).equals(first)).toBe(true);
  await expect(page.evaluate(()=>window.renderRobotFrame(-1))).rejects.toThrow('Invalid robot export frame');
 });
