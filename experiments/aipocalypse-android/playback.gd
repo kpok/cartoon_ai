@@ -1,6 +1,6 @@
 extends RefCounted
 
-const DURATION: float = 8.0
+const DURATION: float = 25.0
 var elapsed: float = 0.0
 var playing: bool = false
 

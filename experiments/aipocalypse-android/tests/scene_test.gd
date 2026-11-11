@@ -7,53 +7,74 @@ func _test() -> void:
 	var scene = load("res://main.tscn").instantiate()
 	root.add_child(scene)
 	scene.set_process(false)
-	assert(scene.wheels.size() == 4)
-	var triangles := 0
-	var model_bounds := AABB()
-	var first_mesh := true
-	for mesh in scene.object.find_children("*", "MeshInstance3D", true, false):
-		var bounds: AABB = mesh.global_transform * mesh.get_aabb()
-		model_bounds = bounds if first_mesh else model_bounds.merge(bounds)
-		first_mesh = false
-		for surface in range(mesh.mesh.get_surface_count()):
-			var arrays: Array = mesh.mesh.surface_get_arrays(surface)
-			triangles += arrays[Mesh.ARRAY_INDEX].size() / 3
-	assert(not first_mesh and triangles > 100 and triangles < 20000)
-	assert(model_bounds.position.is_finite() and model_bounds.size.is_finite())
-	assert(model_bounds.size.x > 3.5 and model_bounds.size.x < 4.0)
-	assert(model_bounds.size.y > 1.2 and model_bounds.size.y < 1.6)
-	assert(absf(model_bounds.position.y) < 0.01)
-	for wheel in scene.wheels:
-		assert(is_equal_approx(wheel.position.y, 0.34))
-		assert(absf(wheel.position.z) > 0.7)
-		assert(wheel.basis.is_equal_approx(Basis.IDENTITY))
-	assert(scene.object.rotation.is_zero_approx())
+	var world = scene.world
+	for role in ["paramedic", "astronaut"]:
+		var actor: Dictionary = world.actors[role]
+		var skeleton: Skeleton3D = actor["skeleton"]
+		assert(skeleton.get_bone_count() == 15)
+		assert(skeleton.find_bone("head") >= 0)
+		assert(actor["player"].has_animation("PhoneGesture"))
+		assert(is_equal_approx(actor["player"].get_animation("PhoneGesture").length, 5.0))
+		assert(actor["attachment"].bone_name == "right_hand")
+		assert(actor["device"].get_parent() == actor["attachment"])
+		var triangles := 0
+		var skinned_meshes := 0
+		for mesh in actor["model"].find_children("*", "MeshInstance3D", true, false):
+			assert(mesh.mesh.get_aabb().size.is_finite())
+			if mesh.skin != null:
+				skinned_meshes += 1
+			for surface in range(mesh.mesh.get_surface_count()):
+				var arrays: Array = mesh.mesh.surface_get_arrays(surface)
+				triangles += arrays[Mesh.ARRAY_INDEX].size() / 3
+		assert(skinned_meshes >= 20 and triangles > 1000 and triangles < 50000)
+		assert(actor["screen"].text == "Hacked by\nAIpokalypse")
+	var attachment = world.actors["paramedic"]["attachment"]
+	var device = world.actors["paramedic"]["device"]
+	var local_transform: Transform3D = device.transform
+	var initial_position: Vector3 = Vector3.ZERO
+	for time in [0.0, 2.5, 5.0]:
+		world.apply_time(time)
+		await process_frame
+		world.apply_time(time)
+		assert(device.transform.is_equal_approx(local_transform))
+		var skeleton: Skeleton3D = world.actors["paramedic"]["skeleton"]
+		var bone := skeleton.get_bone_global_pose(skeleton.find_bone("right_hand"))
+		assert(attachment.global_transform.is_equal_approx(skeleton.global_transform * bone))
+		assert(device.global_position.is_finite())
+		if time == 0:
+			initial_position = device.global_position
+		else:
+			assert(device.global_position.distance_to(initial_position) > 0.2)
+	world.apply_time(10.0)
+	var held_position: Vector3 = device.global_position
+	assert(world.current_shot == 1)
+	assert(world.camera.global_position.distance_to(held_position) < 0.31)
+	assert(not world.camera.is_position_behind(held_position))
+	world.apply_time(14.99)
+	assert(device.global_position.is_equal_approx(held_position))
+	world.apply_time(15.0)
+	assert(world.current_shot == 2 and world.orbit.visible and not world.street.visible)
+	world.apply_time(20.0)
+	var orbit_pose: Transform3D = world.actors["astronaut"]["device"].global_transform
+	world.apply_time(25.0)
+	world.apply_time(20.0)
+	assert(world.actors["astronaut"]["device"].global_transform.is_equal_approx(orbit_pose))
 	scene._control("Start")
 	scene.clock.advance(2.0)
-	scene._update_frame()
-	assert(is_equal_approx(scene.object.position.x, -1.25))
-	for wheel in scene.wheels:
-		assert(is_equal_approx(wheel.rotation.z, -1.25 / 0.34))
-		assert(wheel.basis.z.is_equal_approx(Vector3(0, 0, 1)))
 	scene._notification(MainLoop.NOTIFICATION_APPLICATION_PAUSED)
 	assert(not scene.clock.playing)
-	scene.clock.advance(2.0)
+	scene.clock.advance(3.0)
 	assert(scene.clock.elapsed == 2.0)
-	scene._update_frame()
-	assert(is_equal_approx(scene.object.position.x, -1.25))
 	scene._control("Start")
 	assert(scene.clock.playing)
 	scene._control("Pauza")
 	assert(not scene.clock.playing)
 	scene._control("Restart")
 	assert(scene.clock.elapsed == 0.0 and not scene.clock.playing)
-	assert(scene.object.rotation.is_zero_approx())
-	assert(is_equal_approx(scene.object.position.x, -2.5))
-	for wheel in scene.wheels:
-		assert(wheel.rotation.is_zero_approx())
+	assert(world.current_shot == 0 and world.street.visible and not world.orbit.visible)
+	assert(device.global_position.is_equal_approx(initial_position))
 	assert(scene.sound.stream.data.size() == 8820)
-	assert(scene.status.text.contains("0.0 / 8.0"))
 	scene.queue_free()
 	await process_frame
-	print("Scene integration tests passed")
+	print("Human sample integration tests passed")
 	quit()

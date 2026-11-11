@@ -2,35 +2,13 @@ extends Node3D
 
 const Playback = preload("res://playback.gd")
 var clock = Playback.new()
-var object: Node3D
-var wheels: Array[Node3D] = []
+var world: Node3D
 var status: Label
 var sound: AudioStreamPlayer
 
 func _ready() -> void:
-	RenderingServer.set_default_clear_color(Color("080b12"))
-	var camera := Camera3D.new()
-	camera.position = Vector3(4, 3, 10)
-	add_child(camera)
-	camera.look_at(Vector3(0, 0.65, 0))
-	var light := DirectionalLight3D.new()
-	light.rotation_degrees = Vector3(-45, -30, 0)
-	light.light_energy = 1.5
-	add_child(light)
-	var car_scene: PackedScene = load("res://assets/car.glb")
-	object = car_scene.instantiate()
-	object.name = "Car"
-	add_child(object)
-	for wheel in object.find_children("Wheel_*", "Node3D", true, false):
-		wheels.append(wheel)
-	assert(wheels.size() == 4, "Imported car must have four wheel pivots")
-	var board := Label3D.new()
-	board.text = "Hacked by AIpokalypse"
-	board.position = Vector3(0, 2.05, 0)
-	board.font_size = 64
-	board.pixel_size = 0.006
-	board.modulate = Color("ff344b")
-	add_child(board)
+	world = preload("res://sample_world.gd").new()
+	add_child(world)
 	_build_ui()
 	_build_sound()
 	_update_frame()
@@ -46,7 +24,7 @@ func _build_ui() -> void:
 	logo.texture = load("res://assets/logo.jpg")
 	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	logo.custom_minimum_size = Vector2(0, 150)
+	logo.custom_minimum_size = Vector2(0, 65)
 	root.add_child(logo)
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -62,12 +40,12 @@ func _build_ui() -> void:
 	for title in ["Start", "Pauza", "Restart"]:
 		var button := Button.new()
 		button.text = title
-		button.custom_minimum_size = Vector2(190, 64)
-		button.add_theme_font_size_override("font_size", 26)
+		button.custom_minimum_size = Vector2(190, 52)
+		button.add_theme_font_size_override("font_size", 23)
 		button.pressed.connect(_control.bind(title))
 		buttons.add_child(button)
 	var credits := Label.new()
-	credits.text = "Model auta • 8 s • Godot Engine (MIT) • Logo: kpok"
+	credits.text = "Próbka postaci • 25 s • Godot Engine (MIT) • Logo: kpok"
 	credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(credits)
 	var license_button := Button.new()
@@ -109,14 +87,11 @@ func _process(delta: float) -> void:
 	_update_frame()
 
 func _update_frame() -> void:
-	if not is_instance_valid(object):
+	if not is_instance_valid(world):
 		return
-	var progress: float = clock.elapsed / Playback.DURATION
-	object.position = Vector3(lerpf(-2.5, 2.5, progress), 0, 0)
-	# GLB wheel axles map from Blender Y to Godot Z. Distance fixes pause/reset drift.
-	for wheel in wheels:
-		wheel.rotation.z = -5.0 * progress / 0.34
-	status.text = "%s  %.1f / 8.0 s" % ["Odtwarzanie" if clock.playing else "Pauza", clock.elapsed]
+	world.apply_time(clock.elapsed)
+	var names := ["Ratownik", "Telefon", "Orbita"]
+	status.text = "%s • %s • %.1f / 25.0 s • %d FPS" % ["Odtwarzanie" if clock.playing else "Pauza", names[world.current_shot], clock.elapsed, Engine.get_frames_per_second()]
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_PAUSED or what == NOTIFICATION_APPLICATION_FOCUS_OUT:

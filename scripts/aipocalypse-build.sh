@@ -11,7 +11,13 @@ bash scripts/aipocalypse-prepare.sh
 rm -f "$project/assets/car.glb"
 timeout 120 blender --background --factory-startup --python-exit-code 1 --python "$project/generate_car.py" -- --output "$project/assets/car.glb"
 test -s "$project/assets/car.glb"
+for role in paramedic astronaut; do
+  rm -f "$project/assets/$role.glb"
+  timeout 120 blender --background --factory-startup --python-exit-code 1 --python "$project/generate_human.py" -- --output "$project/assets/$role.glb" --role "$role"
+  test -s "$project/assets/$role.glb"
+done
 timeout 120 godot --headless --path "$project" --editor --import
+timeout 60 godot --headless --path "$project" --script tests/car_test.gd
 timeout 60 godot --headless --path "$project" --script tests/playback_test.gd
 timeout 60 godot --headless --path "$project" --script tests/scene_test.gd
 timeout 60 godot --headless --path "$project" --quit-after 5
