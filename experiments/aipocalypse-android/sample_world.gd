@@ -14,13 +14,16 @@ func _ready() -> void:
 	settings.background_color = Color("202c3b")
 	settings.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	settings.ambient_light_color = Color("b6c3d5")
-	settings.ambient_light_energy = 0.65
+	settings.ambient_light_energy = 0.48
 	environment.environment = settings
 	add_child(environment)
 	var light := DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-40, -35, 0)
 	light.light_color = Color("ffe0bc")
 	light.light_energy = 1.1
+	light.shadow_enabled = true
+	light.directional_shadow_max_distance = 12.0
+	light.directional_shadow_mode = DirectionalLight3D.SHADOW_ORTHOGONAL
 	add_child(light)
 	camera = Camera3D.new()
 	camera.near = 0.01
@@ -41,6 +44,7 @@ func _box(parent: Node3D, position: Vector3, size: Vector3, color: Color) -> Mes
 	var mesh := BoxMesh.new()
 	mesh.size = size
 	node.mesh = mesh
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	node.position = position
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
@@ -57,6 +61,7 @@ func _sphere(parent: Node3D, position: Vector3, radius: float, color: Color) -> 
 	mesh.radial_segments = 24
 	mesh.rings = 12
 	node.mesh = mesh
+	node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	node.position = position
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color

@@ -19,6 +19,7 @@ func _test() -> void:
 		assert(actor["device"].get_parent() == actor["attachment"])
 		var triangles := 0
 		var skinned_meshes := 0
+		var blended_vertices := 0
 		for mesh in actor["model"].find_children("*", "MeshInstance3D", true, false):
 			assert(mesh.mesh.get_aabb().size.is_finite())
 			if mesh.skin != null:
@@ -32,11 +33,17 @@ func _test() -> void:
 					assert(weights.size() == vertices.size() * 4)
 					for vertex in range(vertices.size()):
 						var total := 0.0
+						var influences := 0
 						for weight in range(4):
 							assert(weights[vertex * 4 + weight] >= 0)
 							total += weights[vertex * 4 + weight]
+							if weights[vertex * 4 + weight] > 0.001:
+								influences += 1
 						assert(absf(total - 1.0) < 0.001)
+						if influences > 1:
+							blended_vertices += 1
 		assert(skinned_meshes >= 8 and triangles > 1000 and triangles < 50000)
+		assert(blended_vertices >= 20)
 		assert(actor["screen"].text == "Hacked by\nAIpokalypse")
 	var attachment = world.actors["paramedic"]["attachment"]
 	var device = world.actors["paramedic"]["device"]

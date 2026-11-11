@@ -69,3 +69,47 @@ def limbs(rig, side, sign, cloth, reflective, female):
         return {side+'_thigh':upper,side+'_shin':1-upper}
     loft(rig,side+'Trousers',leg,[cloth,reflective],leg_weights,
          lambda p:1 if not female and 0.25<p.z<0.36 else 0)
+
+
+def shaped_head(rig, skin, hair):
+    rings=[(0,0,1.50,0.035,0.045),(0,-0.004,1.53,0.060,0.064),
+           (0,0,1.57,0.087,0.077),(0,0,1.62,0.100,0.088),
+           (0,0,1.67,0.104,0.094),(0,0.004,1.71,0.102,0.094),
+           (0,0.010,1.75,0.095,0.086),(0,0.012,1.79,0.065,0.062),
+           (0,0.012,1.805,0.02,0.02)]
+    return loft(rig,'ShapedHead',rings,[skin,hair],lambda vertex:{'head':1},
+                lambda p:1 if p.z>(1.741 if p.y<0 else 1.66) else 0,segments=32)
+
+
+def finger_curve(rig, name, points, skin, bone):
+    from mathutils import Vector
+    vertices=[]
+    sides=10
+    for index,(point,radius) in enumerate(points):
+        center=Vector(point)
+        previous=Vector(points[max(0,index-1)][0])
+        following=Vector(points[min(len(points)-1,index+1)][0])
+        tangent=(following-previous).normalized()
+        side=tangent.cross(Vector((1,0,0))).normalized()
+        up=tangent.cross(side).normalized()
+        for step in range(sides):
+            angle=2*math.pi*step/sides
+            vertices.append(center+radius*(math.cos(angle)*side+math.sin(angle)*up))
+    faces=[]
+    for row in range(len(points)-1):
+        for index in range(sides):
+            nxt=(index+1)%sides
+            faces.append((row*sides+index,row*sides+nxt,(row+1)*sides+nxt,(row+1)*sides+index))
+    faces += [tuple(reversed(range(sides))),tuple((len(points)-1)*sides+i for i in range(sides))]
+    mesh=bpy.data.meshes.new(name+'Mesh')
+    mesh.from_pydata(vertices,[],faces)
+    mesh.materials.append(skin)
+    obj=bpy.data.objects.new(name,mesh)
+    bpy.context.collection.objects.link(obj)
+    group=obj.vertex_groups.new(name=bone)
+    group.add(list(range(len(vertices))),1,'REPLACE')
+    modifier=obj.modifiers.new('Armature','ARMATURE')
+    modifier.object=rig
+    obj.parent=rig
+    for polygon in mesh.polygons:polygon.use_smooth=True
+    return obj

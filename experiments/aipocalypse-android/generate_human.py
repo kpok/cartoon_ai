@@ -8,7 +8,7 @@ from mathutils import Vector
 import bpy
 
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from human_shapes import limbs
+from human_shapes import limbs, shaped_head, finger_curve
 
 
 def generate(output, role):
@@ -105,14 +105,15 @@ def generate(output, role):
             if polygon.index//24==5:polygon.material_index=2
     oval('Pelvis',(0,0,0.96),(0.16,0.115,0.13),cloth,'root')
     oval('Neck',(0,0,1.48),(0.065,0.06,0.085),skin,'head')
-    oval('Face',(0,-0.012,1.65),(0.106,0.09,0.14),skin,'head')
-    oval('Hair cap',(0,0.018,1.72),(0.109,0.083,0.09),hair,'head')
+    shaped_head(rig,skin,hair)
     if female: oval('Hair bun',(0,0.10,1.70),(0.06,0.05,0.055),hair,'head')
-    oval('Nose',(0,-0.102,1.65),(0.019,0.023,0.032),skin,'head')
-    oval('Mouth',(0,-0.098,1.596),(0.033,0.008,0.005),dark,'head')
+    oval('Nose bridge',(0,-0.101,1.657),(0.015,0.017,0.030),skin,'head')
+    oval('Nose tip',(0,-0.116,1.64),(0.019,0.015,0.014),skin,'head')
+    oval('Mouth',(0,-0.09,1.587),(0.029,0.005,0.003),dark,'head')
     for sign in (-1,1):
         oval('Eye white',(sign*0.043,-0.089,1.68),(0.019,0.009,0.009),white,'head')
-        oval('Pupil',(sign*0.043,-0.098,1.68),(0.008,0.005,0.009),eye,'head')
+        oval('Pupil',(sign*0.043+0.002,-0.099,1.678),(0.0065,0.004,0.007),eye,'head')
+        oval('Upper eyelid',(sign*0.043,-0.096,1.688),(0.022,0.007,0.004),skin,'head')
         oval('Brow',(sign*0.043,-0.089,1.705),(0.03,0.012,0.006),hair,'head')
         oval('Ear',(sign*0.106,0,1.65),(0.017,0.025,0.04),skin,'head')
     for side, sign in [('right',1),('left',-1)]:
@@ -122,11 +123,34 @@ def generate(output, role):
         for finger in range(4):
             x=sign*0.29+(finger-1.5)*0.017
             if side=='right':
-                limb('Finger base',(x,-0.012,0.80),(x,-0.06,0.765),0.009,skin,side+'_hand')
-                limb('Curled fingertip',(x,-0.06,0.765),(x,-0.065,0.80),0.009,skin,side+'_hand')
+                finger_curve(rig,'Grip finger',[
+                    ((x,-0.012,0.803),0.0075),((x,-0.027,0.775),0.007),
+                    ((x,-0.052,0.762),0.0068),((x,-0.065,0.775),0.0067),
+                    ((x,-0.065,0.802),0.0035)],skin,side+'_hand')
             else:
                 oval('Finger',(x,-0.005,0.78),(0.009,0.016,0.045),skin,side+'_hand')
-        oval('Thumb',(sign*0.337,-0.05 if side=='right' else -0.018,0.835),(0.013,0.023,0.033),skin,side+'_hand')
+        if side=='right':
+            finger_curve(rig,'Grip thumb',[
+                ((0.337,-0.015,0.855),0.011),((0.333,-0.040,0.852),0.010),
+                ((0.329,-0.059,0.845),0.008),((0.326,-0.061,0.835),0.004)],skin,side+'_hand')
+        else:
+            oval('Thumb',(sign*0.337,-0.018,0.835),(0.013,0.023,0.033),skin,side+'_hand')
+
+    def detail_box(name,center,size,material,bone):
+        bpy.ops.mesh.primitive_cube_add(size=1,location=center)
+        obj=bpy.context.object
+        obj.dimensions=size
+        bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+        bind(obj,name,material,bone)
+        for polygon in obj.data.polygons:polygon.use_smooth=False
+    for sign in (-1,1):
+        detail_box('Chest pocket',(sign*0.10,-0.121,1.26),(0.075,0.018,0.095),cloth,'spine')
+        detail_box('Pocket flap',(sign*0.10,-0.133,1.30),(0.081,0.01,0.018),dark,'spine')
+        detail_box('Cargo pocket',(sign*0.165,-0.012,0.77),(0.035,0.115,0.115),cloth,('right' if sign>0 else 'left')+'_thigh')
+        detail_box('Boot sole',(sign*0.10,-0.05,0.023),(0.15,0.25,0.035),dark,('right' if sign>0 else 'left')+'_foot')
+    detail_box('Jacket zipper',(0,-0.135,1.26),(0.006,0.009,0.29),dark,'spine')
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.067,minor_radius=0.012,major_segments=32,minor_segments=8,location=(0,0,1.465))
+    bind(bpy.context.object,'Collar',dark,'spine')
 
     bpy.context.scene.render.fps=24
     bpy.context.scene.frame_start=0
@@ -134,10 +158,11 @@ def generate(output, role):
     rig.animation_data_create()
     rig.animation_data.action=bpy.data.actions.new('PhoneGesture')
     for frame, lift in [(0,0),(24,0),(72,1),(120,1)]:
-        for name,angle in [('right_upper_arm',0.75),('right_forearm',1.35),('head',0.12)]:
+        for name,angle in [('right_upper_arm',0.75),('right_forearm',1.35),('head',0.27),('spine',0.025)]:
             bone=rig.pose.bones[name]
             bone.rotation_mode='XYZ'
             bone.rotation_euler.x=angle*lift
+            if name=='head':bone.rotation_euler.y=0.12*lift
             bone.keyframe_insert(data_path='rotation_euler',frame=frame)
     output.parent.mkdir(parents=True,exist_ok=True)
     bpy.ops.export_scene.gltf(filepath=str(output),export_format='GLB',export_yup=True,
