@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 project=experiments/aipocalypse-android
 output="$RUNNER_TEMP/aipocalypse-build"
 mkdir -p "$output"
-node --test tests/aipocalypse-production.test.mjs
+node --test tests/aipocalypse-production.test.mjs tests/aipocalypse-compile.test.mjs
 bash scripts/aipocalypse-prepare.sh
 # Generate from source on every build; never silently reuse a stale model.
 rm -f "$project/assets/car.glb"
@@ -18,6 +18,8 @@ for role in paramedic astronaut; do
 done
 timeout 120 godot --headless --path "$project" --editor --import
 timeout 60 godot --headless --path "$project" --script tests/car_test.gd
+timeout 60 godot --headless --path "$project" --script tests/film_timeline_test.gd
+timeout 120 godot --headless --path "$project" --script tests/film_player_test.gd
 timeout 60 godot --headless --path "$project" --script tests/playback_test.gd
 timeout 60 godot --headless --path "$project" --script tests/scene_test.gd
 timeout 60 godot --headless --path "$project" --script tests/acting_test.gd
