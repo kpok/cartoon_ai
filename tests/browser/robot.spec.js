@@ -1,3 +1,4 @@
+import {captureRobotFrame} from './robot-frames.js';
 import {test,expect} from '@playwright/test';
 test('robot loads locally with orbit controls and preserves story navigation',async({page,baseURL})=>{
  const external=[],violations=[],errors=[];
@@ -64,8 +65,8 @@ test('timeline seeks to reference gestures while paused and orbit remains usable
 test('robot export renders exact repeatable frames without player controls',async({page})=>{
  await page.setViewportSize({width:360,height:640});await page.goto('/robot.html?export=1');
  await page.waitForFunction(()=>window.robotExportReady===true);const canvas=page.locator('#robot-canvas');
- expect(await page.evaluate(()=>window.renderRobotFrame(0))).toEqual({time:0,width:360,height:640});const first=await canvas.screenshot();
- await page.evaluate(()=>window.renderRobotFrame(22.5));expect((await canvas.screenshot()).equals(first)).toBe(false);
- await page.evaluate(()=>window.renderRobotFrame(0));expect((await canvas.screenshot()).equals(first)).toBe(true);
+ expect(await page.evaluate(()=>window.renderRobotFrame(0))).toEqual({time:0,width:360,height:640});const first=await captureRobotFrame(page,0);
+ expect((await captureRobotFrame(page,22.5)).equals(first)).toBe(false);
+ expect((await captureRobotFrame(page,0)).equals(first)).toBe(true);
  await expect(page.evaluate(()=>window.renderRobotFrame(-1))).rejects.toThrow('Invalid robot export frame');
 });
