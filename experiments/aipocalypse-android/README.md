@@ -1,4 +1,4 @@
-# AIpokalypse — próbka postaci Android0.3
+# AIpokalypse — próbka postaci Android0.4
 
 APK zawiera25sekund próby, nie pełny film ani zatwierdzoną finalną stylistykę:
 
@@ -37,3 +37,10 @@ Settings → Secrets and variables → Actions:
 Nie generować nowego klucza do aktualizacji, nie dodawać go doGit/artefaktów/cache. Bez sekretów publikacja zatrzymuje się. ApplicationID `org.cartoonai.aipocalypse`; versionCode rośnie według numeru uruchomieniaworkflow, rerun zachowuje numer.
 
 Workflow właściciela na feat/aipocalypse-film lub ręcznie na tymbranchu/main. Publikuje podpisany APK+SHA256 w artefakcie aipocalypse-android przez1dzień. EXE/web/MP4 nie są częścią tej próbki.
+
+
+## Zmiany0.4
+
+Ciągłe siatki rękawów i spodni z płynnym przejściem wag na łokciach/kolanach zastępują osobne elipsoidy. Głowa ma modelowany zarys szczęki i włosów, a ubranie kieszenie, zamek, kołnierz i podeszwy butów. Palce prawej dłoni są krzywymi zagiętymi wokół dolnej krawędzi telefonu. Gest obejmuje pochylenie i obrót głowy oraz mały ruch tułowia; stabilny detal10–15s zachowany.
+
+Test importu sprawdza normalizację wag każdego wierzchołka i obecność rzeczywistych wierzchołków z wpływem więcej niż jednej kości. Porównano kadry Godota w spoczynku, w trakcie ruchu i w ustalonej pozie. Cienie kontaktowe mają ograniczony zasięg12m; ich koszt musi zostać oceniony na telefonie. Tła i schematyczna Ziemia nie zostały w tej iteracji przebudowane. Model pozostaje stylizowany i mniej szczegółowy niż karta referencyjna.

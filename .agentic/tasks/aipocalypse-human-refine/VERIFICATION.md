@@ -1,0 +1,13 @@
+# Human refinement checkpoint
+
+Code7333a9aeebefeffaf56d8ce815aa54caeb1568a2; baseline4b6673a; branchfeat/aipocalypse-film/draftPR19. No merge. Commitsdf5e37b(continuousweightedlimbs) and7333a9a(head/clothes/grip/gaze/lighting).
+
+Independentplanreview refine_human_plan PASSwithconditions. Independentcode-review refine_human_review PASS; testactualimportedweights/skinning/geometry/phoneattachment/seeking/pause/restart passed. ActualGodotframes0/2.5/5/12/20s renderedonCompatibilityMesa/llvmpipe; independentvisualreview refine_visual_review confirmedvisibleimprovement andnoscreenshot-confirmedblocker toofferingAPK. It didnotapprovefinalartquality.
+
+Changes: continuousarm/leglofts withnormalizedtwo-bonejointweights; headjaw/scalpshape,eyelids; jacketpockets/zip/collar/cargopockets/bootsole; curvedgripfingers; headpitch/yaw+smallspinegesture. Same15bones,5sclip,25sclock andfixedright_handattachment. Contactshadowslimited12m; environmentalboxes/spheresdon'tcastshadowsoncharacters. HelpersourceexcludedfromAPK.
+
+Verification: Blender4.3.2localgeneration bothroles; Godot4.6.3import/integrationpassed. Testsverifypositiveweights sum1and>=20genuinelyblendedvertices,geometry<50ktriangles peractor,3handposes anddeterministicreset. Node76/76,licenses,workflowpolicy,diffcheckpassed. LocalparamedicGLB624948B beforeCI. SporadicObjectDBshutdownwarning persistswithoutassertionfailure.
+
+CIrun42987375438 / job130411666113 succeededforexact7333a9a: repositoryaudit,pinnedBlender4.2generation,importtests,APKexport,stablesigningandartifactpublication. Version0.4.0,sameapplicationID/key,artifactretention1day.
+
+Residual: staticframesdon'tprovegesturefluidity/allintermediatecollisionorAndroidFPS/memory. Visualreview notedstiffgrip,angularfingersandsimplifiedexpression; referenceillustrationqualitynotreached. Phoneinstallation/updateandruntimeevaluationremainuseracceptance. ExistingenvironmentsandEarthremainplaceholders; noadditionalfilmscenes/newpaidservicesorAIvoices.
