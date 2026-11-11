@@ -69,6 +69,10 @@ func _build_ui() -> void:
 	credits.text = "Próba techniczna • 8 s • Godot Engine (MIT) • Logo: kpok"
 	credits.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	root.add_child(credits)
+	var license_button := Button.new()
+	license_button.text = "Licencje silnika"
+	license_button.pressed.connect(func(): OS.shell_open("https://godotengine.org/license/"))
+	root.add_child(license_button)
 
 func _build_sound() -> void:
 	sound = AudioStreamPlayer.new()

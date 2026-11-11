@@ -2,7 +2,7 @@
 
 **Decyzja użytkownika, 10 listopada 2026: pipeline AIpokalypse ma na tym etapie generować wyłącznie APK dla Androida. EXE odkładamy na później.**
 
-To plan wdrożenia, nie informacja o istniejącym już workflow APK. W tym commicie zmieniamy dokumentację i politykę retencji obecnych workflow; nie implementujemy jeszcze aplikacji Godot.
+Etap 0 jest zaimplementowany w `experiments/aipocalypse-android` oraz workflow `aipocalypse-android.yml`. Bieżące wyniki i ograniczenia: `.agentic/tasks/aipocalypse-android/STATE.md`. Podpisany APK i odbiór na telefonie wymagają osobnego potwierdzenia; kod nie oznacza ukończenia filmu.
 
 ## Stałe wymagania
 
