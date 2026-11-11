@@ -1,0 +1,25 @@
+extends SceneTree
+
+const Playback = preload("res://playback.gd")
+
+func _init() -> void:
+	var clock = Playback.new()
+	clock.advance(2.0)
+	assert(clock.elapsed == 0.0)
+	clock.start()
+	clock.advance(2.0)
+	clock.pause()
+	clock.advance(3.0)
+	assert(clock.elapsed == 2.0)
+	clock.start()
+	clock.advance(-1.0)
+	assert(clock.elapsed == 2.0)
+	clock.advance(20.0)
+	assert(clock.elapsed == 8.0 and not clock.playing)
+	clock.start()
+	assert(clock.elapsed == 0.0 and clock.playing)
+	clock.advance(1.0)
+	clock.restart()
+	assert(clock.elapsed == 0.0 and not clock.playing)
+	print("Playback tests passed")
+	quit()

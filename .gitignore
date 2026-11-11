@@ -18,3 +18,9 @@ __pycache__/
 /.agentic/tasks/head-face-stage/*.log
 /.agentic/tasks/head-face-stage/*.png
 /.agentic/tasks/head-face-stage/*.mp4
+
+# Generated Android build inputs and outputs.
+/experiments/aipocalypse-android/.godot/
+/experiments/aipocalypse-android/assets/logo.jpg
+/aipocalypse-output/
+/aipocalypse-tools/
