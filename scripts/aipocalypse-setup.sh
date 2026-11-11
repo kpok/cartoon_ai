@@ -18,7 +18,7 @@ done
 rm "$tools/godot.zip" "$tools/templates.tpz"
 java_sdk="${JAVA_HOME_17_X64:?Hosted runner must provide Java 17}"
 android_sdk="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-"$android_sdk/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-35' 'build-tools;35.0.1' 'platform-tools'
+"$android_sdk/cmdline-tools/latest/bin/sdkmanager" 'platforms;android-36' 'build-tools;35.0.1' 'platform-tools'
 mkdir -p "$HOME/.config/godot"
 python3 - "$HOME/.config/godot/editor_settings-4.6.tres" "$java_sdk" "$android_sdk" <<'PY'
 import json, sys
