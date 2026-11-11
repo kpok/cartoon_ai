@@ -19,6 +19,8 @@ done
 timeout 120 godot --headless --path "$project" --editor --import
 timeout 60 godot --headless --path "$project" --script tests/car_test.gd
 timeout 60 godot --headless --path "$project" --script tests/film_timeline_test.gd
+timeout 60 godot --headless --path "$project" --script tests/opening_motion_test.gd
+timeout 90 godot --headless --path "$project" --script tests/opening_scene_test.gd
 timeout 120 godot --headless --path "$project" --script tests/film_player_test.gd
 timeout 60 godot --headless --path "$project" --script tests/playback_test.gd
 timeout 60 godot --headless --path "$project" --script tests/scene_test.gd

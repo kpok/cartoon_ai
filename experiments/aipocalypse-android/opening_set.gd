@@ -20,6 +20,7 @@ var phone_attachment: BoneAttachment3D
 var shards: Array[Node3D] = []
 var skid_marks: Array[Node3D] = []
 var indicator: MeshInstance3D
+var stop_lines: Array[MeshInstance3D] = []
 var references: Dictionary = {}
 var last_state: Dictionary = {}
 
@@ -77,8 +78,9 @@ func build(builder: RefCounted) -> void:
 
 func _ground() -> void:
 	var asphalt := _box(Vector3(0, -0.09, 0), Vector3(36, 0.16, 36), "263342")
-	asphalt.material_override.metallic = 0.45
-	asphalt.material_override.roughness = 0.23
+	asphalt.material_override.metallic = 0.05
+	asphalt.material_override.metallic_specular = 0.15
+	asphalt.material_override.roughness = 0.42
 	for x in [-8.5, 8.5]:
 		for z in [-8.5, 8.5]:
 			_box(Vector3(x, 0.03, z), Vector3(9, 0.12, 9), "6d7780")
@@ -100,10 +102,18 @@ func _ground() -> void:
 					at = Vector3(at.z, at.y, at.x)
 					size = Vector3(size.z, size.y, size.x)
 				_box(at, size, "c3c4b6")
+	for axis in range(2):
+		for side in [-1, 1]:
+			var at := Vector3(side * 1.8, 0.006, side * 4.3)
+			var size := Vector3(3.3, 0.012, 0.22)
+			if axis == 1:
+				at = Vector3(at.z, at.y, -at.x)
+				size = Vector3(size.z, size.y, size.x)
+			stop_lines.append(_box(at, size, "e1dfcb"))
 	for i in range(7):
 		var puddle: MeshInstance3D = factory.cylinder(self, Vector3(-3 + i * 1.1, 0.003, -1.8 + sin(i * 2) * 2.8), 0.65, 0.003, Color("506376"))
 		puddle.scale = Vector3(1.5, 1, 0.4)
-		puddle.material_override.roughness = 0.08
+		puddle.material_override.roughness = 0.32
 	for at in [Vector3(-3.7, 0.009, 2.7), Vector3(2.7, 0.009, -3.7)]:
 		var reflection: MeshInstance3D = factory.cylinder(self, at, 0.3, 0.004, Color("48d48e"))
 		reflection.scale = Vector3(0.5, 1, 2.6)
@@ -154,15 +164,16 @@ func _vehicle(parent: Node3D, delivery: bool) -> Node3D:
 	var model: Node3D = factory.car_scene.instantiate()
 	parent.add_child(model)
 	for part in model.find_children("*", "MeshInstance3D", true, false):
-		if part.name == "Cabin":
+		if part.name == "Cabin" or (delivery and part.name == "Roof"):
 			part.hide()
 		if part.name in ["Body", "Roof"]:
 			var paint := StandardMaterial3D.new()
 			paint.albedo_color = Color("d9d5bd") if delivery else Color("c99434")
-			paint.metallic = 0.45
-			paint.roughness = 0.3
+			paint.metallic = 0.15
+			paint.roughness = 0.4
 			part.material_override = paint
 	if delivery:
+		factory.box(parent, Vector3(0.88, 1.48, 0), Vector3(1.45, 0.09, 1.42), Color("d9dedb"))
 		factory.box(parent, Vector3(-0.65, 1.03, 0), Vector3(1.8, 1.2, 1.5), Color("d9dedb"))
 		factory.box(parent, Vector3(-0.65, 1.13, 0.76), Vector3(1.65, 0.14, 0.02), Color("537f8d"))
 	else:
@@ -171,8 +182,30 @@ func _vehicle(parent: Node3D, delivery: bool) -> Node3D:
 		roof_sign.modulate = Color("182331")
 		indicator = factory.box(parent, Vector3(1.83, 0.61, 0.53), Vector3(0.03, 0.16, 0.13), Color("ffab38"))
 		_unlit(indicator)
+	var front := 1.56 if delivery else 0.72
+	var rear := 0.18 if delivery else -1.08
+	for x in [front, rear]:
+		for z in [-0.65, 0.65]:
+			factory.box(parent, Vector3(x, 1.08, z), Vector3(0.045, 0.55, 0.045), Color("4a5259"))
+		var glass: MeshInstance3D = factory.box(parent, Vector3(x, 1.08, 0), Vector3(0.012, 0.5, 1.27), Color(0.25, 0.47, 0.58, 0.12))
+		glass.material_override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		glass.material_override.roughness = 0.4
 	for z in [-0.69, 0.69]:
 		factory.box(parent, Vector3(0.63 if delivery else -0.1, 1.03, z), Vector3(0.035, 0.48, 0.035), Color("4a5259"))
+	var shadow: MeshInstance3D = factory.cylinder(parent, Vector3(0, 0.005, 0), 1, 0.004, Color.BLACK)
+	shadow.scale = Vector3(1.7, 1, 0.65)
+	_unlit(shadow, 0.28)
+	var seat_x := 0.25 if delivery else -0.60
+	factory.box(parent, Vector3(seat_x, 0.96, -0.30), Vector3(0.11, 0.46, 0.40), Color("354452"))
+	factory.box(parent, Vector3(seat_x, 1.24, -0.30), Vector3(0.12, 0.16, 0.24), Color("354452"))
+	factory.box(parent, Vector3(1.25 if delivery else 0.50, 0.87, 0), Vector3(0.18, 0.12, 1.18), Color("30404d"))
+	var wheel_shape := TorusMesh.new()
+	wheel_shape.inner_radius = 0.12
+	wheel_shape.outer_radius = 0.15
+	wheel_shape.rings = 16
+	wheel_shape.ring_segments = 8
+	var steering: MeshInstance3D = factory.mesh(parent, wheel_shape, Vector3(1.1 if delivery else 0.35, 0.98, -0.30), Color("25303a"))
+	steering.rotation.z = PI / 2
 	return model
 
 func _driver(vehicle: Node3D, role: String, at: Vector3) -> Dictionary:
@@ -210,13 +243,16 @@ func apply_time(time: float, shot_id: String, camera: Camera3D) -> void:
 		actor.player.seek(0, true)
 	_seated(taxi_driver)
 	_seated(van_driver)
-	_pose(taxi_driver, "head", Vector3(0.42 if time >= 18 else 0.0, 0.12 if time < 7 else 0.0, 0))
+	var glance := sin(clampf((time - 4) / 1.5, 0, 1) * PI) * 0.25
+	_pose(taxi_driver, "head", Vector3(0.42 if time >= 18 else 0.0, glance, 0))
 	_pose(van_driver, "head", Vector3(0, -0.25 if time >= 11 and time < 14 else 0, 0))
 	var cup_p := clampf((time - 18.15) / 0.65, 0, 1)
 	cup.position = Vector3(-5.82 - cup_p * 0.08, 1.08 + cup_p * 0.065, 4.65)
 	cup.rotation.z = cup_p * PI / 2
 	_pose(cafe_worker, "spine", Vector3(-0.07 * cup_p, 0, 0))
-	_pose(cafe_worker, "left_upper_arm", Vector3(0.35 + cup_p * 0.5, 0, -0.18))
+	var arrange := sin(clampf((time - 4) / 3.0, 0, 1) * PI) * 0.22
+	_pose(cafe_worker, "left_upper_arm", Vector3(0.35 + arrange + cup_p * 0.5, 0, -0.18))
+	_pose(cafe_worker, "left_forearm", Vector3(0.7 + arrange, 0, 0))
 	bystander.node.visible = time >= 29
 	bystander.player.seek(clampf(time - 29, 0, 3), true)
 	_pose(bystander, "right_thigh", Vector3(-1.35, 0, 0))
@@ -253,7 +289,7 @@ func _camera(shot: String, camera: Camera3D, time: float) -> void:
 			camera.position = van.position + Vector3(-1.9, 1.5, 2.3)
 			camera.look_at(van.position + Vector3(-0.1, 1.0, 0.6))
 		"S01-U005":
-			camera.position = Vector3(-10, 7.5, -11)
+			camera.position = Vector3(-8, 11, -9)
 			camera.look_at(Vector3(-0.1, 1.0, 0.2))
 		"S01-U006":
 			camera.position = Vector3(-5.05, 1.65, 3.75)
@@ -262,7 +298,7 @@ func _camera(shot: String, camera: Camera3D, time: float) -> void:
 			camera.position = Vector3(-6.2, 2.65, -6.0)
 			camera.look_at(display.position)
 		"S01-U008":
-			camera.position = Vector3(4.7, 2.1, 0.5)
+			camera.position = Vector3(4.8, 2.0, 4.8)
 			camera.look_at(Vector3(1.65, 1.0, 2.6))
 
 func _signal(at: Vector3, yaw: float) -> Node3D:

@@ -70,6 +70,8 @@ func _build_ui() -> void:
 	card_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	card_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	card_text.add_theme_font_size_override("font_size", 42)
+	card_text.add_theme_color_override("font_outline_color", Color.BLACK)
+	card_text.add_theme_constant_override("outline_size", 4)
 	card_panel.add_child(card_text)
 	ui = MarginContainer.new()
 	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -181,6 +183,11 @@ func _update_frame() -> void:
 	var words: String = timeline.card_at(clock.elapsed)
 	card_panel.visible = black or not words.is_empty()
 	card_panel.color = Color(0, 0, 0, 1.0 if black else 0.82)
+	var opening_card: bool = clock.elapsed >= 35 and clock.elapsed < 55
+	if opening_card:
+		card_panel.color.a = 0.65
+	card_text.offset_top = 380 if opening_card else 80
+	card_text.offset_bottom = -45 if opening_card else -80
 	card_text.text = words
 	var finale: bool = clock.elapsed >= 845
 	if finale and not entered_finale:
